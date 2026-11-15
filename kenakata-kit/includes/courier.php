@@ -157,6 +157,8 @@ function kk_courier_load() {
 	require_once KK_DIR . '/includes/courier-core.php';
 }
 
+require_once KK_DIR . '/includes/courier-admin.php'; // Courier check on WooCommerce → Orders and the order screen
+
 add_action( 'rest_api_init', function () {
 	$ns   = 'kenakata/v1';
 	$can  = function () {

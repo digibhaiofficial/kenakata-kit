@@ -721,7 +721,11 @@ function kk_courier_rest_checkup( WP_REST_Request $req ) {
 	if ( is_wp_error( $order ) ) {
 		return $order;
 	}
-	return kk_courier_checkup( $order, ! empty( $req->get_param( 'refresh' ) ) );
+	$res = kk_courier_checkup( $order, ! empty( $req->get_param( 'refresh' ) ) );
+	if ( ! is_wp_error( $res ) && function_exists( 'kk_cc_store' ) ) {
+		kk_cc_store( $order, $res ); // the orders list shows the result as a coloured badge
+	}
+	return $res;
 }
 
 /** "Test connection" on the settings screen. $target: a courier key (its account is asked for a balance or store list) or 'check' (BD Courier plan). Books and counts nothing. */

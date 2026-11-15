@@ -4,7 +4,7 @@ Plugin URI: https://digibhai.com/
 Requires at least: 6.3
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 3.13.1
+Stable tag: 3.14.0
 License: GPLv2 or later
 
 Everything a Bangladeshi WooCommerce store usually needs. Settings: left admin menu → Kenakata Kit.
@@ -30,6 +30,12 @@ Products Grid, Products Carousel, Brands, Categories, Buy Now Button, Live Searc
 Older [ss_…] shortcodes keep working. Options: see the guide or Kenakata Kit → Shortcodes.
 
 == Changelog ==
+= 3.14.0 =
+* Store dashboard: products with options. Choose "Simple product" or "With options", give the options any names (Size, Colour, Weight…) and values (S, M, L…); names and values used before are suggested. "Make all combinations" creates one option per combination, each with its own price, sale price, stock and picture; "Same price for all" fills them at once. A simple product can get options later. Names that match WooCommerce → Products → Attributes use those shared lists.
+* Store dashboard: brand on the product form (optional) and "+ New category" / "+ New brand" right there. The Store Manager role may now add categories and brands.
+* Store dashboard: sales report for today, yesterday, 7 days, 30 days, this month, last month or any dates (orders, sales, average order, items sold, a bar per day or month). Cached 5 minutes.
+* Dashboard checks: email (SMTP) plugin, page cache, cart bot guard, courier booking and Free/Pro status, each with a link to fix it.
+
 = 3.13.1 =
 * License: "Order on WhatsApp" button (no key yet? one tap opens WhatsApp with a ready message that includes the site address). Also on Pro-only screens.
 * Updates screen: the plugin's logo and "Tested up to WordPress 7.1" are shown; right after updating, the same version is no longer offered again.

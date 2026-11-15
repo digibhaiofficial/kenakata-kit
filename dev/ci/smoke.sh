@@ -192,6 +192,30 @@ code=$(curl -s -o /tmp/body -w "%{http_code}" -b "$JAR" -H "X-WP-Nonce: $RN" "$U
 check "store dashboard report answers ($code)" '[ "$code" = 200 ] && ! grep -q "rest_no_route" /tmp/body'
 code=$(curl -sL -o /tmp/body -w "%{http_code}" -b "$JAR" "$URL/dashboard/")
 check "store dashboard page opens ($code)" '[ "$code" = 200 ] && clean /tmp/body'
+# 3.14: product with options, brand, new category, date-range report (real WooCommerce)
+wpc eval 'if ( ! taxonomy_exists( "pa_size" ) ) { wc_create_attribute( array( "name" => "Size", "slug" => "size" ) ); }' >/dev/null 2>&1
+curl -s -o /tmp/body -b "$JAR" -H "X-WP-Nonce: $RN" -H "Content-Type: application/json" -X POST -d '{"tax":"category","name":"Salwar Kameez"}' "$URL/?rest_route=/kenakata/v1/sd/terms"
+CATID=$(grep -oP '"id":\K[0-9]+' /tmp/body | head -1)
+check "store dashboard: new category made ($CATID)" '[ -n "$CATID" ] && grep -q "Salwar Kameez" /tmp/body'
+curl -s -o /tmp/body -b "$JAR" -H "X-WP-Nonce: $RN" -H "Content-Type: application/json" -X POST -d '{"name":"Test Kameez","status":"publish","type":"variable","category_ids":['"${CATID:-0}"'],"image_ids":[],"attributes":[{"name":"Size","values":["S","M"]},{"name":"Colour","values":["Red","Blue"]}],"variations":[{"options":{"Size":"S","Colour":"Red"},"regular_price":"1500"},{"options":{"Size":"M","Colour":"Red"},"regular_price":"1500","manage_stock":true,"stock_quantity":4},{"options":{"Size":"S","Colour":"Blue"},"regular_price":"1600","sale_price":"1400"},{"options":{"Size":"M","Colour":"Blue"},"regular_price":"1600"}]}' "$URL/?rest_route=/kenakata/v1/sd/products"
+VPID=$(grep -oP '^\{"id":\K[0-9]+' /tmp/body | head -1)
+vinfo=$(wpc eval '$p = wc_get_product( '"${VPID:-0}"' ); if ( ! $p ) { echo "none"; return; } $a = $p->get_attributes(); echo $p->get_type(), "|", count( $p->get_children() ), "|", isset( $a["pa_size"] ) ? "global" : "own", "|", $p->get_variation_price( "min" ), "-", $p->get_variation_price( "max" ), "|", implode( ",", $p->get_category_ids() );')
+check "product with options saved in WooCommerce (type|options|Size|price range|cat = $vinfo)" '[ "$vinfo" = "variable|4|global|1400-1600|$CATID" ] || [ "$vinfo" = "variable|4|global|1400.00-1600.00|$CATID" ]'
+curl -s -o /tmp/body -b "$JAR" -H "X-WP-Nonce: $RN" "$URL/?rest_route=/kenakata/v1/sd/products/${VPID:-0}"
+check "options come back with their names (Size / Colour)" 'grep -q "\"options\":{\"Size\":\"S\",\"Colour\":\"Red\"}" /tmp/body'
+code=$(curl -sL -o /tmp/body -w "%{http_code}" "$URL/?p=${VPID:-0}")
+check "the product page with options works ($code)" '[ "$code" = 200 ] && clean /tmp/body && grep -q "variations_form" /tmp/body'
+SPID=$(wpc wc product create --user=1 --name="Plain Shirt" --regular_price=900 --porcelain 2>/dev/null)
+wpc eval 'wp_update_post( array( "ID" => '"${SPID:-0}"' ) ); $p = wc_get_product( '"${SPID:-0}"' ); $a = new WC_Product_Attribute(); $a->set_name( "Fabric" ); $a->set_options( array( "Cotton" ) ); $a->set_visible( true ); $a->set_variation( false ); $p->set_attributes( array( $a ) ); $p->save();' >/dev/null 2>&1
+curl -s -o /tmp/body -b "$JAR" -H "X-WP-Nonce: $RN" -H "Content-Type: application/json" -X POST -d '{"type":"variable","attributes":[{"name":"Size","values":["L","XL"]}],"variations":[{"options":{"Size":"L"},"regular_price":"950"},{"options":{"Size":"XL"},"regular_price":"990"}]}' "$URL/?rest_route=/kenakata/v1/sd/products/${SPID:-0}"
+cinfo=$(wpc eval '$p = wc_get_product( '"${SPID:-0}"' ); $a = $p->get_attributes(); echo $p->get_type(), "|", count( $p->get_children() ), "|", isset( $a["fabric"] ) ? "kept" : "lost";')
+check "simple product turned into one with options, its other details kept ($cinfo)" '[ "$cinfo" = "variable|2|kept" ]'
+XID=$(wpc eval 'echo wc_get_product( '"${SPID:-0}"' )->get_children()[0];')
+curl -s -o /tmp/body -b "$JAR" -H "X-WP-Nonce: $RN" -H "Content-Type: application/json" -X POST -d '{"variations":[{"id":'"${XID:-0}"',"remove":true}]}' "$URL/?rest_route=/kenakata/v1/sd/products/${SPID:-0}"
+check "an option can be removed" '[ "$(wpc eval "echo count( wc_get_product( ${SPID:-0} )->get_children() );")" = 1 ]'
+TODAY=$(date +%Y-%m-%d)
+curl -s -o /tmp/body -b "$JAR" -H "X-WP-Nonce: $RN" "$URL/?rest_route=/kenakata/v1/sd/report/range&from=2026-01-01&to=$TODAY"
+check "sales report for chosen dates" 'grep -q "\"orders\":" /tmp/body && grep -q "\"series\":" /tmp/body && ! grep -q "critical error" /tmp/body'
 
 echo "== Order tracking with order number required"
 wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["tr_require_order"] = 1; kk_update_settings( $s );'

@@ -54,6 +54,22 @@ for (let i = 0; i < 27; i++) {
 }
 const cats = [{ id: 47, name: 'Bedroom & Bedding', depth: 0, count: 12 }, { id: 48, name: 'Bedsheets', depth: 1, count: 9 }, { id: 50, name: 'Cushion Covers', depth: 1, count: 1 }, { id: 52, name: 'Table Linen', depth: 0, count: 3 }];
 let nextId = 2000;
+const brands = [{ id: 90, name: 'Purple Flora', depth: 0, count: 5 }];
+const attrSugg = [{ name: 'Size', values: ['S', 'M', 'L', 'XL'], global: true }, { name: 'Color', values: ['Cream', 'Lavender', 'Red'], global: true }];
+function saveOptions(p, body) {
+  if (!Array.isArray(body.attributes)) return '';
+  p.type = 'variable'; p.attributes = body.attributes.map((a) => ({ name: a.name, values: a.values, variation: true, global: false }));
+  const keep = [];
+  (body.variations || []).forEach((r) => {
+    if (r.remove) return;
+    let v = r.id ? p.variations.find((x) => x.id === r.id) : null;
+    if (!v) v = { id: nextId++, image: '', sku: '', status: 'publish', image_id: 0 };
+    v.options = r.options; v.label = Object.keys(r.options).map((k) => k + ': ' + r.options[k]).join(', ');
+    const e = applyPriceStock(v, r); if (e) throw new Error(e);
+    keep.push(v);
+  });
+  p.variations = keep; p.regular_price = ''; p.manage_stock = false; return '';
+}
 const products = [];
 const pnames = ['Tulip', 'Royal Elegance', 'Rose Garden', 'Orchid', 'Lily', 'Joypuri', 'Floral Romance', 'Blossom Bunch', 'Aurora Nest'];
 pnames.forEach((n, i) => {
@@ -63,8 +79,10 @@ pnames.forEach((n, i) => {
     regular_price: variable ? '' : '2350', sale_price: i === 1 ? '2150' : '', manage_stock: !variable, stock_quantity: variable ? '' : [12, 2, 0, 7, 3, 15, 1, 9, 4][i], stock_status: i === 2 ? 'outofstock' : 'instock',
     short_description: '<ul><li>King size: 8.5 ft x 7.5 ft</li><li>1 bedsheet + 2 pillow covers</li></ul>', description: `<p>The <strong>${n}</strong> set.</p><h2>Styling ideas</h2><p>Pairs well with wood.</p><p><img src="x" onerror="alert(2)"></p>`,
     category_ids: [48], images: [{ id: 700 + i, url: IMG(['#e8d9c4', '#d9c6e8', '#c4d9e8'][i % 3]) }], permalink: 'http://localhost:' + PORT + '/product/' + i,
-    variations: variable ? [{ id: 800 + i * 3, label: 'Color: Cream, Set: Standard Set', image: '', sku: '', regular_price: '2350', sale_price: '', manage_stock: true, stock_quantity: 5, stock_status: 'instock', status: 'publish' },
-      { id: 801 + i * 3, label: 'Color: Lavender, Set: With Side Pillow Covers', image: '', sku: '', regular_price: '2650', sale_price: '', manage_stock: false, stock_quantity: '', stock_status: 'outofstock', status: 'publish' }] : [],
+    variations: variable ? [{ id: 800 + i * 3, label: 'Color: Cream, Set: Standard Set', options: { Color: 'Cream', Set: 'Standard Set' }, image_id: 0, image: '', sku: '', regular_price: '2350', sale_price: '', manage_stock: true, stock_quantity: 5, stock_status: 'instock', status: 'publish' },
+      { id: 801 + i * 3, label: 'Color: Lavender, Set: With Side Pillow Covers', options: { Color: 'Lavender', Set: 'With Side Pillow Covers' }, image_id: 0, image: '', sku: '', regular_price: '2650', sale_price: '', manage_stock: false, stock_quantity: '', stock_status: 'outofstock', status: 'publish' }] : [],
+    attributes: variable ? [{ name: 'Color', values: ['Cream', 'Lavender'], variation: true, global: true }, { name: 'Set', values: ['Standard Set', 'With Side Pillow Covers'], variation: true, global: false }] : [],
+    brand_ids: [],
     edit_url: '',
   });
 });
@@ -124,16 +142,19 @@ function api(req, res, route, q, body) {
   }
   if (route === 'products' && req.method === 'POST') {
     if (!body.name) return err(res, 400, 'kk_sd_no_name', 'Please enter a name.');
-    if (body.regular_price === '' || body.regular_price === undefined) return err(res, 400, 'kk_sd_no_price', 'Please enter a price.');
-    const p = { id: nextId++, type: 'simple', editable_type: true, name: body.name, status: body.status, sku: body.sku || '', regular_price: '', sale_price: '', manage_stock: false, stock_quantity: '', stock_status: 'instock', short_description: body.short_description, description: body.description, category_ids: body.category_ids, images: body.image_ids.map((id) => media[id] || { id, url: IMG('#ccc') }), permalink: '', variations: [], edit_url: '' };
-    const e = applyPriceStock(p, body); if (e) return err(res, 400, 'kk_sd_bad_sale', e);
+    if (body.type !== 'variable' && (body.regular_price === '' || body.regular_price === undefined)) return err(res, 400, 'kk_sd_no_price', 'Please enter a price.');
+    const p = { id: nextId++, type: 'simple', editable_type: true, name: body.name, status: body.status, sku: body.sku || '', regular_price: '', sale_price: '', manage_stock: false, stock_quantity: '', stock_status: 'instock', short_description: body.short_description, description: body.description, category_ids: body.category_ids, brand_ids: body.brand_ids || [], attributes: [], images: body.image_ids.map((id) => media[id] || { id, url: IMG('#ccc') }), permalink: '', variations: [], edit_url: '' };
+    if (body.type === 'variable') { try { saveOptions(p, body); } catch (x) { return err(res, 400, 'kk_sd_bad_sale', x.message); } }
+    else { const e = applyPriceStock(p, body); if (e) return err(res, 400, 'kk_sd_bad_sale', e); }
     products.unshift(p); return send(res, 200, p);
   }
   if ((m = route.match(/^products\/(\d+)$/))) {
     const p = products.find((x) => x.id === Number(m[1])); if (!p) return err(res, 404, 'kk_sd_not_found', 'Not found.');
     if (req.method === 'POST') {
       if ('name' in body && !body.name) return err(res, 400, 'kk_sd_no_name', 'Please enter a name.');
-      if (p.type !== 'variable') { const e = applyPriceStock(p, body); if (e) return err(res, 400, 'kk_sd_bad_sale', e); }
+      if (body.type === 'variable') { try { saveOptions(p, body); } catch (x) { return err(res, 400, 'kk_sd_bad_sale', x.message); } }
+      else if (p.type !== 'variable') { const e = applyPriceStock(p, body); if (e) return err(res, 400, 'kk_sd_bad_sale', e); }
+      if (body.brand_ids) p.brand_ids = body.brand_ids;
       Object.assign(p, { name: body.name, status: body.status, sku: body.sku, short_description: body.short_description, description: body.description, category_ids: body.category_ids, images: body.image_ids.map((id) => media[id] || p.images.find((i) => i.id === id) || { id, url: IMG('#ccc') }) });
     }
     return send(res, 200, p);
@@ -144,6 +165,21 @@ function api(req, res, route, q, body) {
     return send(res, 200, p);
   }
   if (route === 'categories') return send(res, 200, cats);
+  if (route === 'brands') return send(res, 200, brands);
+  if (route === 'attributes') return send(res, 200, attrSugg);
+  if (route === 'terms' && req.method === 'POST') {
+    if (!body.name) return err(res, 400, 'kk_sd_no_name', 'Please enter a name.');
+    const list = body.tax === 'brand' ? brands : cats; const have = list.find((x) => x.name.toLowerCase() === body.name.toLowerCase());
+    if (have) return send(res, 200, { id: have.id, name: have.name, existed: true, list });
+    const t = { id: nextId++, name: body.name, depth: body.parent && body.parent !== '0' ? 1 : 0, count: 0 }; list.push(t);
+    return send(res, 200, { id: t.id, name: t.name, existed: false, list });
+  }
+  if (route === 'report/range') {
+    const from = q.get('from'), to = q.get('to'); const days = Math.round((new Date(to) - new Date(from)) / 864e5) + 1;
+    const series = []; for (let i = 0; i < days; i++) { const d = new Date(new Date(from).getTime() + i * 864e5).toISOString().slice(0, 10); series.push({ d, orders: i % 3, sales: (i % 3) * 1200, text: money((i % 3) * 1200) }); }
+    const orders = series.reduce((a, r) => a + r.orders, 0), sales = series.reduce((a, r) => a + r.sales, 0);
+    return send(res, 200, { from, to, monthly: false, series, orders, items: orders * 2, sales: money(sales), avg: money(orders ? sales / orders : 0), truncated: false });
+  }
   if (route === 'media' && req.method === 'POST') { const id = nextId++; media[id] = { id, url: IMG('#9b7bb5') }; return send(res, 200, media[id]); }
   if (route === 'posts' && req.method === 'GET') return send(res, 200, page(posts, q));
   if (route === 'posts' && req.method === 'POST') { if (!body.title) return err(res, 400, 'kk_sd_no_title', 'Please enter a title.'); const p = { id: nextId++, title: body.title, title_raw: body.title, status: body.status, date: { ts: now, text: 'today' }, image: body.featured_id ? (media[body.featured_id] || {}).url : '', link: body.status === 'publish' ? 'http://localhost/p' : '', content: body.content, excerpt: body.excerpt, featured_id: body.featured_id, featured: body.featured_id ? (media[body.featured_id] || {}).url : '', edit_url: '' }; posts.unshift(p); return send(res, 200, p); }
@@ -174,7 +210,7 @@ http.createServer((req, res) => {
   if (u.pathname === '/dashboard/' || u.pathname === '/dashboard') {
     const cfg = {
       rest: `http://localhost:${PORT}/wp-json/kenakata/v1/sd/`, nonce: u.searchParams.get('badnonce') ? 'x' : 'test-nonce', site: 'Purple Flora', home: `http://localhost:${PORT}/`, logo: '',
-      user: { name: 'Shop Owner' }, caps: { orders: true, products: true, publishProduct: true, posts: true, publishPost: true, upload: true, admin: !u.searchParams.get('manager') },
+      user: { name: 'Shop Owner' }, caps: { orders: true, products: true, publishProduct: true, posts: true, publishPost: true, upload: true, terms: true, money: true, admin: !u.searchParams.get('manager') }, brands: true, maxVariations: 100,
       adminUrl: u.searchParams.get('manager') ? '' : `http://localhost:${PORT}/wp-admin/`, logoutUrl: `http://localhost:${PORT}/wp-login.php?action=logout`, profileUrl: `http://localhost:${PORT}/wp-admin/profile.php`, statuses: STATUSES, couriers: COURIERS, currency: '৳', lowStock: 3, i18n: u.searchParams.get('lang') === 'bn' ? i18nBn : i18n,
     };
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });

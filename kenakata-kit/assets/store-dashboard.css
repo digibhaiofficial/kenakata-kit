@@ -373,3 +373,43 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .sd-inc__addr { margin: 0; font-size: 13px; overflow-wrap: anywhere; }
 .sd-inc__actions { display: flex; flex-wrap: wrap; gap: 8px; }
 
+
+/* 3.14: product type, options (variations), new category / brand, report periods */
+.sd-seg--type { display: flex; width: 100%; margin: 6px 0 4px; }
+.sd-seg--type button { flex: 1; min-height: 40px; font-size: 14px; }
+.sd-seg--wrap { display: flex; flex-wrap: wrap; gap: 2px; }
+.sd-newterm__bar { margin-top: 8px; }
+.sd-newterm { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.sd-newterm .sd-input { flex: 1 1 180px; min-width: 0; }
+.sd-attrs { display: grid; gap: 12px; margin: 8px 0 12px; }
+.sd-attr { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--sd-line); border-radius: 12px; background: var(--sd-bg); }
+.sd-attr__head { display: flex; align-items: flex-end; gap: 8px; }
+.sd-attr__head .sd-field { flex: 1; margin: 0; }
+.sd-attr__val { display: flex; gap: 8px; }
+.sd-attr__val .sd-input { flex: 1; min-width: 0; }
+.sd-vals { gap: 6px; }
+.sd-chip--val { min-height: 32px; padding: 4px 6px 4px 12px; font-weight: 600; }
+.sd-chip__x { display: inline-grid; place-items: center; width: 24px; height: 24px; padding: 0; border: 0; border-radius: 50%; background: var(--sd-bg); color: var(--sd-muted); font-size: 16px; line-height: 1; cursor: pointer; }
+.sd-chip__x:hover { background: var(--sd-bad-bg); color: var(--sd-bad); }
+.sd-opts-bar { display: flex; gap: 8px; margin: 4px 0; }
+.sd-bulk { margin: 8px 0; padding: 10px 12px; border: 1px dashed var(--sd-line); border-radius: 10px; }
+.sd-bulk summary { font-weight: 600; cursor: pointer; }
+.sd-bulk__row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.sd-bulk__row .sd-input { flex: 1 1 110px; min-width: 0; }
+.sd-vars { display: grid; gap: 10px; }
+.sd-var { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 10px; border: 1px solid var(--sd-line); border-radius: 12px; background: var(--sd-card); }
+.sd-var.is-stale { border-color: var(--sd-bad); }
+.sd-var__pic { display: grid; place-items: center; width: 56px; height: 56px; overflow: hidden; border: 1px dashed var(--sd-line); border-radius: 10px; background: var(--sd-bg); color: var(--sd-muted); cursor: pointer; }
+.sd-var__pic img { width: 100%; height: 100%; object-fit: cover; }
+.sd-var__pic.is-busy { opacity: .5; }
+.sd-var__label { display: block; margin-bottom: 6px; }
+.sd-var__fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.sd-var__fields .sd-field { margin: 0; }
+.sd-var__fields .sd-label { font-size: 12px; }
+.sd-range { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 10px; }
+.sd-range .sd-input { flex: 1 1 140px; min-width: 0; }
+@media (max-width: 520px) {
+	.sd-var { grid-template-columns: 48px minmax(0, 1fr) auto; }
+	.sd-var__pic { width: 48px; height: 48px; }
+	.sd-var__fields { grid-template-columns: 1fr 1fr; }
+}

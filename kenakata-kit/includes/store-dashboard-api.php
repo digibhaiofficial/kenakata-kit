@@ -587,7 +587,51 @@ function kk_sd_variation_data( WC_Product_Variation $v ) {
 		'stock_quantity' => null === $v->get_stock_quantity( 'edit' ) ? '' : (int) $v->get_stock_quantity( 'edit' ),
 		'stock_status'   => $v->get_stock_status( 'edit' ),
 		'status'         => $v->get_status( 'edit' ),
+		'image_id'       => (int) $v->get_image_id( 'edit' ),
+		'options'        => kk_sd_variation_options( $v ),
 	);
+}
+
+/** A variation's choices as attribute name => value text, e.g. array( 'Size' => 'M', 'Color' => 'Red' ). */
+function kk_sd_variation_options( WC_Product_Variation $v ) {
+	$parent = wc_get_product( $v->get_parent_id() );
+	$out    = array();
+	if ( ! $parent ) {
+		return $out;
+	}
+	foreach ( $parent->get_attributes() as $key => $attr ) {
+		if ( ! $attr instanceof WC_Product_Attribute || ! $attr->get_variation() ) {
+			continue;
+		}
+		$value = (string) $v->get_attribute( $key ); // term name for global attributes, text for own ones
+		$out[ kk_sd_attr_label( $attr ) ] = '' === $value ? '' : html_entity_decode( $value, ENT_QUOTES, 'UTF-8' );
+	}
+	return $out;
+}
+
+/** Name of an attribute as the shop owner sees it ("Size", not "pa_size"). */
+function kk_sd_attr_label( WC_Product_Attribute $attr ) {
+	return html_entity_decode( $attr->is_taxonomy() ? wc_attribute_label( $attr->get_name() ) : $attr->get_name(), ENT_QUOTES, 'UTF-8' );
+}
+
+/** The product's attributes for the form: name, values, used for options or not. */
+function kk_sd_product_attributes( WC_Product $p ) {
+	$out = array();
+	foreach ( $p->get_attributes() as $attr ) {
+		if ( ! $attr instanceof WC_Product_Attribute ) {
+			continue;
+		}
+		$values = array();
+		if ( $attr->is_taxonomy() ) {
+			foreach ( $attr->get_terms() ? $attr->get_terms() : array() as $term ) {
+				$values[] = html_entity_decode( $term->name, ENT_QUOTES, 'UTF-8' );
+			}
+		} else {
+			$values = array_map( function ( $v ) { return html_entity_decode( (string) $v, ENT_QUOTES, 'UTF-8' ); }, $attr->get_options() );
+		}
+		$out[] = array( 'name' => kk_sd_attr_label( $attr ), 'values' => array_values( $values ), 'variation' => (bool) $attr->get_variation(), 'global' => $attr->is_taxonomy() );
+	}
+	return $out;
 }
 
 function kk_sd_product_full( WC_Product $p ) {
@@ -622,6 +666,8 @@ function kk_sd_product_full( WC_Product $p ) {
 		'short_description' => kk_sd_editable_html( $p->get_short_description( 'edit' ) ),
 		'description'       => kk_sd_editable_html( $p->get_description( 'edit' ) ),
 		'category_ids'      => array_map( 'absint', $p->get_category_ids( 'edit' ) ),
+		'brand_ids'         => kk_brand_taxonomy() ? array_map( 'absint', wp_get_object_terms( $p->get_id(), kk_brand_taxonomy(), array( 'fields' => 'ids' ) ) ) : array(),
+		'attributes'        => kk_sd_product_attributes( $p ),
 		'images'            => $images,
 		'permalink'         => 'publish' === $p->get_status() ? get_permalink( $p->get_id() ) : '',
 		'variations'        => $variations,
@@ -740,8 +786,10 @@ function kk_sd_apply_price_stock( WC_Product $p, array $clean ) {
 
 function kk_sd_product_save( WP_REST_Request $req ) {
 	$creating = empty( $req['id'] );
+	$data     = kk_sd_body( $req );
+	$want     = isset( $data['type'] ) && 'variable' === $data['type'] ? 'variable' : '';
 	if ( $creating ) {
-		$p = new WC_Product_Simple();
+		$p = 'variable' === $want ? new WC_Product_Variable() : new WC_Product_Simple();
 	} else {
 		$p = kk_sd_get_product( $req['id'] );
 		if ( is_wp_error( $p ) ) {
@@ -750,8 +798,27 @@ function kk_sd_product_save( WP_REST_Request $req ) {
 		if ( ! in_array( $p->get_type(), array( 'simple', 'variable' ), true ) ) {
 			return kk_sd_error( 'type', __( 'This kind of product can only be edited in WordPress admin.', 'kenakata-kit' ) );
 		}
+		if ( 'variable' === $want && $p->is_type( 'simple' ) ) { // Simple → with options (one way: options are kept safe)
+			wp_set_object_terms( $p->get_id(), 'variable', 'product_type' );
+			wc_delete_product_transients( $p->get_id() );
+			$p = new WC_Product_Variable( $p->get_id() );
+		}
 	}
-	$data = kk_sd_body( $req );
+	if ( $p->is_type( 'variable' ) && array_key_exists( 'attributes', $data ) ) {
+		$attrs = kk_sd_build_attributes( (array) $data['attributes'] );
+		if ( is_wp_error( $attrs ) ) {
+			return $attrs;
+		}
+		// Attributes that only describe the product (not used for options) are kept as they are.
+		$keep = array_filter( $p->get_attributes(), function ( $a ) {
+			return $a instanceof WC_Product_Attribute && ! $a->get_variation();
+		} );
+		$pos = count( $attrs );
+		foreach ( $keep as $a ) {
+			$a->set_position( $pos++ );
+		}
+		$p->set_attributes( array_merge( $attrs, array_values( $keep ) ) );
+	}
 
 	if ( $creating || array_key_exists( 'name', $data ) ) {
 		$name = trim( sanitize_text_field( (string) ( $data['name'] ?? '' ) ) );
@@ -806,6 +873,23 @@ function kk_sd_product_save( WP_REST_Request $req ) {
 	if ( ! $p->get_id() ) {
 		return kk_sd_error( 'save', __( 'Something went wrong. Please try again.', 'kenakata-kit' ), 500 );
 	}
+	delete_transient( 'kk_sd_attr_sugg' );
+	if ( array_key_exists( 'brand_ids', $data ) && kk_brand_taxonomy() && current_user_can( 'assign_product_terms' ) ) {
+		$brands = array();
+		foreach ( (array) $data['brand_ids'] as $id ) {
+			$term = get_term( absint( $id ), kk_brand_taxonomy() );
+			if ( $term && ! is_wp_error( $term ) ) {
+				$brands[] = (int) $term->term_id;
+			}
+		}
+		wp_set_object_terms( $p->get_id(), $brands, kk_brand_taxonomy() );
+	}
+	if ( $p->is_type( 'variable' ) && array_key_exists( 'variations', $data ) ) {
+		$done = kk_sd_save_variations( wc_get_product( $p->get_id() ), (array) $data['variations'] );
+		if ( is_wp_error( $done ) ) {
+			return $done;
+		}
+	}
 	kk_sd_flush_summary();
 	return kk_sd_product_full( wc_get_product( $p->get_id() ) );
 }
@@ -856,6 +940,323 @@ function kk_sd_categories() {
 	};
 	$walk( 0, 0 );
 	return $out;
+}
+
+/* =========================================================================
+ * Product options (variable products): attributes, variations, suggestions
+ * ====================================================================== */
+
+/**
+ * Attributes from the form: array( array( name, values[] ) ). A name that matches a global attribute
+ * (Products → Attributes, e.g. "Size") uses it, adding new values as terms when the user may; any other name
+ * becomes the product's own attribute. All are used for options and shown on the product page.
+ */
+function kk_sd_build_attributes( array $rows ) {
+	$attrs = array();
+	$pos   = 0;
+	$seen  = array();
+	foreach ( $rows as $row ) {
+		$name   = trim( sanitize_text_field( (string) ( $row['name'] ?? '' ) ) );
+		$values = array();
+		foreach ( (array) ( $row['values'] ?? array() ) as $v ) {
+			$v = trim( sanitize_text_field( (string) $v ) );
+			if ( '' !== $v && ! in_array( kk_sd_lc( $v ), array_map( 'kk_sd_lc', $values ), true ) ) {
+				$values[] = str_replace( '|', '-', $v ); // "|" separates values in WooCommerce
+			}
+		}
+		if ( '' === $name || ! $values ) {
+			continue;
+		}
+		$key = kk_sd_lc( $name );
+		if ( isset( $seen[ $key ] ) ) {
+			return kk_sd_error( 'attr_twice', sprintf( /* translators: %s: option name such as Size */ __( '"%s" is listed twice.', 'kenakata-kit' ), $name ) );
+		}
+		$seen[ $key ] = true;
+		$attr         = new WC_Product_Attribute();
+		$tax_id       = kk_sd_global_attribute_id( $name );
+		if ( $tax_id ) {
+			$taxonomy = wc_attribute_taxonomy_name_by_id( $tax_id );
+			$term_ids = array();
+			foreach ( $values as $v ) {
+				$term = get_term_by( 'name', $v, $taxonomy );
+				if ( ! $term && current_user_can( 'manage_product_terms' ) ) {
+					$made = wp_insert_term( $v, $taxonomy );
+					$term = is_wp_error( $made ) ? null : get_term( $made['term_id'], $taxonomy );
+				}
+				if ( $term && ! is_wp_error( $term ) ) {
+					$term_ids[] = (int) $term->term_id;
+				}
+			}
+			if ( count( $term_ids ) === count( $values ) ) {
+				$attr->set_id( $tax_id );
+				$attr->set_name( $taxonomy );
+				$attr->set_options( $term_ids );
+			} else {
+				$tax_id = 0; // not allowed to add values to the shared list: keep them on this product only
+			}
+		}
+		if ( ! $tax_id ) {
+			$attr->set_id( 0 );
+			$attr->set_name( $name );
+			$attr->set_options( $values );
+		}
+		$attr->set_position( $pos++ );
+		$attr->set_visible( true );
+		$attr->set_variation( true );
+		$attrs[] = $attr;
+	}
+	if ( count( $attrs ) > 3 ) {
+		return kk_sd_error( 'attr_many', __( 'Use at most 3 option types (for example Size, Colour, Fabric).', 'kenakata-kit' ) );
+	}
+	return $attrs;
+}
+
+/** Lower case for comparing names (Bengali-safe when mbstring is there). */
+function kk_sd_lc( $s ) {
+	return function_exists( 'mb_strtolower' ) ? mb_strtolower( (string) $s, 'UTF-8' ) : strtolower( (string) $s );
+}
+
+/** Id of the global attribute with this name or label ("Size" → pa_size), or 0. */
+function kk_sd_global_attribute_id( $name ) {
+	$want = kk_sd_lc( trim( (string) $name ) );
+	foreach ( wc_get_attribute_taxonomies() as $t ) {
+		if ( kk_sd_lc( (string) $t->attribute_label ) === $want || kk_sd_lc( (string) $t->attribute_name ) === sanitize_title( $name ) ) {
+			return taxonomy_exists( wc_attribute_taxonomy_name( $t->attribute_name ) ) ? (int) $t->attribute_id : 0;
+		}
+	}
+	return 0;
+}
+
+/**
+ * Create, change and remove options of a variable product.
+ * $rows: array( array( id?, options => array( name => value ), regular_price, sale_price, manage_stock, stock_quantity, stock_status, sku, image_id, remove ) ).
+ */
+function kk_sd_save_variations( WC_Product_Variable $p, array $rows ) {
+	$map = array(); // attribute label (lower case) => array( key, is_taxonomy, taxonomy )
+	foreach ( $p->get_attributes() as $key => $attr ) {
+		if ( $attr instanceof WC_Product_Attribute && $attr->get_variation() ) {
+			$map[ kk_sd_lc( kk_sd_attr_label( $attr ) ) ] = array( sanitize_title( $key ), $attr->is_taxonomy(), $attr->is_taxonomy() ? $attr->get_name() : '', $attr );
+		}
+	}
+	$children = array_map( 'intval', $p->get_children() );
+	$count    = count( $children );
+	$errors   = array();
+	foreach ( $rows as $i => $row ) {
+		$id = absint( $row['id'] ?? 0 );
+		if ( $id && ! in_array( $id, $children, true ) ) {
+			continue; // not an option of this product
+		}
+		if ( $id && ! empty( $row['remove'] ) ) {
+			$v = wc_get_product( $id );
+			if ( $v ) {
+				$v->delete( true );
+				$count--;
+			}
+			continue;
+		}
+		if ( ! $id && $count >= kk_sd_max_variations() ) {
+			return kk_sd_error( 'var_many', sprintf( /* translators: %d: number */ __( 'A product can have at most %d options here.', 'kenakata-kit' ), kk_sd_max_variations() ) );
+		}
+		$v = $id ? wc_get_product( $id ) : new WC_Product_Variation();
+		if ( ! $v instanceof WC_Product_Variation ) {
+			continue;
+		}
+		if ( ! $id ) {
+			$v->set_parent_id( $p->get_id() );
+			$v->set_status( 'publish' );
+		}
+		if ( isset( $row['options'] ) && is_array( $row['options'] ) ) {
+			$set = array();
+			foreach ( $row['options'] as $label => $value ) {
+				$m = $map[ kk_sd_lc( trim( (string) $label ) ) ] ?? null;
+				if ( ! $m ) {
+					continue;
+				}
+				$value = trim( sanitize_text_field( (string) $value ) );
+				if ( $m[1] ) { // global attribute: the term's slug
+					$term = '' === $value ? null : get_term_by( 'name', $value, $m[2] );
+					$set[ $m[0] ] = $term ? $term->slug : '';
+				} else {
+					$set[ $m[0] ] = $value; // '' = "any"
+				}
+			}
+			$v->set_attributes( $set );
+		}
+		$clean = kk_sd_clean_price_stock( $row, false );
+		if ( is_wp_error( $clean ) ) {
+			$errors[] = $clean->get_error_message();
+			continue;
+		}
+		kk_sd_apply_price_stock( $v, $clean );
+		if ( array_key_exists( 'sku', $row ) ) {
+			try {
+				$v->set_sku( wc_clean( (string) $row['sku'] ) );
+			} catch ( WC_Data_Exception $e ) {
+				$errors[] = $e->getMessage();
+			}
+		}
+		if ( array_key_exists( 'image_id', $row ) ) {
+			$img = kk_sd_clean_image_ids( array( $row['image_id'] ) );
+			$v->set_image_id( $img ? $img[0] : '' );
+		}
+		$v->save();
+		if ( ! $id ) {
+			$count++;
+		}
+	}
+	WC_Product_Variable::sync( $p->get_id() );
+	wc_delete_product_transients( $p->get_id() );
+	return $errors ? kk_sd_error( 'var_some', implode( ' ', array_unique( $errors ) ) ) : true;
+}
+
+/** Suggestions for option names and values: the shop's global attributes and names used on recent products. Cached 10 minutes. */
+function kk_sd_attribute_suggestions() {
+	$saved = get_transient( 'kk_sd_attr_sugg' );
+	if ( is_array( $saved ) ) {
+		return $saved;
+	}
+	$out = array();
+	foreach ( wc_get_attribute_taxonomies() as $t ) {
+		$tax = wc_attribute_taxonomy_name( $t->attribute_name );
+		if ( ! taxonomy_exists( $tax ) ) {
+			continue;
+		}
+		$terms = get_terms( array( 'taxonomy' => $tax, 'hide_empty' => false, 'number' => 60, 'fields' => 'names' ) );
+		$out[ kk_sd_lc( $t->attribute_label ) ] = array( 'name' => html_entity_decode( $t->attribute_label, ENT_QUOTES, 'UTF-8' ), 'values' => is_wp_error( $terms ) ? array() : array_map( function ( $n ) { return html_entity_decode( $n, ENT_QUOTES, 'UTF-8' ); }, $terms ), 'global' => true );
+	}
+	$recent = wc_get_products( array( 'type' => 'variable', 'limit' => 30, 'orderby' => 'date', 'order' => 'DESC', 'status' => array( 'publish', 'draft', 'pending', 'private' ) ) );
+	foreach ( $recent as $p ) {
+		foreach ( kk_sd_product_attributes( $p ) as $a ) {
+			$k = kk_sd_lc( $a['name'] );
+			if ( ! isset( $out[ $k ] ) ) {
+				$out[ $k ] = array( 'name' => $a['name'], 'values' => array(), 'global' => false );
+			}
+			$out[ $k ]['values'] = array_slice( array_values( array_unique( array_merge( $out[ $k ]['values'], $a['values'] ) ) ), 0, 60 );
+		}
+	}
+	$out = array_values( $out );
+	set_transient( 'kk_sd_attr_sugg', $out, 10 * MINUTE_IN_SECONDS );
+	return $out;
+}
+
+/** Categories or brands as a tree list (id, name, depth, count). */
+function kk_sd_term_list( $taxonomy ) {
+	if ( ! $taxonomy || ! taxonomy_exists( $taxonomy ) ) {
+		return array();
+	}
+	$terms = get_terms( array( 'taxonomy' => $taxonomy, 'hide_empty' => false, 'orderby' => 'name' ) );
+	if ( is_wp_error( $terms ) ) {
+		return array();
+	}
+	$by_parent = array();
+	foreach ( $terms as $t ) {
+		$by_parent[ (int) $t->parent ][] = $t;
+	}
+	$out  = array();
+	$walk = function ( $parent, $depth ) use ( &$walk, &$out, $by_parent ) {
+		foreach ( $by_parent[ $parent ] ?? array() as $t ) {
+			$out[] = array( 'id' => (int) $t->term_id, 'name' => html_entity_decode( $t->name, ENT_QUOTES, 'UTF-8' ), 'depth' => $depth, 'count' => (int) $t->count );
+			$walk( (int) $t->term_id, $depth + 1 );
+		}
+	};
+	$walk( 0, 0 );
+	return $out;
+}
+
+/** New category or brand from the product form. */
+function kk_sd_term_create( WP_REST_Request $req ) {
+	$data = kk_sd_body( $req );
+	$tax  = 'brand' === ( $data['tax'] ?? '' ) ? kk_brand_taxonomy() : 'product_cat';
+	if ( ! $tax ) {
+		return kk_sd_error( 'no_brands', __( 'Brands are not turned on (WooCommerce → Products → Brands).', 'kenakata-kit' ) );
+	}
+	$name = trim( sanitize_text_field( (string) ( $data['name'] ?? '' ) ) );
+	if ( '' === $name ) {
+		return kk_sd_error( 'no_name', __( 'Please enter a name.', 'kenakata-kit' ) );
+	}
+	$have = get_term_by( 'name', $name, $tax );
+	if ( $have ) {
+		return array( 'id' => (int) $have->term_id, 'name' => html_entity_decode( $have->name, ENT_QUOTES, 'UTF-8' ), 'existed' => true, 'list' => kk_sd_term_list( $tax ) );
+	}
+	$parent = absint( $data['parent'] ?? 0 );
+	$made   = wp_insert_term( $name, $tax, $parent && is_taxonomy_hierarchical( $tax ) ? array( 'parent' => $parent ) : array() );
+	if ( is_wp_error( $made ) ) {
+		return kk_sd_error( 'term', $made->get_error_message() );
+	}
+	return array( 'id' => (int) $made['term_id'], 'name' => $name, 'existed' => false, 'list' => kk_sd_term_list( $tax ) );
+}
+
+/**
+ * Sales between two dates (the shop's own days), with one bar per day (or per month for long ranges).
+ * At most 366 days and 5,000 orders; cached 5 minutes (cleared when an order changes).
+ */
+function kk_sd_report_range( $from, $to ) {
+	$tz = wp_timezone();
+	$a  = DateTimeImmutable::createFromFormat( '!Y-m-d', (string) $from, $tz );
+	$b  = DateTimeImmutable::createFromFormat( '!Y-m-d', (string) $to, $tz );
+	if ( ! $a || ! $b ) {
+		return kk_sd_error( 'bad_date', __( 'Please choose both dates.', 'kenakata-kit' ) );
+	}
+	if ( $b < $a ) {
+		list( $a, $b ) = array( $b, $a );
+	}
+	$days = (int) $a->diff( $b )->days + 1;
+	if ( $days > 366 ) {
+		return kk_sd_error( 'too_long', __( 'Choose at most one year.', 'kenakata-kit' ) );
+	}
+	$key   = 'kk_sd_rep_r_' . (int) get_option( 'kk_sd_rep_gen', 0 ) . '_' . $a->format( 'Ymd' ) . '_' . $b->format( 'Ymd' );
+	$saved = get_transient( $key );
+	if ( is_array( $saved ) ) {
+		return $saved;
+	}
+	$cap  = 5000;
+	$list = wc_get_orders( array(
+		'type'         => 'shop_order',
+		'status'       => kk_sd_sale_statuses(),
+		'limit'        => $cap,
+		'date_created' => $a->getTimestamp() . '...' . ( $b->modify( '+1 day' )->getTimestamp() - 1 ),
+	) );
+	$list    = is_array( $list ) ? $list : array();
+	$monthly = $days > 62;
+	$series  = array();
+	for ( $d = $a; $d <= $b; $d = $d->modify( '+1 day' ) ) {
+		$series[ $d->format( $monthly ? 'Y-m' : 'Y-m-d' ) ] = array( 'orders' => 0, 'sales' => 0.0 );
+	}
+	$orders = 0;
+	$sales  = 0.0;
+	$items  = 0;
+	foreach ( $list as $o ) {
+		if ( ! $o instanceof WC_Order || ! $o->get_date_created() ) {
+			continue;
+		}
+		$k = $o->get_date_created()->date( $monthly ? 'Y-m' : 'Y-m-d' );
+		if ( ! isset( $series[ $k ] ) ) {
+			continue;
+		}
+		$value = max( 0.0, (float) $o->get_total() - (float) $o->get_total_refunded() );
+		$series[ $k ]['orders']++;
+		$series[ $k ]['sales'] += $value;
+		$orders++;
+		$sales += $value;
+		$items += (int) $o->get_item_count();
+	}
+	$rows = array();
+	foreach ( $series as $d => $v ) {
+		$rows[] = array( 'd' => $d, 'orders' => $v['orders'], 'sales' => round( $v['sales'], 2 ), 'text' => kk_sd_money( $v['sales'] ) );
+	}
+	$data = array(
+		'from'      => $a->format( 'Y-m-d' ),
+		'to'        => $b->format( 'Y-m-d' ),
+		'monthly'   => $monthly,
+		'series'    => $rows,
+		'orders'    => $orders,
+		'items'     => $items,
+		'sales'     => kk_sd_money( $sales ),
+		'avg'       => $orders ? kk_sd_money( $sales / $orders ) : kk_sd_money( 0 ),
+		'truncated' => count( $list ) >= $cap,
+	);
+	set_transient( $key, $data, 5 * MINUTE_IN_SECONDS );
+	return $data;
 }
 
 /* =========================================================================
@@ -1045,6 +1446,13 @@ add_action( 'rest_api_init', function () {
 			return kk_sd_report_trend( absint( $req->get_param( 'days' ) ) );
 		},
 	) );
+	register_rest_route( $ns, '/sd/report/range', array(
+		'methods'             => 'GET',
+		'permission_callback' => $money,
+		'callback'            => function ( WP_REST_Request $req ) {
+			return kk_sd_report_range( sanitize_text_field( (string) $req->get_param( 'from' ) ), sanitize_text_field( (string) $req->get_param( 'to' ) ) );
+		},
+	) );
 	register_rest_route( $ns, '/sd/report/top', array(
 		'methods'             => 'GET',
 		'permission_callback' => $money,
@@ -1072,6 +1480,11 @@ add_action( 'rest_api_init', function () {
 	$route( 'products/' . $id, 'POST', 'edit_products', 'kk_sd_product_save' );
 	$route( 'variations/' . $id, 'POST', 'edit_products', 'kk_sd_variation_save' );
 	$route( 'categories', 'GET', 'edit_products', 'kk_sd_categories' );
+	$route( 'brands', 'GET', 'edit_products', function () {
+		return kk_sd_term_list( kk_brand_taxonomy() );
+	} );
+	$route( 'terms', 'POST', 'manage_product_terms', 'kk_sd_term_create' );
+	$route( 'attributes', 'GET', 'edit_products', 'kk_sd_attribute_suggestions' );
 
 	$route( 'media', 'POST', 'upload_files', 'kk_sd_upload' );
 

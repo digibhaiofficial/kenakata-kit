@@ -8100,3 +8100,195 @@ msgstr "হ্যালো, আমি Kenakata Kit Pro কিনতে চাই
 
 msgid "No key yet? Order on WhatsApp"
 msgstr "লাইসেন্স কী নেই? WhatsApp-এ অর্ডার করুন"
+
+msgid "No brands yet."
+msgstr "এখনো কোনো ব্র্যান্ড নেই।"
+
+msgid "New brand name"
+msgstr "নতুন ব্র্যান্ডের নাম"
+
+msgid "New category name"
+msgstr "নতুন ক্যাটাগরির নাম"
+
+msgid "Main category (no parent)"
+msgstr "মূল ক্যাটাগরি (উপরে কিছু নেই)"
+
+msgid "Parent category"
+msgstr "কোন ক্যাটাগরির ভেতরে"
+
+msgid "Add brand"
+msgstr "ব্র্যান্ড যোগ করুন"
+
+msgid "Add category"
+msgstr "ক্যাটাগরি যোগ করুন"
+
+msgid "New brand"
+msgstr "নতুন ব্র্যান্ড"
+
+msgid "New category"
+msgstr "নতুন ক্যাটাগরি"
+
+msgid "It already existed and is now ticked."
+msgstr "এটা আগে থেকেই ছিল, টিক দেওয়া হলো।"
+
+msgid "Added and ticked."
+msgstr "যোগ হয়েছে, টিক দেওয়া হলো।"
+
+msgid "Options (size, colour…)"
+msgstr "অপশন (সাইজ, রং…)"
+
+msgid "Simple product"
+msgstr "সাধারণ প্রোডাক্ট"
+
+msgid "With options (size, colour…)"
+msgstr "অপশনসহ (সাইজ, রং…)"
+
+msgid "Product type"
+msgstr "প্রোডাক্টের ধরন"
+
+msgid "Choose \"With options\" when the customer picks a size, colour or other choice, each with its own price and stock."
+msgstr "কাস্টমার যদি সাইজ, রং বা অন্য কিছু বেছে নেয় আর প্রতিটার দাম/স্টক আলাদা হয়, তাহলে \"অপশনসহ\" বাছুন।"
+
+msgid "You can add options to this product. After saving with options it cannot become a simple product again here."
+msgstr "এই প্রোডাক্টে অপশন যোগ করা যায়। অপশনসহ সেভ করার পর এখান থেকে আর সাধারণ প্রোডাক্টে ফেরানো যায় না।"
+
+msgid "Optional: leave empty if the product has no brand."
+msgstr "ঐচ্ছিক: ব্র্যান্ড না থাকলে ফাঁকা রাখুন।"
+
+msgid "Any"
+msgstr "যেকোনো"
+
+msgid "e.g. Size, Colour, Weight"
+msgstr "যেমন: সাইজ, রং, ওজন"
+
+msgid "Option name"
+msgstr "অপশনের নাম"
+
+msgid "Type a value and press Enter (S, M, L…)"
+msgstr "মান লিখে Enter চাপুন (S, M, L…)"
+
+msgid "Option values"
+msgstr "অপশনের মান"
+
+msgid "Add"
+msgstr "যোগ"
+
+msgid "Add another option (e.g. Colour)"
+msgstr "আরেকটা অপশন যোগ করুন (যেমন রং)"
+
+msgid "{n} combinations possible · {have} added below"
+msgstr "মোট {n}টা কম্বিনেশন সম্ভব · নিচে {have}টা আছে"
+
+msgid "Give the option a name and at least one value, then press \"Make all combinations\"."
+msgstr "অপশনের নাম আর অন্তত একটা মান দিন, তারপর \"সব কম্বিনেশন বানাও\" চাপুন।"
+
+msgid "empty = not counted"
+msgstr "ফাঁকা = গোনা হবে না"
+
+msgid "Picture for this option"
+msgstr "এই অপশনের ছবি"
+
+msgid "not in the values above"
+msgstr "উপরের মানে নেই"
+
+msgid "Make all combinations"
+msgstr "সব কম্বিনেশন বানাও"
+
+msgid "At most {n} options per product."
+msgstr "একটা প্রোডাক্টে সর্বোচ্চ {n}টা অপশন।"
+
+msgid "{n} new options added. Set their prices, then save."
+msgstr "{n}টা নতুন অপশন যোগ হয়েছে। দাম দিয়ে সেভ করুন।"
+
+msgid "All combinations are already there."
+msgstr "সব কম্বিনেশন আগে থেকেই আছে।"
+
+msgid "Apply to all"
+msgstr "সবগুলোতে বসাও"
+
+msgid "Same price or stock for all options"
+msgstr "সব অপশনে একই দাম বা স্টক"
+
+msgid "Each combination (for example M / Red) is an option with its own price, stock and picture."
+msgstr "প্রতিটা কম্বিনেশন (যেমন M / লাল) একটা অপশন, যার নিজের দাম, স্টক আর ছবি থাকে।"
+
+msgid "An option has values but no name."
+msgstr "একটা অপশনের মান আছে কিন্তু নাম নেই।"
+
+msgid "Press \"Make all combinations\" first."
+msgstr "আগে \"সব কম্বিনেশন বানাও\" চাপুন।"
+
+msgid "Please enter a price for {option}."
+msgstr "{option}-এর দাম দিন।"
+
+msgid "Yesterday"
+msgstr "গতকাল"
+
+msgid "This month"
+msgstr "এই মাস"
+
+msgid "Last month"
+msgstr "গত মাস"
+
+msgid "Period"
+msgstr "সময়"
+
+msgid "Choose dates"
+msgstr "তারিখ বাছুন"
+
+msgid "From"
+msgstr "থেকে"
+
+msgid "To"
+msgstr "পর্যন্ত"
+
+msgid "Items sold"
+msgstr "বিক্রি হওয়া পণ্য"
+
+msgid "Sales report"
+msgstr "বিক্রির হিসাব"
+
+msgid "\"%s\" is listed twice."
+msgstr "\"%s\" দুবার দেওয়া হয়েছে।"
+
+msgid "Use at most 3 option types (for example Size, Colour, Fabric)."
+msgstr "সর্বোচ্চ ৩ ধরনের অপশন দিন (যেমন সাইজ, রং, কাপড়)।"
+
+msgid "A product can have at most %d options here."
+msgstr "এখান থেকে একটা প্রোডাক্টে সর্বোচ্চ %dটা অপশন রাখা যায়।"
+
+msgid "Brands are not turned on (WooCommerce → Products → Brands)."
+msgstr "ব্র্যান্ড চালু নেই (WooCommerce → Products → Brands)।"
+
+msgid "Please choose both dates."
+msgstr "দুটো তারিখই বাছুন।"
+
+msgid "Choose at most one year."
+msgstr "সর্বোচ্চ এক বছর বাছুন।"
+
+msgid "optional"
+msgstr "ঐচ্ছিক"
+
+msgid "An email (SMTP) plugin is active: order emails go out through a real mailbox"
+msgstr "ইমেইল (SMTP) প্লাগইন চালু: অর্ডারের ইমেইল আসল মেইলবক্স দিয়ে যায়"
+
+msgid "No email (SMTP) plugin: on many hostings order emails are never delivered. Install FluentSMTP (free) and connect your shop's mailbox, then send a test email."
+msgstr "কোনো ইমেইল (SMTP) প্লাগইন নেই: অনেক হোস্টিংয়ে অর্ডারের ইমেইল পৌঁছায়ই না। FluentSMTP (ফ্রি) বসিয়ে দোকানের মেইলবক্স যুক্ত করুন, তারপর একটা পরীক্ষার ইমেইল পাঠান।"
+
+msgid "No page cache plugin: pages are built again for every visitor. On LiteSpeed hosting use LiteSpeed Cache (free)."
+msgstr "কোনো পেজ ক্যাশ প্লাগইন নেই: প্রতিটা ভিজিটরের জন্য পেজ নতুন করে বানাতে হয়। LiteSpeed হোস্টিংয়ে LiteSpeed Cache (ফ্রি) ব্যবহার করুন।"
+
+msgid "Bots cannot fill the cart through \"add to cart\" links"
+msgstr "বট \"add to cart\" লিংক দিয়ে কার্ট ভরতে পারে না"
+
+msgid "Cart bot guard is off: bots opening \"add to cart\" links can overload the server"
+msgstr "কার্ট-বট গার্ড বন্ধ: \"add to cart\" লিংক খোলা বট সার্ভারে চাপ বাড়াতে পারে"
+
+msgid "One-tap courier booking is ready: %s"
+msgstr "এক চাপে কুরিয়ার বুকিং তৈরি: %s"
+
+msgid "No courier connected yet: add Steadfast, Pathao, RedX or eCourier keys to send parcels with one tap"
+msgstr "এখনো কোনো কুরিয়ার যুক্ত নেই: এক চাপে পার্সেল পাঠাতে Steadfast, Pathao, RedX বা eCourier-এর কী দিন"
+
+msgid "Free version: store dashboard, courier booking and incomplete orders need a Pro key (License tab)"
+msgstr "ফ্রি ভার্সন: স্টোর ড্যাশবোর্ড, কুরিয়ার বুকিং আর অসম্পূর্ণ অর্ডারের জন্য Pro কী লাগবে (License ট্যাব)"

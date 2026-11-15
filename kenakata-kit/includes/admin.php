@@ -687,6 +687,19 @@ function kk_render_dashboard() {
 			$checks[] = array( false, sprintf( __( 'Scheduled tasks (cron) are not running: last run %d minutes ago. Backups, scheduled sales and emails may not run. Add a server cron job (hosting panel → Cron Jobs, every 5 minutes) that opens your-site/wp-cron.php.', 'kenakata-kit' ), $cron['minutes_since_last'] ) );
 		}
 	}
+	// Things that often go wrong on a new shop (3.14).
+	$smtp     = defined( 'FLUENTMAIL' ) || class_exists( 'FluentMail\\App\\Services\\Mailer\\Manager' ) || defined( 'WPMS_PLUGIN_VER' ) || class_exists( 'PostmanOptions' ) || defined( 'POST_SMTP_VER' ) || function_exists( 'easy_wp_smtp_init' );
+	$checks[] = $smtp ? array( true, __( 'An email (SMTP) plugin is active: order emails go out through a real mailbox', 'kenakata-kit' ) ) : array( false, __( 'No email (SMTP) plugin: on many hostings order emails are never delivered. Install FluentSMTP (free) and connect your shop\'s mailbox, then send a test email.', 'kenakata-kit' ), admin_url( 'plugin-install.php?s=fluent+smtp&tab=search&type=term' ) );
+	$cache    = defined( 'LSCWP_V' ) || defined( 'WP_ROCKET_VERSION' ) || defined( 'W3TC' ) || class_exists( 'WpFastestCache' ) || defined( 'WPCACHEHOME' ) || defined( 'BREEZE_VERSION' );
+	$checks[] = $cache ? array( true, __( 'A page cache plugin is active', 'kenakata-kit' ) ) : array( false, __( 'No page cache plugin: pages are built again for every visitor. On LiteSpeed hosting use LiteSpeed Cache (free).', 'kenakata-kit' ), kk_admin_url( 'speed' ) );
+	$checks[] = kk_opt( 'cart_bot_guard' ) ? array( true, __( 'Bots cannot fill the cart through "add to cart" links', 'kenakata-kit' ) ) : array( false, __( 'Cart bot guard is off: bots opening "add to cart" links can overload the server', 'kenakata-kit' ), kk_admin_url( 'guard' ) );
+	if ( function_exists( 'kk_is_pro' ) && kk_is_pro() ) {
+		$couriers = function_exists( 'kk_courier_enabled' ) ? kk_courier_enabled() : array();
+		/* translators: %s: courier names */
+		$checks[] = $couriers ? array( true, sprintf( __( 'One-tap courier booking is ready: %s', 'kenakata-kit' ), implode( ', ', $couriers ) ) ) : array( false, __( 'No courier connected yet: add Steadfast, Pathao, RedX or eCourier keys to send parcels with one tap', 'kenakata-kit' ), kk_admin_url( 'courier' ) );
+	} else {
+		$checks[] = array( false, __( 'Free version: store dashboard, courier booking and incomplete orders need a Pro key (License tab)', 'kenakata-kit' ), kk_admin_url( 'license' ) );
+	}
 	/* translators: %s: phone number */
 	$checks[] = kk_opt( 'wa_number' ) ? array( true, sprintf( __( 'WhatsApp number set: %s', 'kenakata-kit' ), kk_opt( 'wa_number' ) ) ) : array( false, __( 'No WhatsApp number', 'kenakata-kit' ), kk_admin_url( 'whatsapp' ) );
 	$lang = kk_opt( 'admin_lang' );

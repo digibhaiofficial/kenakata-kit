@@ -495,17 +495,40 @@
 		});
 	}
 
-	function drawTrend(body, data, switchTo) {
+	function ymd(d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+	/** Report periods: [key, label, from, to]. */
+	function periods() {
+		var now = new Date(), y = now.getFullYear(), m = now.getMonth(), d = now.getDate();
+		var day = function (offset) { return ymd(new Date(y, m, d - offset)); };
+		return [
+			['today', t('today'), day(0), day(0)],
+			['yesterday', t('yesterday'), day(1), day(1)],
+			['last7', t('last7'), day(6), day(0)],
+			['last30', t('last30'), day(29), day(0)],
+			['month', t('thisMonth'), ymd(new Date(y, m, 1)), day(0)],
+			['lastmonth', t('lastMonth'), ymd(new Date(y, m - 1, 1)), ymd(new Date(y, m, 0))]
+		];
+	}
+	function drawTrend(body, data, switchTo, state) {
 		clear(body);
-		var seg = h('div', { class: 'sd-seg', role: 'group' }, [7, 30].map(function (d) {
-			return h('button', { type: 'button', class: data.days === d ? 'is-active' : '', onclick: function () { if (data.days !== d) { switchTo(d); } } }, d === 7 ? t('last7') : t('last30'));
-		}));
+		state = state || {};
+		var seg = h('div', { class: 'sd-seg sd-seg--wrap', role: 'group', 'aria-label': t('period') }, periods().map(function (p) {
+			return h('button', { type: 'button', class: state.key === p[0] ? 'is-active' : '', onclick: function () { switchTo({ key: p[0], from: p[2], to: p[3] }); } }, p[1]);
+		}).concat([h('button', { type: 'button', class: state.key === 'custom' ? 'is-active' : '', onclick: function () { custom.hidden = !custom.hidden; } }, t('customRange'))]));
+		var fromIn = h('input', { type: 'date', class: 'sd-input', value: state.from || '', 'aria-label': t('dateFrom') });
+		var toIn = h('input', { type: 'date', class: 'sd-input', value: state.to || '', 'aria-label': t('dateTo') });
+		var custom = h('div', { class: 'sd-range', hidden: state.key !== 'custom' }, fromIn, h('span', { text: '→' }), toIn,
+			button(t('show'), { class: 'sd-btn sd-btn--sm sd-btn--primary', onclick: function () { if (fromIn.value && toIn.value) { switchTo({ key: 'custom', from: fromIn.value, to: toIn.value }); } } }));
 		body.appendChild(seg);
+		body.appendChild(custom);
+		if (data.from) { body.appendChild(h('p', { class: 'sd-note', text: (data.from === data.to ? data.from : data.from + ' → ' + data.to) })); }
 		body.appendChild(h('dl', { class: 'sd-kpis' },
 			h('div', null, h('dt', { text: t('sales') }), h('dd', { text: data.sales })),
 			h('div', null, h('dt', { text: t('orders') }), h('dd', { text: String(data.orders) })),
-			h('div', null, h('dt', { text: t('avgOrder') }), h('dd', { text: data.avg }))));
+			h('div', null, h('dt', { text: t('avgOrder') }), h('dd', { text: data.avg })),
+			data.items !== undefined ? h('div', null, h('dt', { text: t('itemsSold') }), h('dd', { text: String(data.items) })) : null));
 		if (!data.orders) { body.appendChild(h('p', { class: 'sd-note', text: t('noSales') })); return; }
+		if (data.series.length < 2) { return; }
 		var W = 600, H = 170, base = 140, n = data.series.length, step = (W - 16) / n, bw = Math.max(3, step * 0.68);
 		var max = 0;
 		data.series.forEach(function (r) { if (r.sales > max) { max = r.sales; } });
@@ -548,11 +571,12 @@
 	}
 
 	function insightsCard() {
-		var trend = insightBlock(t('salesTrend'), function (body, reset) {
-			var show = function (days) {
-				loadInto(body, 'report/trend?days=' + days, function (b, data) { drawTrend(b, data, show); }, reset);
+		var trend = insightBlock(t('salesReport'), function (body, reset) {
+			var show = function (st) {
+				loadInto(body, 'report/range?' + qs({ from: st.from, to: st.to }), function (b, data) { drawTrend(b, data, show, st); }, reset);
 			};
-			show(7);
+			var p = periods()[2];
+			show({ key: p[0], from: p[2], to: p[3] });
 		});
 		var top = insightBlock(t('topProducts'), function (body, reset) { loadInto(body, 'report/top', drawTop, reset); });
 		var cod = insightBlock(t('cashAtCourier'), function (body, reset) { loadInto(body, 'report/cod', drawCod, reset); });
@@ -1016,10 +1040,63 @@
 	function swap(el) { clear(main); main.appendChild(el); }
 
 	/* ------------------------------------------------------------------ Products */
-	var catsCache = null;
+	var catsCache = null, brandsCache = null, attrCache = null;
 	function getCats() {
 		if (catsCache) { return Promise.resolve(catsCache); }
 		return api('categories').then(function (c) { catsCache = c; return c; });
+	}
+	function getBrands() {
+		if (!C.brands) { return Promise.resolve([]); }
+		if (brandsCache) { return Promise.resolve(brandsCache); }
+		return api('brands').then(function (b) { brandsCache = b; return b; }, function () { return []; });
+	}
+	function getAttrSuggestions() {
+		if (attrCache) { return Promise.resolve(attrCache); }
+		return api('attributes').then(function (a) { attrCache = a; return a; }, function () { return []; });
+	}
+
+	/** Tick list of categories or brands, with "+ New …" when the user may add terms. */
+	function termPicker(kind, list, selected) {
+		var chosen = selected.slice();
+		var box = h('div', { class: 'sd-checks' });
+		function draw() {
+			clear(box);
+			if (!list.length) { box.appendChild(h('p', { class: 'sd-muted', text: kind === 'brand' ? t('noBrandsYet') : t('none') })); }
+			list.forEach(function (c) {
+				var cb = h('input', { type: 'checkbox', value: String(c.id), checked: chosen.indexOf(c.id) !== -1 });
+				cb.addEventListener('change', function () {
+					setDirty(true);
+					if (cb.checked) { if (chosen.indexOf(c.id) === -1) { chosen.push(c.id); } } else { chosen = chosen.filter(function (x) { return x !== c.id; }); }
+				});
+				box.appendChild(h('label', { class: 'sd-check', style: 'padding-left:' + (c.depth * 18) + 'px' }, cb, h('span', { text: c.name })));
+			});
+		}
+		draw();
+		var kids = [box];
+		if (C.caps.terms) {
+			var nameIn = input({ placeholder: kind === 'brand' ? t('newBrandName') : t('newCategoryName'), autocomplete: 'off' });
+			var parentSel = kind === 'brand' ? null : select([['0', t('noParent')]].concat(list.map(function (c) { return [String(c.id), new Array(c.depth + 1).join('— ') + c.name]; })), '0', { 'aria-label': t('parentCategory') });
+			var add = button(kind === 'brand' ? t('addBrand') : t('addCategory'), { class: 'sd-btn sd-btn--sm' }, 'plus');
+			var form = h('div', { class: 'sd-newterm', hidden: true }, nameIn, parentSel, add);
+			var open = button(kind === 'brand' ? t('newBrand') : t('newCategory'), { class: 'sd-btn sd-btn--sm sd-btn--ghost', onclick: function () { form.hidden = !form.hidden; if (!form.hidden) { nameIn.focus(); } } }, 'plus');
+			function create() {
+				var name = nameIn.value.trim();
+				if (!name) { nameIn.focus(); return; }
+				busy(add, true);
+				api('terms', { method: 'POST', body: { tax: kind, name: name, parent: parentSel ? parentSel.value : 0 } }).then(function (res) {
+					busy(add, false);
+					list = res.list;
+					if (kind === 'brand') { brandsCache = list; } else { catsCache = list; }
+					if (chosen.indexOf(res.id) === -1) { chosen.push(res.id); }
+					nameIn.value = ''; form.hidden = true; setDirty(true); draw();
+					toast(res.existed ? t('termExisted') : t('termAdded'), 'ok');
+				}, function (e) { busy(add, false); toast(e.message, 'bad'); });
+			}
+			add.addEventListener('click', create);
+			nameIn.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); create(); } });
+			kids.push(h('div', { class: 'sd-newterm__bar' }, open), form);
+		}
+		return { el: kids, value: function () { return chosen.slice(); } };
 	}
 
 	function statusLabel(s) { return t({ publish: 'published', draft: 'draft', pending: 'pending', private: 'private', future: 'scheduled' }[s] || s); }
@@ -1053,8 +1130,8 @@
 	}
 
 	function viewProduct(id) {
-		return Promise.all([id ? api('products/' + encodeURIComponent(id)) : Promise.resolve(null), getCats()]).then(function (res) {
-			return renderProduct(res[0], res[1]);
+		return Promise.all([id ? api('products/' + encodeURIComponent(id)) : Promise.resolve(null), getCats(), getBrands()]).then(function (res) {
+			return renderProduct(res[0], res[1], res[2]);
 		});
 	}
 
@@ -1083,9 +1160,10 @@
 		};
 	}
 
-	function renderProduct(p, cats) {
+	function renderProduct(p, cats, brands) {
 		var creating = !p;
-		p = p || { id: 0, type: 'simple', editable_type: true, name: '', status: 'publish', sku: '', regular_price: '', sale_price: '', manage_stock: false, stock_quantity: '', stock_status: 'instock', short_description: '', description: '', category_ids: [], images: [], variations: [], permalink: '', edit_url: '' };
+		brands = brands || [];
+		p = p || { id: 0, type: 'simple', editable_type: true, name: '', status: 'publish', sku: '', regular_price: '', sale_price: '', manage_stock: false, stock_quantity: '', stock_status: 'instock', short_description: '', description: '', category_ids: [], brand_ids: [], attributes: [], images: [], variations: [], permalink: '', edit_url: '' };
 		var root = h('div', { class: 'sd-view sd-form' });
 		root.appendChild(pageHead(creating ? t('newProduct') : p.name, { back: '#/products' }));
 		if (!p.editable_type) {
@@ -1096,7 +1174,20 @@
 		var name = input({ value: p.name, required: true, autocomplete: 'off' });
 		var visible = toggle(t('visibility'), p.status === 'publish');
 		var sku = input({ value: p.sku, autocomplete: 'off' });
-		var ps = variable ? null : priceStockFields(p);
+		var ps = priceStockFields(p);
+		var opts = optionsEditor(p);
+		var priceCard = card(t('priceStock'), [ps.el]);
+		var optsCard = card(t('optionsTitle'), opts.el, 'sd-opts-card');
+		function showType(isVar) { variable = isVar; priceCard.hidden = isVar; optsCard.hidden = !isVar; }
+		var typeSeg = null;
+		if (p.type === 'simple') {
+			var bSimple = h('button', { type: 'button', class: 'is-active', text: t('typeSimple') });
+			var bVar = h('button', { type: 'button', text: t('typeVariable') });
+			bSimple.addEventListener('click', function () { bSimple.classList.add('is-active'); bVar.classList.remove('is-active'); showType(false); });
+			bVar.addEventListener('click', function () { bVar.classList.add('is-active'); bSimple.classList.remove('is-active'); showType(true); setDirty(true); });
+			typeSeg = h('div', null, h('div', { class: 'sd-seg sd-seg--type', role: 'group', 'aria-label': t('productType') }, bSimple, bVar),
+				h('p', { class: 'sd-help', text: creating ? t('typeHelp') : t('typeConvertHelp') }));
+		}
 
 		// Pictures.
 		var images = p.images.slice();
@@ -1128,72 +1219,228 @@
 		}
 		drawGallery();
 
-		// Categories.
-		var catBoxes = cats.map(function (c) {
-			var box = h('input', { type: 'checkbox', value: String(c.id), checked: p.category_ids.indexOf(c.id) !== -1 });
-			box.addEventListener('change', function () { setDirty(true); });
-			return h('label', { class: 'sd-check', style: 'padding-left:' + (c.depth * 18) + 'px' }, box, h('span', { text: c.name }));
-		});
+		// Categories and brands.
+		var catPick = termPicker('category', cats, p.category_ids || []);
+		var brandPick = C.brands ? termPicker('brand', brands, p.brand_ids || []) : null;
 
 		var shortEd = editor(p.short_description, { small: true, label: t('shortDesc') });
 		var descEd = editor(p.description, { label: t('description') });
 		var saveBtn = button(t('save'), { class: 'sd-btn sd-btn--primary sd-btn--lg' });
 
-		root.appendChild(card('', [field(t('name'), name), visible.el]));
-		if (variable) { root.appendChild(card(t('stock'), h('p', { class: 'sd-help', text: t('variableNote') }))); }
-		else { root.appendChild(card(t('priceStock'), [ps.el])); }
+		root.appendChild(card('', [field(t('name'), name), visible.el, typeSeg]));
+		root.appendChild(priceCard);
+		root.appendChild(optsCard);
+		showType(variable);
 		root.appendChild(card(t('images'), gallery));
-		root.appendChild(card(t('categories'), h('div', { class: 'sd-checks' }, catBoxes.length ? catBoxes : h('p', { class: 'sd-muted', text: t('none') }))));
+		root.appendChild(card(t('categories'), catPick.el));
+		if (brandPick) { root.appendChild(card(t('brand'), [h('p', { class: 'sd-help', text: t('brandHelp') })].concat(brandPick.el))); }
 		root.appendChild(card(t('shortDesc'), shortEd.el));
 		root.appendChild(card(t('description'), descEd.el));
 		root.appendChild(card('', field(t('sku'), sku)));
 
 		saveBtn.addEventListener('click', function () {
 			if (!name.value.trim()) { toast(t('requiredName'), 'bad'); name.focus(); return; }
-			if (ps) {
+			if (!variable) {
 				if (ps.reg.value.trim() === '' && (creating || visible.input.checked)) { toast(t('requiredPrice'), 'bad'); ps.reg.focus(); return; }
 				var problem = ps.check();
 				if (problem) { toast(problem, 'bad'); return; }
+			} else {
+				var optProblem = opts.check(visible.input.checked);
+				if (optProblem) { toast(optProblem, 'bad'); return; }
 			}
 			var body = {
 				name: name.value.trim(), status: visible.input.checked ? 'publish' : 'draft', sku: sku.value.trim(),
 				short_description: shortEd.get(), description: descEd.get(),
-				category_ids: catBoxes.map(function (l) { return l.firstChild; }).filter(function (b) { return b.checked; }).map(function (b) { return parseInt(b.value, 10); }),
+				category_ids: catPick.value(),
 				image_ids: images.map(function (i) { return i.id; })
 			};
-			if (ps) { Object.assign(body, ps.values()); }
+			if (brandPick) { body.brand_ids = brandPick.value(); }
+			if (variable) { body.type = 'variable'; Object.assign(body, opts.values()); } else { Object.assign(body, ps.values()); }
 			busy(saveBtn, true);
 			api(creating ? 'products' : 'products/' + p.id, { method: 'POST', body: body }).then(function (res) {
 				setDirty(false); summaryCache = null; toast(t('saved'), 'ok');
 				if (creating) { skipHash = true; location.hash = '#/products/' + res.id; current = 'products/' + res.id; }
-				swap(renderProduct(res, cats));
+				attrCache = null;
+				swap(renderProduct(res, catsCache || cats, brandsCache || brands));
 			}, function (err) { busy(saveBtn, false); toast(err.message, 'bad'); });
 		});
 		root.appendChild(h('div', { class: 'sd-savebar' }, saveBtn,
 			p.permalink ? h('a', { class: 'sd-btn sd-btn--ghost', href: escUrl(p.permalink), target: '_blank', rel: 'noopener' }, icon('ext'), h('span', { text: t('viewProduct') })) : null));
 
-		if (variable && p.variations.length) {
-			root.appendChild(card(t('variations'), [h('p', { class: 'sd-help', text: t('variationsHelp') }), p.variations.map(function (v) { return variationRow(v, p, cats); })]));
-		}
 		if (p.edit_url) { root.appendChild(h('p', { class: 'sd-foot-link' }, h('a', { href: escUrl(p.edit_url) }, icon('ext'), h('span', { text: t('openInAdmin') })))); }
 		return root;
 	}
 
-	function variationRow(v, parent, cats) {
-		var ps = priceStockFields(v);
-		var btn = button(t('save'), { class: 'sd-btn sd-btn--primary sd-btn--sm' });
-		btn.addEventListener('click', function () {
-			var problem = ps.check();
-			if (problem) { toast(problem, 'bad'); return; }
-			busy(btn, true);
-			api('variations/' + v.id, { method: 'POST', body: ps.values() }).then(function (res) {
-				setDirty(false); summaryCache = null; toast(t('saved'), 'ok');
-				swap(renderProduct(res, cats));
-			}, function (err) { busy(btn, false); toast(err.message, 'bad'); });
+	/**
+	 * Options of a variable product: option types (any name: Size, Colour, Weight…) with their values, then one row per
+	 * combination with its own price, sale price, stock and picture. Names and values already used in the shop are suggested.
+	 */
+	function optionsEditor(p) {
+		var attrs = (p.attributes || []).filter(function (a) { return a.variation; }).map(function (a) { return { name: a.name, values: a.values.slice() }; });
+		if (!attrs.length) { attrs.push({ name: '', values: [] }); }
+		var rows = (p.variations || []).map(function (v) {
+			return { id: v.id, options: v.options || {}, regular_price: v.regular_price, sale_price: v.sale_price, stock: v.manage_stock ? String(v.stock_quantity) : '', stock_status: v.stock_status, sku: v.sku, image_id: v.image_id || 0, image: v.image || '' };
 		});
-		return h('div', { class: 'sd-variation' },
-			h('div', { class: 'sd-variation__head' }, v.image ? h('img', { src: escUrl(v.image), alt: '' }) : null, h('strong', { text: v.label || ('#' + v.id) })),
-			ps.el, btn);
+		var removed = [];
+		var sugg = [];
+		var listId = 'sd-attrnames-' + (++uid);
+		var nameList = h('datalist', { id: listId });
+		getAttrSuggestions().then(function (a) {
+			sugg = a || [];
+			sugg.forEach(function (x) { nameList.appendChild(h('option', { value: x.name })); });
+		});
+		var attrBox = h('div', { class: 'sd-attrs' });
+		var rowBox = h('div', { class: 'sd-vars' });
+		var info = h('p', { class: 'sd-help' });
+
+		function suggestionsFor(name) {
+			var n = String(name || '').trim().toLowerCase();
+			for (var i = 0; i < sugg.length; i++) { if (sugg[i].name.toLowerCase() === n) { return sugg[i].values; } }
+			return [];
+		}
+		function key(opts) { return attrs.map(function (a) { return (opts[a.name] || '').toLowerCase(); }).join('|'); }
+		function label(opts) { return attrs.map(function (a) { return opts[a.name] || t('anyValue'); }).join(' / '); }
+
+		function drawAttrs() {
+			clear(attrBox);
+			attrs.forEach(function (a, ai) {
+				var nameIn = input({ value: a.name, list: listId, placeholder: t('optionNameHint'), autocomplete: 'off', 'aria-label': t('optionName') });
+				nameIn.addEventListener('change', function () {
+					var old = a.name; a.name = nameIn.value.trim();
+					rows.forEach(function (r) { if (old && r.options[old] !== undefined) { r.options[a.name] = r.options[old]; delete r.options[old]; } });
+					drawAttrs(); drawRows();
+				});
+				var chips = h('div', { class: 'sd-chips sd-chips--wrap sd-vals' });
+				a.values.forEach(function (v, vi) {
+					chips.appendChild(h('span', { class: 'sd-chip sd-chip--val' }, h('span', { text: v }),
+						h('button', { type: 'button', class: 'sd-chip__x', 'aria-label': t('remove') + ' ' + v, text: '×', onclick: function () { a.values.splice(vi, 1); setDirty(true); drawAttrs(); drawRows(); } })));
+				});
+				var vList = 'sd-attrvals-' + (++uid);
+				var vData = h('datalist', { id: vList }, suggestionsFor(a.name).filter(function (x) { return a.values.indexOf(x) === -1; }).map(function (x) { return h('option', { value: x }); }));
+				var valIn = input({ list: vList, placeholder: t('optionValueHint'), autocomplete: 'off', 'aria-label': t('optionValues') });
+				function addVals() {
+					valIn.value.split(/[,،|]/).map(function (x) { return x.trim(); }).filter(Boolean).forEach(function (v) {
+						if (!a.values.some(function (x) { return x.toLowerCase() === v.toLowerCase(); })) { a.values.push(v); }
+					});
+					valIn.value = ''; setDirty(true); drawAttrs(); drawRows();
+					var again = attrBox.querySelectorAll('.sd-attr')[ai]; if (again) { again.querySelector('.sd-attr__val input').focus(); }
+				}
+				valIn.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addVals(); } });
+				valIn.addEventListener('change', function () { if (valIn.value.trim()) { addVals(); } });
+				var del = attrs.length > 1 ? button(t('remove'), { class: 'sd-btn sd-btn--xs sd-btn--danger', onclick: function () { attrs.splice(ai, 1); setDirty(true); drawAttrs(); drawRows(); } }) : null;
+				attrBox.appendChild(h('div', { class: 'sd-attr' },
+					h('div', { class: 'sd-attr__head' }, field(t('optionName'), nameIn), del),
+					chips,
+					h('div', { class: 'sd-attr__val' }, valIn, vData, button(t('add'), { class: 'sd-btn sd-btn--sm', onclick: addVals }))));
+			});
+			if (attrs.length < 3) {
+				attrBox.appendChild(button(t('addOptionType'), { class: 'sd-btn sd-btn--sm sd-btn--ghost', onclick: function () { attrs.push({ name: '', values: [] }); drawAttrs(); } }, 'plus'));
+			}
+		}
+
+		function combos() {
+			var list = [{}];
+			attrs.filter(function (a) { return a.name && a.values.length; }).forEach(function (a) {
+				var next = [];
+				list.forEach(function (base) { a.values.forEach(function (v) { var o = Object.assign({}, base); o[a.name] = v; next.push(o); }); });
+				list = next;
+			});
+			return attrs.some(function (a) { return a.name && a.values.length; }) ? list : [];
+		}
+
+		function drawRows() {
+			clear(rowBox);
+			var all = combos();
+			info.textContent = all.length ? fill(t('combosInfo'), { n: all.length, have: rows.length }) : t('optionsStart');
+			rows.forEach(function (r, ri) {
+				var reg = input({ value: r.regular_price, inputmode: 'decimal', autocomplete: 'off', 'aria-label': t('regularPrice') });
+				var sale = input({ value: r.sale_price, inputmode: 'decimal', autocomplete: 'off', 'aria-label': t('salePrice') });
+				var qty = input({ value: r.stock, inputmode: 'numeric', type: 'number', min: '0', step: '1', placeholder: t('stockBlank'), 'aria-label': t('quantity') });
+				reg.addEventListener('input', function () { r.regular_price = reg.value.trim(); r.dirty = true; });
+				sale.addEventListener('input', function () { r.sale_price = sale.value.trim(); r.dirty = true; });
+				qty.addEventListener('input', function () { r.stock = qty.value.trim(); r.dirty = true; });
+				var pic = h('span', { class: 'sd-var__pic' }, r.image ? h('img', { src: escUrl(r.image), alt: '' }) : icon('image'));
+				if (C.caps.upload) {
+					var file = h('input', { type: 'file', accept: 'image/jpeg,image/png,image/webp,image/gif', class: 'sd-offscreen', id: 'sd-vfile-' + (++uid) });
+					file.addEventListener('change', function () {
+						if (!file.files[0]) { return; }
+						pic.classList.add('is-busy');
+						upload(file.files[0]).then(function (m) { r.image_id = m.id; r.image = m.url; r.dirty = true; setDirty(true); drawRows(); }, function (err) { pic.classList.remove('is-busy'); toast(err.message, 'bad'); });
+					});
+					pic = h('label', { class: 'sd-var__pic', for: file.id, title: t('optionPicture') }, pic.firstChild, file);
+				}
+				var stale = all.length && !all.some(function (c) { return key(c) === key(r.options); });
+				rowBox.appendChild(h('div', { class: 'sd-var' + (stale ? ' is-stale' : '') },
+					pic,
+					h('div', { class: 'sd-var__main' },
+						h('strong', { class: 'sd-var__label', text: label(r.options) }),
+						stale ? h('span', { class: 'sd-pill sd-pill--outofstock', text: t('optionStale') }) : null,
+						h('div', { class: 'sd-var__fields' },
+							field(t('regularPrice') + ' (' + C.currency + ')', reg), field(t('salePrice'), sale), field(t('quantity'), qty))),
+					button('×', { class: 'sd-btn sd-btn--xs sd-btn--danger sd-var__del', 'aria-label': t('remove') + ' ' + label(r.options), onclick: function () {
+						if (r.id) { removed.push(r.id); }
+						rows.splice(ri, 1); setDirty(true); drawRows();
+					} })));
+			});
+		}
+
+		var makeBtn = button(t('makeCombos'), { class: 'sd-btn sd-btn--primary sd-btn--sm' }, 'plus');
+		makeBtn.addEventListener('click', function () {
+			var all = combos();
+			if (!all.length) { toast(t('optionsStart'), 'bad'); return; }
+			var have = {}; rows.forEach(function (r) { have[key(r.options)] = true; });
+			var add = all.filter(function (c) { return !have[key(c)]; });
+			if (rows.length + add.length > C.maxVariations) { toast(fill(t('tooManyOptions'), { n: C.maxVariations }), 'bad'); return; }
+			var first = rows[0] || {};
+			add.forEach(function (c) { rows.push({ id: 0, options: c, regular_price: first.regular_price || '', sale_price: '', stock: '', stock_status: 'instock', sku: '', image_id: 0, image: '', dirty: true }); });
+			setDirty(true); drawRows();
+			toast(add.length ? fill(t('combosAdded'), { n: add.length }) : t('combosNone'), add.length ? 'ok' : '');
+		});
+
+		var bReg = input({ inputmode: 'decimal', placeholder: t('regularPrice'), 'aria-label': t('regularPrice') });
+		var bSale = input({ inputmode: 'decimal', placeholder: t('salePrice'), 'aria-label': t('salePrice') });
+		var bQty = input({ inputmode: 'numeric', type: 'number', min: '0', placeholder: t('quantity'), 'aria-label': t('quantity') });
+		var bApply = button(t('applyAll'), { class: 'sd-btn sd-btn--sm', onclick: function () {
+			if (!bReg.value.trim() && !bSale.value.trim() && !bQty.value.trim()) { bReg.focus(); return; }
+			rows.forEach(function (r) {
+				if (bReg.value.trim()) { r.regular_price = bReg.value.trim(); }
+				if (bSale.value.trim()) { r.sale_price = bSale.value.trim(); }
+				if (bQty.value.trim()) { r.stock = bQty.value.trim(); }
+				r.dirty = true;
+			});
+			setDirty(true); drawRows();
+		} });
+
+		drawAttrs();
+		drawRows();
+		return {
+			el: [nameList, h('p', { class: 'sd-help', text: t('optionsHelp') }), attrBox,
+				h('div', { class: 'sd-opts-bar' }, makeBtn), info,
+				h('details', { class: 'sd-bulk' }, h('summary', { text: t('sameForAll') }), h('div', { class: 'sd-bulk__row' }, bReg, bSale, bQty, bApply)),
+				rowBox],
+			check: function (publishing) {
+				var named = attrs.filter(function (a) { return a.name && a.values.length; });
+				if (!named.length) { return t('optionsStart'); }
+				if (attrs.some(function (a) { return !a.name && a.values.length; })) { return t('optionNameMissing'); }
+				if (!rows.length) { return t('makeCombosFirst'); }
+				for (var i = 0; i < rows.length; i++) {
+					var r = rows[i], rp = parseFloat(r.regular_price), sp = parseFloat(r.sale_price);
+					if (publishing && String(r.regular_price || '').trim() === '') { return fill(t('optionNeedsPrice'), { option: label(r.options) }); }
+					if (String(r.sale_price || '').trim() !== '' && (isNaN(rp) || sp >= rp)) { return label(r.options) + ': ' + t('salePriceError'); }
+				}
+				return '';
+			},
+			values: function () {
+				var list = rows.map(function (r) {
+					var o = { options: r.options, regular_price: String(r.regular_price || ''), sale_price: String(r.sale_price || ''), image_id: r.image_id || 0 };
+					if (r.id) { o.id = r.id; }
+					if (String(r.stock).trim() !== '') { o.manage_stock = true; o.stock_quantity = parseInt(r.stock, 10) || 0; } else { o.manage_stock = false; o.stock_status = r.stock_status === 'outofstock' ? 'outofstock' : 'instock'; }
+					return o;
+				});
+				removed.forEach(function (id) { list.push({ id: id, remove: true }); });
+				return { attributes: attrs.filter(function (a) { return a.name && a.values.length; }), variations: list };
+			}
+		};
 	}
 
 	/* ------------------------------------------------------------------ Blog posts */

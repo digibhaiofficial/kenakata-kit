@@ -13,7 +13,7 @@ defined( 'ABSPATH' ) || exit;
 
 define( 'KK_SD_CAP', 'kk_store_dashboard' );
 define( 'KK_SD_ROLE', 'kk_store_manager' );
-define( 'KK_SD_ROLE_VERSION', '1' ); // bump when the role's capabilities change
+define( 'KK_SD_ROLE_VERSION', '2' ); // bump when the role's capabilities change
 
 // The dashboard's data API (43 KB of code) is needed only for REST requests, not on every page.
 add_action( 'rest_api_init', function () {
@@ -27,7 +27,7 @@ function kk_sd_role_caps() {
 		// Blog.
 		'edit_posts', 'edit_published_posts', 'publish_posts', 'edit_others_posts', 'read_private_posts',
 		// Products (WooCommerce).
-		'edit_products', 'edit_published_products', 'edit_others_products', 'edit_private_products', 'read_private_products', 'publish_products', 'assign_product_terms',
+		'edit_products', 'edit_published_products', 'edit_others_products', 'edit_private_products', 'read_private_products', 'publish_products', 'assign_product_terms', 'manage_product_terms',
 		// Orders (WooCommerce).
 		'edit_shop_orders', 'edit_others_shop_orders', 'edit_published_shop_orders', 'edit_private_shop_orders', 'read_private_shop_orders',
 	);
@@ -171,8 +171,14 @@ if ( kk_opt( 'sd_enable' ) ) {
 	}
 }
 
+/** Most options (variations) one product may get from the dashboard: keeps a save quick on small hosting. */
+function kk_sd_max_variations() {
+	return max( 10, (int) apply_filters( 'kk_sd_max_variations', 100 ) );
+}
+
 function kk_sd_flush_summary() {
 	delete_transient( 'kk_sd_summary' );
+	update_option( 'kk_sd_rep_gen', (int) get_option( 'kk_sd_rep_gen', 0 ) + 1, false ); // date-range reports are cached under this number
 	foreach ( array( 'trend_7', 'trend_30', 'top', 'cod' ) as $name ) {
 		delete_transient( 'kk_sd_rep_' . $name ); // insight blocks (loaded only when someone taps them)
 	}
@@ -457,6 +463,59 @@ function kk_sd_strings() {
 		'insights'       => __( 'More insights', 'kenakata-kit' ),
 		'insightsHelp'    => __( 'These load only when you tap them, so the dashboard stays fast.', 'kenakata-kit' ),
 		'salesTrend'      => __( 'Sales trend', 'kenakata-kit' ),
+		'showIt' => __( 'Show', 'kenakata-kit' ),
+		'hideIt' => __( 'Hide', 'kenakata-kit' ),
+		'noBrandsYet' => __( 'No brands yet.', 'kenakata-kit' ),
+		'newBrandName' => __( 'New brand name', 'kenakata-kit' ),
+		'newCategoryName' => __( 'New category name', 'kenakata-kit' ),
+		'noParent' => __( 'Main category (no parent)', 'kenakata-kit' ),
+		'parentCategory' => __( 'Parent category', 'kenakata-kit' ),
+		'addBrand' => __( 'Add brand', 'kenakata-kit' ),
+		'addCategory' => __( 'Add category', 'kenakata-kit' ),
+		'newBrand' => __( 'New brand', 'kenakata-kit' ),
+		'newCategory' => __( 'New category', 'kenakata-kit' ),
+		'termExisted' => __( 'It already existed and is now ticked.', 'kenakata-kit' ),
+		'termAdded' => __( 'Added and ticked.', 'kenakata-kit' ),
+		'optionsTitle' => __( 'Options (size, colour…)', 'kenakata-kit' ),
+		'typeSimple' => __( 'Simple product', 'kenakata-kit' ),
+		'typeVariable' => __( 'With options (size, colour…)', 'kenakata-kit' ),
+		'productType' => __( 'Product type', 'kenakata-kit' ),
+		'typeHelp' => __( 'Choose "With options" when the customer picks a size, colour or other choice, each with its own price and stock.', 'kenakata-kit' ),
+		'typeConvertHelp' => __( 'You can add options to this product. After saving with options it cannot become a simple product again here.', 'kenakata-kit' ),
+		'brand' => __( 'Brand', 'kenakata-kit' ),
+		'brandHelp' => __( 'Optional: leave empty if the product has no brand.', 'kenakata-kit' ),
+		'anyValue' => __( 'Any', 'kenakata-kit' ),
+		'optionNameHint' => __( 'e.g. Size, Colour, Weight', 'kenakata-kit' ),
+		'optionName' => __( 'Option name', 'kenakata-kit' ),
+		'optionValueHint' => __( 'Type a value and press Enter (S, M, L…)', 'kenakata-kit' ),
+		'optionValues' => __( 'Option values', 'kenakata-kit' ),
+		'add' => __( 'Add', 'kenakata-kit' ),
+		'addOptionType' => __( 'Add another option (e.g. Colour)', 'kenakata-kit' ),
+		'combosInfo' => __( '{n} combinations possible · {have} added below', 'kenakata-kit' ),
+		'optionsStart' => __( 'Give the option a name and at least one value, then press "Make all combinations".', 'kenakata-kit' ),
+		'stockBlank' => __( 'optional', 'kenakata-kit' ),
+		'optionPicture' => __( 'Picture for this option', 'kenakata-kit' ),
+		'optionStale' => __( 'not in the values above', 'kenakata-kit' ),
+		'makeCombos' => __( 'Make all combinations', 'kenakata-kit' ),
+		'tooManyOptions' => __( 'At most {n} options per product.', 'kenakata-kit' ),
+		'combosAdded' => __( '{n} new options added. Set their prices, then save.', 'kenakata-kit' ),
+		'combosNone' => __( 'All combinations are already there.', 'kenakata-kit' ),
+		'applyAll' => __( 'Apply to all', 'kenakata-kit' ),
+		'sameForAll' => __( 'Same price or stock for all options', 'kenakata-kit' ),
+		'optionsHelp' => __( 'Each combination (for example M / Red) is an option with its own price, stock and picture.', 'kenakata-kit' ),
+		'optionNameMissing' => __( 'An option has values but no name.', 'kenakata-kit' ),
+		'makeCombosFirst' => __( 'Press "Make all combinations" first.', 'kenakata-kit' ),
+		'optionNeedsPrice' => __( 'Please enter a price for {option}.', 'kenakata-kit' ),
+		'yesterday' => __( 'Yesterday', 'kenakata-kit' ),
+		'thisMonth' => __( 'This month', 'kenakata-kit' ),
+		'lastMonth' => __( 'Last month', 'kenakata-kit' ),
+		'period' => __( 'Period', 'kenakata-kit' ),
+		'customRange' => __( 'Choose dates', 'kenakata-kit' ),
+		'dateFrom' => __( 'From', 'kenakata-kit' ),
+		'dateTo' => __( 'To', 'kenakata-kit' ),
+		'show' => __( 'Show', 'kenakata-kit' ),
+		'itemsSold' => __( 'Items sold', 'kenakata-kit' ),
+		'salesReport' => __( 'Sales report', 'kenakata-kit' ),
 		'topProducts'     => __( 'Best-selling products', 'kenakata-kit' ),
 		'cashAtCourier'   => __( 'Cash with couriers', 'kenakata-kit' ),
 		'showIt'          => _x( 'Show', 'Dashboard button: open a block', 'kenakata-kit' ),
@@ -549,6 +608,7 @@ function kk_sd_config() {
 			'posts'          => current_user_can( 'edit_posts' ),
 			'publishPost'    => current_user_can( 'publish_posts' ),
 			'upload'         => current_user_can( 'upload_files' ),
+			'terms'          => current_user_can( 'manage_product_terms' ),
 			'admin'          => $admin,
 			'money'          => kk_sd_can_money(),
 		),
@@ -563,6 +623,8 @@ function kk_sd_config() {
 		'couriers'  => kk_couriers(),
 		'currency'  => html_entity_decode( get_woocommerce_currency_symbol(), ENT_QUOTES, 'UTF-8' ),
 		'lowStock'  => max( 0, absint( kk_opt( 'sd_low_stock' ) ) ),
+		'brands'    => '' !== kk_brand_taxonomy(),
+		'maxVariations' => kk_sd_max_variations(),
 		'lang'      => kk_sd_lang(),
 		'i18n'      => kk_sd_strings(),
 	);

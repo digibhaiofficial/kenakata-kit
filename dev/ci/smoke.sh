@@ -184,6 +184,13 @@ check "Make order adds the delivery charge (shipping|total = $out)" '[ "${out%%|
 code=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$URL/?rest_route=/kenakata/v1/sd/incomplete/$IC/order")
 check "store-dashboard API refuses visitors ($code)" '[ "$code" = 401 ] || [ "$code" = 403 ]'
 
+echo "== Store dashboard API"
+wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["sd_enable"] = 1; kk_update_settings( $s );'
+code=$(curl -s -o /tmp/body -w "%{http_code}" -b "$JAR" -H "X-WP-Nonce: $RN" "$URL/?rest_route=/kenakata/v1/sd/report/cod")
+check "store dashboard report answers ($code)" '[ "$code" = 200 ] && ! grep -q "rest_no_route" /tmp/body'
+code=$(curl -sL -o /tmp/body -w "%{http_code}" -b "$JAR" "$URL/dashboard/")
+check "store dashboard page opens ($code)" '[ "$code" = 200 ] && clean /tmp/body'
+
 echo "== Order tracking with order number required"
 wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["tr_require_order"] = 1; kk_update_settings( $s );'
 curl -sL -o /tmp/body "$URL/?pagename=track&kk_phone=01712345678"

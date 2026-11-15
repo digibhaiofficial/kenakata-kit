@@ -3,7 +3,7 @@ Contributors: DigiBhai.com
 Plugin URI: https://digibhai.com/
 Requires at least: 6.3
 Requires PHP: 7.4
-Stable tag: 3.12.2
+Stable tag: 3.12.3
 License: GPLv2 or later
 
 Everything a Bangladeshi WooCommerce store usually needs. Settings: left admin menu → Kenakata Kit.
@@ -29,6 +29,10 @@ Products Grid, Products Carousel, Brands, Categories, Buy Now Button, Live Searc
 Older [ss_…] shortcodes keep working. Options: see the guide or Kenakata Kit → Shortcodes.
 
 == Changelog ==
+= 3.12.3 =
+* Faster: shop pages no longer load the settings screens and the update check (about a third less plugin code per page view; on hosting without PHP OPcache this saves real time on every uncached page, the cart and the checkout). The store dashboard's data code loads only for its own requests.
+* Clearer courier messages: Pathao's own reason is shown ("login email or password is wrong" / "Client ID or secret is wrong"), and a warning appears when a courier's TEST server is switched on while real details are used.
+
 = 3.12.2 =
 * Fixed: updates were not offered on shared hosting where GitHub's API refuses the server (60 questions an hour per address, shared by many sites). Kenakata Kit now falls back to GitHub's normal release page, which has no such limit.
 

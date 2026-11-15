@@ -85,7 +85,8 @@ function kk_courier_http( $provider, $method, $path, $body = null, array $extra_
 		return new WP_Error(
 			'kk_courier_unreachable',
 			/* translators: 1: courier name 2: courier name 3: technical reason from the server */
-			sprintf( __( 'Could not reach %1$s or it did not answer in time. Check your %2$s account before sending again: the parcel may already have been created. (Server says: %3$s)', 'kenakata-kit' ), $label, $label, mb_substr( $why, 0, 160 ) ),
+			sprintf( __( 'Could not reach %1$s or it did not answer in time. Check your %2$s account before sending again: the parcel may already have been created. (Server says: %3$s)', 'kenakata-kit' ), $label, $label, mb_substr( $why, 0, 160 ) )
+				. ( kk_opt( 'courier_' . $provider . '_sandbox' ) ? ' ' . __( 'Note: this courier\'s TEST server is switched on in the settings. For real parcels and real login details, switch it off.', 'kenakata-kit' ) : '' ),
 			array( 'status' => 502 )
 		);
 	}
@@ -240,7 +241,18 @@ function kk_courier_pathao_token( $fresh = false ) {
 		return (string) $body['access_token'];
 	}
 	delete_transient( kk_courier_pathao_token_key() );
-	return new WP_Error( 'kk_courier_auth', __( 'Pathao did not accept the login details. An administrator should check them in Kenakata Kit → Courier booking.', 'kenakata-kit' ), array( 'status' => 502 ) );
+	$why = kk_courier_error_text( $body );
+	$msg = __( 'Pathao did not accept the login details. An administrator should check them in Kenakata Kit → Courier booking.', 'kenakata-kit' );
+	if ( false !== stripos( $why, 'user credentials' ) ) {
+		$msg = __( 'Pathao says the login email or password is wrong. Type the email and password you use to sign in at merchant.pathao.com again (the Client ID and secret are separate) and save.', 'kenakata-kit' );
+	} elseif ( false !== stripos( $why, 'client' ) ) {
+		$msg = __( 'Pathao says the Client ID or Client secret is wrong. Copy them again from merchant.pathao.com → Developers API and save.', 'kenakata-kit' );
+	}
+	if ( kk_opt( 'courier_pathao_sandbox' ) ) {
+		$msg .= ' ' . __( 'Note: "Use Pathao\'s test server" is on. Real Pathao details only work with it off.', 'kenakata-kit' );
+	}
+	/* translators: %s: Pathao's own words */
+	return new WP_Error( 'kk_courier_auth', $msg . ( '' !== $why ? ' ' . sprintf( __( '(Pathao: %s)', 'kenakata-kit' ), $why ) : '' ), array( 'status' => 502 ) );
 }
 
 /** A call to Pathao with a valid token; if the token was refused it is renewed once and the call repeated. */

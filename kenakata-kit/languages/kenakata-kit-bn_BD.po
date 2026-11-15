@@ -8019,3 +8019,18 @@ msgstr "এখনই আপডেট খুঁজুন"
 
 msgid "A new version was found: use the box above to update."
 msgstr "নতুন ভার্সন পাওয়া গেছে: আপডেট করতে উপরের বক্স ব্যবহার করুন।"
+
+msgid "Pathao says the login email or password is wrong. Type the email and password you use to sign in at merchant.pathao.com again (the Client ID and secret are separate) and save."
+msgstr "Pathao বলছে লগইন ইমেইল বা পাসওয়ার্ড ভুল। merchant.pathao.com-এ যে ইমেইল আর পাসওয়ার্ড দিয়ে লগইন করেন, সেটা আবার লিখে সেভ করুন (Client ID আর secret আলাদা জিনিস)।"
+
+msgid "Pathao says the Client ID or Client secret is wrong. Copy them again from merchant.pathao.com → Developers API and save."
+msgstr "Pathao বলছে Client ID বা Client secret ভুল। merchant.pathao.com → Developers API থেকে আবার কপি করে সেভ করুন।"
+
+msgid "Note: \"Use Pathao's test server\" is on. Real Pathao details only work with it off."
+msgstr "খেয়াল করুন: \"Use Pathao's test server\" চালু আছে। আসল Pathao তথ্য শুধু এটা বন্ধ থাকলেই কাজ করে।"
+
+msgid "(Pathao: %s)"
+msgstr "(Pathao: %s)"
+
+msgid "Note: this courier's TEST server is switched on in the settings. For real parcels and real login details, switch it off."
+msgstr "খেয়াল করুন: সেটিংসে এই কুরিয়ারের টেস্ট সার্ভার চালু আছে। আসল পার্সেল আর আসল লগইন তথ্যের জন্য এটা বন্ধ করুন।"

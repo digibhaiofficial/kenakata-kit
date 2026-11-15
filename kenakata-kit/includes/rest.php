@@ -23,6 +23,7 @@ add_action( 'rest_api_init', function () {
 				if ( ! is_array( $data ) ) {
 					return new WP_Error( 'kk_bad_json', 'JSON object expected.', array( 'status' => 400 ) );
 				}
+				kk_load_admin();
 				$count = kk_import_settings( $data );
 				return array( 'updated' => $count, 'settings' => kk_all_opts( true ) );
 			},

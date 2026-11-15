@@ -15,7 +15,10 @@ define( 'KK_SD_CAP', 'kk_store_dashboard' );
 define( 'KK_SD_ROLE', 'kk_store_manager' );
 define( 'KK_SD_ROLE_VERSION', '1' ); // bump when the role's capabilities change
 
-require_once KK_DIR . '/includes/store-dashboard-api.php';
+// The dashboard's data API (43 KB of code) is needed only for REST requests, not on every page.
+add_action( 'rest_api_init', function () {
+	require_once KK_DIR . '/includes/store-dashboard-api.php';
+}, 0 );
 
 /** Capabilities of the Store Manager role. */
 function kk_sd_role_caps() {

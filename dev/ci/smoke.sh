@@ -360,6 +360,15 @@ wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["mp_enable"] = 0
 curl -s -o /dev/null -b /tmp/c4 -c /tmp/c4 -X POST -d "product_id=$PID&quantity=1" "$URL/?wc-ajax=kk_add"; curl -sL -o /tmp/body -b /tmp/c4 "$URL/?page_id=$(wpc option get woocommerce_checkout_page_id)"
 check "switched off → not offered at checkout" '! grep -q "payment_method_kk_mobile_pay" /tmp/body && clean /tmp/body'
 
+echo "== 3.16.1: block editor styles only where blocks are used"
+BP=$(wpc post create --post_type=post --post_status=publish --post_title="Block post" --post_content='<!-- wp:paragraph --><p>Hello blocks</p><!-- /wp:paragraph -->' --porcelain)
+wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["speed_block_css"] = 1; kk_update_settings( $s );'
+curl -sL -o /tmp/body "$URL/?page_id=$CARDS"
+check "page without blocks: no block-library CSS" '! grep -q "wp-block-library-css" /tmp/body && clean /tmp/body'
+curl -sL -o /tmp/body "$URL/?p=$BP"
+check "post written with blocks keeps it" 'grep -q "wp-block-library-css" /tmp/body'
+wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["speed_block_css"] = 0; kk_update_settings( $s );'
+
 echo "== Bots"
 wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["speed_robots_shop"] = 1; $s["speed_bot_block"] = 1; $s["speed_ai_block"] = 1; kk_update_settings( $s );'
 check "robots.txt keeps crawlers off search/sort/filter pages and names the blocked bots" 'curl -s "$URL/?robots=1" | grep -q "orderby" && curl -s "$URL/?robots=1" | grep -q "User-agent: AhrefsBot"'

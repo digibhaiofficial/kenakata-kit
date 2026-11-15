@@ -4,7 +4,7 @@ Plugin URI: https://digibhai.com/
 Requires at least: 6.3
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 3.16.0
+Stable tag: 3.16.1
 License: GPLv2 or later
 
 Everything a Bangladeshi WooCommerce store usually needs. Settings: left admin menu → Kenakata Kit.
@@ -30,6 +30,9 @@ Products Grid, Products Carousel, Brands, Categories, Buy Now Button, Live Searc
 Older [ss_…] shortcodes keep working. Options: see the guide or Kenakata Kit → Shortcodes.
 
 == Changelog ==
+= 3.16.1 =
+* Speed & health (off until turned on): "Block editor styles only where blocks are used". Pages built with Elementor skip the block editor's style file (about 100 KB before compression, render-blocking). Posts written with blocks, cart, checkout and My account keep it.
+
 = 3.16.0 =
 * New (off until turned on): bKash / Nagad / Rocket / Upay by hand (Kenakata Kit → Mobile payment). The customer sends money to your number, then types the number they sent from and the Transaction ID, and may add a screenshot (kept privately, only staff can open it). No API and no fees. A TrxID can be used only once. The order waits On hold until you press "Payment received" (order screen or store dashboard) or "Not received".
 * Ask for the whole amount or only the delivery charge (or a fixed amount) in advance, the rest cash on delivery: courier booking and labels then collect only what is left.

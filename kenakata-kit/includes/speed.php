@@ -87,6 +87,21 @@ if ( kk_opt( 'speed_wc_assets' ) ) {
 	}, 99 );
 }
 
+// Block editor styles only where blocks are used (pages built with Elementor or shortcodes do not need them).
+if ( kk_opt( 'speed_block_css' ) ) {
+	add_action( 'wp_enqueue_scripts', function () {
+		if ( is_singular() && has_blocks( get_post() ) ) {
+			return;
+		}
+		if ( function_exists( 'is_woocommerce' ) && ( is_cart() || is_checkout() || is_account_page() ) ) {
+			return; // WooCommerce may use its blocks here
+		}
+		foreach ( array( 'wp-block-library', 'wp-block-library-theme', 'classic-theme-styles', 'wc-blocks-style', 'wc-blocks-vendors-style' ) as $h ) {
+			wp_dequeue_style( $h );
+		}
+	}, 100 );
+}
+
 /* =========================================================================
  * Bots: keep crawlers away from pages that cannot be cached, and stop bots that bring no customers
  * ====================================================================== */

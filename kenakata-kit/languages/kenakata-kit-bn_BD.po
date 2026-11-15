@@ -8900,3 +8900,36 @@ msgstr "WooCommerce-এর দোকানের ঠিকানা"
 
 msgid "Create a page"
 msgstr "পেজ বানান"
+
+msgid "Choose your district"
+msgstr "আপনার জেলা বাছুন"
+
+msgid "Choose your thana / upazila"
+msgstr "আপনার থানা / উপজেলা বাছুন"
+
+msgid "Other (write it in the address)"
+msgstr "অন্য (ঠিকানায় লিখে দিন)"
+
+msgid "Please choose your thana / upazila again: it does not match the district."
+msgstr "থানা / উপজেলা আবার বাছুন: এটা জেলার সাথে মিলছে না।"
+
+msgid "District and thana"
+msgstr "জেলা ও থানা"
+
+msgid "Customers pick their district (64) and then their thana / upazila from a list, so couriers get a clean address. City thanas of Dhaka, Chattogram, Rajshahi, Khulna, Gazipur and Narayanganj are included. \"Other\" lets them write it in the address."
+msgstr "কাস্টমার তালিকা থেকে জেলা (৬৪টা), তারপর থানা / উপজেলা বাছে, ফলে কুরিয়ার পরিষ্কার ঠিকানা পায়। ঢাকা, চট্টগ্রাম, রাজশাহী, খুলনা, গাজীপুর আর নারায়ণগঞ্জের শহরের থানাও আছে। \"অন্য\" বাছলে ঠিকানায় লিখে দিতে পারে।"
+
+msgid "Ask for district and thana"
+msgstr "জেলা ও থানা চাওয়া হবে"
+
+msgid "Adds a District list (always required) to the checkout. Turn off to go back to the address field only."
+msgstr "চেকআউটে জেলার তালিকা যোগ হয় (সবসময় বাধ্যতামূলক)। বন্ধ করলে আবার শুধু ঠিকানার ঘর থাকবে।"
+
+msgid "Thana / upazila"
+msgstr "থানা / উপজেলা"
+
+msgid "District field label"
+msgstr "জেলার ঘরের লেবেল"
+
+msgid "Thana field label"
+msgstr "থানার ঘরের লেবেল"

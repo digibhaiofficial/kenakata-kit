@@ -105,6 +105,24 @@ add_filter( 'woocommerce_checkout_fields', function ( $fields ) {
 		) ),
 	);
 
+	// District → thana (3.19, off until turned on). The thana list follows the district (kk_bd_thanas()).
+	if ( kk_opt( 'co_district_enable' ) && 'BD' === kk_opt( 'co_country' ) ) {
+		$billing['billing_state'] = array(
+			'type' => 'state', 'country' => 'BD', 'label' => kk_opt( 'co_district_label' ), 'required' => true,
+			'class' => array( 'form-row-wide', 'kk-district' ), 'priority' => 24, 'placeholder' => __( 'Choose your district', 'kenakata-kit' ),
+		);
+		$mode = (string) kk_opt( 'co_thana_mode' );
+		if ( in_array( $mode, array( 'optional', 'required' ), true ) ) {
+			$state   = function_exists( 'WC' ) && WC()->customer ? (string) WC()->customer->get_billing_state() : '';
+			$options = array( '' => __( 'Choose your thana / upazila', 'kenakata-kit' ) ) + kk_thana_options( $state );
+			$billing['billing_city'] = array(
+				'type' => 'select', 'label' => kk_opt( 'co_thana_label' ), 'required' => 'required' === $mode,
+				'class' => array( 'form-row-wide', 'kk-thana' ), 'priority' => 26, 'options' => $options,
+				'input_class' => array( 'kk-thana__select' ),
+			);
+		}
+	}
+
 	if ( kk_opt( 'co_area_enable' ) && kk_area_methods() ) {
 		$options = array();
 		foreach ( kk_area_methods() as $id => $m ) {
@@ -271,3 +289,68 @@ if ( kk_opt( 'co_cart_hide_shipping' ) ) {
 		}
 	} );
 }
+
+/* =========================================================================
+ * District → thana data (3.19)
+ * ====================================================================== */
+
+/** All districts (WooCommerce state codes) with their thanas: code => array( bengali name, array( array( en, bn ), … ) ). */
+function kk_bd_thanas() {
+	static $data = null;
+	if ( null === $data ) {
+		$data = (array) apply_filters( 'kk_bd_thanas', include KK_DIR . '/includes/data/bd-thanas.php' );
+	}
+	return $data;
+}
+
+/** Use the Bengali names on a Bengali site. */
+function kk_bd_names_bn() {
+	return 0 === strpos( determine_locale(), 'bn' );
+}
+
+/** Thana options for a district (value = English name, saved in the order's "city"), plus "Other". */
+function kk_thana_options( $state ) {
+	$all = kk_bd_thanas();
+	$out = array();
+	if ( isset( $all[ $state ] ) ) {
+		$bn = kk_bd_names_bn();
+		foreach ( $all[ $state ][1] as $t ) {
+			$out[ $t[0] ] = $bn ? $t[1] : $t[0];
+		}
+	}
+	$out['Other'] = __( 'Other (write it in the address)', 'kenakata-kit' );
+	return $out;
+}
+
+if ( kk_opt( 'co_district_enable' ) ) {
+	// The thana list for each district, for the checkout script (only on the checkout page).
+	add_action( 'wp_enqueue_scripts', function () {
+		if ( ! function_exists( 'is_checkout' ) || ! is_checkout() || is_order_received_page() ) {
+			return;
+		}
+		$bn   = kk_bd_names_bn();
+		$list = array();
+		foreach ( kk_bd_thanas() as $code => $d ) {
+			$list[ $code ] = array_map( function ( $t ) use ( $bn ) { return array( $t[0], $bn ? $t[1] : $t[0] ); }, $d[1] );
+		}
+		$js = 'window.kkThanas=' . wp_json_encode( array( 'list' => $list, 'choose' => __( 'Choose your thana / upazila', 'kenakata-kit' ), 'other' => __( 'Other (write it in the address)', 'kenakata-kit' ) ) ) . ';'
+			. '(function(){function fill(){var d=document.getElementById("billing_state"),t=document.getElementById("billing_city");if(!d||!t||t.tagName!=="SELECT")return;var keep=t.value,L=kkThanas.list[d.value]||[];t.innerHTML="";var o=document.createElement("option");o.value="";o.textContent=kkThanas.choose;t.appendChild(o);L.forEach(function(x){var e=document.createElement("option");e.value=x[0];e.textContent=x[1];t.appendChild(e);});var e2=document.createElement("option");e2.value="Other";e2.textContent=kkThanas.other;t.appendChild(e2);t.value=keep;if(t.value!==keep)t.value="";if(window.jQuery)jQuery(t).trigger("change.select2");}'
+			. 'document.addEventListener("change",function(e){if(e.target&&e.target.id==="billing_state")fill();});if(window.jQuery){jQuery(document.body).on("change","#billing_state",fill).on("updated_checkout",fill);}document.addEventListener("DOMContentLoaded",fill);})();';
+		wp_register_script( 'kenakata-kit-thana', '', array(), KK_VERSION, true );
+		wp_enqueue_script( 'kenakata-kit-thana' );
+		wp_add_inline_script( 'kenakata-kit-thana', $js );
+	}, 30 );
+
+	// A thana that does not belong to the chosen district is not kept (except "Other").
+	add_action( 'woocommerce_after_checkout_validation', function ( $data, $errors ) {
+		$mode = (string) kk_opt( 'co_thana_mode' );
+		if ( ! in_array( $mode, array( 'optional', 'required' ), true ) || empty( $data['billing_city'] ) ) {
+			return;
+		}
+		$opts = kk_thana_options( (string) ( $data['billing_state'] ?? '' ) );
+		if ( ! isset( $opts[ $data['billing_city'] ] ) ) {
+			$errors->add( 'kk_thana', __( 'Please choose your thana / upazila again: it does not match the district.', 'kenakata-kit' ) );
+		}
+	}, 15, 2 );
+}
+

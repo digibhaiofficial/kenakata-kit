@@ -421,6 +421,26 @@ get "$URL/wp-admin/admin.php?page=kenakata-kit&tab=courier" >/dev/null
 check "courier settings link to the courier panels" 'grep -q "kk-help-link" /tmp/body && grep -q "steadfast.com.bd/login" /tmp/body && grep -q "merchant.pathao.com" /tmp/body && clean /tmp/body'
 check "guide has the roadmap with settings buttons" 'grep -q "id=\"roadmap\"" "$WP/wp-content/plugins/kenakata-kit/docs/index.html" && grep -q "data-tab=\"courier\"" "$WP/wp-content/plugins/kenakata-kit/docs/index.html"'
 
+echo "== 3.19: district and thana at checkout"
+wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["co_district_enable"] = 1; $s["co_thana_mode"] = "required"; $s["co_throttle_enable"] = 0; kk_update_settings( $s );'
+rm -f /tmp/c6; curl -s -o /dev/null -b /tmp/c6 -c /tmp/c6 -X POST -d "product_id=$PID&quantity=1" "$URL/?wc-ajax=kk_add"
+curl -sL -o /tmp/body -b /tmp/c6 -c /tmp/c6 "$URL/?page_id=$(wpc option get woocommerce_checkout_page_id)"
+CN6=$(grep -oP 'name="woocommerce-process-checkout-nonce" value="\K[^"]+' /tmp/body | head -1)
+check "checkout asks for district (64) and thana; list for the script" 'grep -q "id=\"billing_state\"" /tmp/body && [ "$(grep -o "value=\"BD-[0-9]*\"" /tmp/body | sort -u | wc -l)" = 64 ] && grep -q "id=\"billing_city\"" /tmp/body && grep -q "kkThanas" /tmp/body && grep -q "Mirpur" /tmp/body && clean /tmp/body'
+SM6=$(wpc eval 'foreach ( WC_Shipping_Zones::get_zone( 0 )->get_shipping_methods( true ) as $m ) { echo $m->get_rate_id(); break; }')
+CO6="billing_first_name=Thana&billing_phone=01713000777&billing_address_1=House+3&billing_country=BD&shipping_method%5B0%5D=$SM6&billing_delivery_area=$SM6&payment_method=cod&terms=1&woocommerce-process-checkout-nonce=$CN6"
+curl -s -o /tmp/body -b /tmp/c6 -c /tmp/c6 -X POST -d "$CO6&billing_state=BD-13" "$URL/?wc-ajax=checkout"
+check "thana required → order refused without it" 'grep -q "\"result\":\"failure\"" /tmp/body'
+curl -s -o /tmp/body -b /tmp/c6 -c /tmp/c6 -X POST -d "$CO6&billing_state=BD-60&billing_city=Mirpur" "$URL/?wc-ajax=checkout"
+check "thana from another district is refused" 'grep -q "\"result\":\"failure\"" /tmp/body && grep -q "does not match the district" /tmp/body'
+curl -s -o /tmp/body -b /tmp/c6 -c /tmp/c6 -X POST -d "$CO6&billing_state=BD-13&billing_city=Mirpur" "$URL/?wc-ajax=checkout"
+TID=$(grep -oP '"order_id":\K[0-9]+' /tmp/body | head -1)
+tinfo=$(wpc eval '$o = wc_get_order( '"${TID:-0}"' ); echo $o ? $o->get_billing_state() . "|" . $o->get_billing_city() : "none";')
+check "order saved with district and thana ($tinfo)" '[ "$tinfo" = "BD-13|Mirpur" ]'
+wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["co_district_enable"] = 0; $s["co_throttle_enable"] = 1; kk_update_settings( $s );'
+curl -sL -o /tmp/body -b /tmp/c6 -c /tmp/c6 "$URL/?page_id=$(wpc option get woocommerce_checkout_page_id)"
+check "switched off → no district / thana fields" '! grep -q "id=\"billing_state\"" /tmp/body && ! grep -q "kkThanas" /tmp/body'
+
 echo "== Bots"
 wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["speed_robots_shop"] = 1; $s["speed_bot_block"] = 1; $s["speed_ai_block"] = 1; kk_update_settings( $s );'
 check "robots.txt keeps crawlers off search/sort/filter pages and names the blocked bots" 'curl -s "$URL/?robots=1" | grep -q "orderby" && curl -s "$URL/?robots=1" | grep -q "User-agent: AhrefsBot"'

@@ -4,7 +4,7 @@ Plugin URI: https://digibhai.com/
 Requires at least: 6.3
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 3.18.0
+Stable tag: 3.19.0
 License: GPLv2 or later
 
 Everything a Bangladeshi WooCommerce store usually needs. Settings: left admin menu → Kenakata Kit.
@@ -30,6 +30,9 @@ Products Grid, Products Carousel, Brands, Categories, Buy Now Button, Live Searc
 Older [ss_…] shortcodes keep working. Options: see the guide or Kenakata Kit → Shortcodes.
 
 == Changelog ==
+= 3.19.0 =
+* Checkout (off until turned on): District and thana. Customers choose their district (all 64) and then their thana / upazila from a list that follows the district (572 places in English and Bengali, including the city thanas of Dhaka, Chattogram, Rajshahi, Khulna, Gazipur and Narayanganj; "Other" for the rest). Thana can be off, optional or required. Saved in the order's district and city, so labels and courier bookings get them. Upazila list: nuhil/bangladesh-geocode (MIT).
+
 = 3.18.0 =
 * Guide: new "step by step" roadmap (six stages, each with a button that opens the right settings tab) and a new chapter for daily work: products with options, confirming orders and couriers, printing, bKash / Nagad / Rocket, the fake-order shield, the sales report and keeping the site fast. The version shown in the guide is now always current.
 * Settings: "where do I find this?" links under fields (Steadfast, Pathao, RedX, eCourier and BD Courier panels, Cloudflare Turnstile keys, WooCommerce payment methods and store address, adding a team member, creating a page).

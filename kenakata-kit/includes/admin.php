@@ -8,7 +8,7 @@
 defined( 'ABSPATH' ) || exit;
 
 add_action( 'admin_menu', function () {
-	$icon = 'data:image/svg+xml;base64,' . base64_encode( '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#a7aaad" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6.2"/><circle cx="10" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/></svg>' );
+	$icon = KK_URL . 'assets/img/menu-icon.png'; // Kenakata Kit logo (white bag, green K) for the dark admin menu
 	add_menu_page( __( 'Kenakata Kit', 'kenakata-kit' ), __( 'Kenakata Kit', 'kenakata-kit' ), 'manage_woocommerce', 'kenakata-kit', 'kk_render_settings', $icon, 56 );
 	add_submenu_page( 'kenakata-kit', __( 'Dashboard', 'kenakata-kit' ), __( 'Dashboard', 'kenakata-kit' ), 'manage_woocommerce', 'kenakata-kit', 'kk_render_settings' );
 	foreach ( array( 'design', 'cards', 'checkout', 'widgets', 'help' ) as $key ) {
@@ -279,8 +279,9 @@ function kk_render_settings() {
 	<div class="wrap kk-admin"<?php echo kk_admin_theme_attr(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built from validated colours ?>>
 		<header class="kk-admin__top">
 			<div class="kk-admin__brand">
-				<span class="kk-admin__logo"><?php echo kk_icon( 'cart' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static SVG ?></span>
-				<div><h1><?php esc_html_e( 'Kenakata Kit', 'kenakata-kit' ); ?></h1><span class="kk-admin__ver"><?php /* translators: %s: version number */ printf( esc_html__( 'Version %s · E-commerce toolkit for Bangladesh', 'kenakata-kit' ), esc_html( KK_VERSION ) ); ?> · <?php /* translators: %s: company name */ printf( esc_html__( 'by %s', 'kenakata-kit' ), '<a href="https://digibhai.com/" target="_blank" rel="noopener">DigiBhai.com</a>' ); ?></span></div>
+				<img class="kk-admin__logo" src="<?php echo esc_url( KK_URL . 'assets/img/logo.png' ); ?>" width="46" height="46" alt="">
+				<?php $kk_pro = function_exists( 'kk_is_pro' ) && kk_is_pro(); ?>
+				<div><h1><?php esc_html_e( 'Kenakata Kit', 'kenakata-kit' ); ?><?php if ( $kk_pro ) : ?> <a class="kk-pro-title" href="<?php echo esc_url( kk_admin_url( 'license' ) ); ?>" title="<?php esc_attr_e( 'Pro license active', 'kenakata-kit' ); ?>">PRO</a><?php endif; ?></h1><span class="kk-admin__ver"><?php /* translators: %s: version number */ printf( esc_html__( 'Version %s · E-commerce toolkit for Bangladesh', 'kenakata-kit' ), esc_html( KK_VERSION ) ); ?><?php if ( $kk_pro ) : ?> · <strong class="kk-pro-on">✓ <?php esc_html_e( 'Pro activated', 'kenakata-kit' ); ?></strong><?php endif; ?> · <?php /* translators: %s: company name */ printf( esc_html__( 'by %s', 'kenakata-kit' ), '<a href="https://digibhai.com/" target="_blank" rel="noopener">DigiBhai.com</a>' ); ?></span></div>
 			</div>
 			<div class="kk-admin__top-actions">
 				<a class="button" href="<?php echo esc_url( home_url( '/' ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'View site ↗', 'kenakata-kit' ); ?></a>
@@ -305,7 +306,7 @@ function kk_render_settings() {
 						$k === $tab ? ' aria-current="page"' : '',
 						esc_attr( $item['icon'] ),
 						esc_html( $item['label'] ),
-						! empty( $item['pro'] ) ? ' <span class="kk-pro-badge">PRO</span>' : ''
+						! empty( $item['pro'] ) && ! ( function_exists( 'kk_is_pro' ) && kk_is_pro() ) ? ' <span class="kk-pro-badge">PRO</span>' : '' // with Pro active, the header shows PRO once
 					);
 				}
 				?>

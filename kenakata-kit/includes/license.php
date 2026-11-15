@@ -199,22 +199,25 @@ function kk_render_license_page() {
 	$data  = is_array( $s['data'] ) ? $s['data'] : array();
 	$is_ok = $s['ok'];
 	$admin = current_user_can( 'manage_options' );
-	echo '<div class="kk-card">';
-	echo '<p class="' . ( $is_ok ? 'kk-notice-ok' : ( 'empty' === $s['code'] ? '' : 'kk-notice-err' ) ) . '" role="status"><strong>' . esc_html( kk_license_message( $s['code'] ) ) . '</strong></p>';
-	if ( $s['dev'] && ! $is_ok ) {
-		echo '<p class="kk-card__desc">' . esc_html__( 'This is a test copy (localhost / .local / .test), so all Pro features are open here without a key.', 'kenakata-kit' ) . '</p>';
-	}
+	$logo = '<img src="' . esc_url( KK_URL . 'assets/img/logo-128.png' ) . '" alt="">';
 	if ( $is_ok ) {
 		$domains = implode( ', ', array_map( 'strval', (array) ( $data['d'] ?? array() ) ) );
-		echo '<table class="form-table" role="presentation"><tbody>';
-		echo '<tr><th>' . esc_html__( 'Key number', 'kenakata-kit' ) . '</th><td>' . esc_html( (string) ( $data['id'] ?? '' ) ) . '</td></tr>';
-		echo '<tr><th>' . esc_html__( 'Website(s)', 'kenakata-kit' ) . '</th><td>' . esc_html( $domains ) . '</td></tr>';
-		echo '<tr><th>' . esc_html__( 'Updates until', 'kenakata-kit' ) . '</th><td>' . esc_html( '' === $s['expires'] ? __( 'Lifetime', 'kenakata-kit' ) : date_i18n( get_option( 'date_format' ), strtotime( $s['expires'] . ' 12:00:00' ) ) ) . '</td></tr>';
-		echo '</tbody></table>';
+		echo '<div class="kk-lic-hero">' . $logo . '<div><h3>' . esc_html__( 'Kenakata Kit PRO is activated', 'kenakata-kit' ) . ' ✓</h3><p>' . esc_html__( 'All Pro features are open on this website.', 'kenakata-kit' ) . '</p></div></div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $logo escaped above
+		echo '<div class="kk-lic-grid">';
+		echo '<div><span>' . esc_html__( 'Key number', 'kenakata-kit' ) . '</span><b>' . esc_html( (string) ( $data['id'] ?? '' ) ) . '</b></div>';
+		echo '<div><span>' . esc_html__( 'Website(s)', 'kenakata-kit' ) . '</span><b>' . esc_html( $domains ) . '</b></div>';
+		echo '<div><span>' . esc_html__( 'Updates until', 'kenakata-kit' ) . '</span><b>' . esc_html( '' === $s['expires'] ? __( 'Lifetime', 'kenakata-kit' ) : date_i18n( get_option( 'date_format' ), strtotime( $s['expires'] . ' 12:00:00' ) ) ) . '</b></div>';
+		echo '</div>';
 		if ( ! $s['updates_ok'] ) {
 			echo '<p class="kk-notice-err">' . esc_html__( 'Your update period has ended. Pro keeps working, but new versions are not offered. Contact us to renew.', 'kenakata-kit' ) . '</p>';
 		}
+	} else {
+		echo '<div class="kk-lic-hero kk-lic-hero--free">' . $logo . '<div><h3>' . esc_html__( 'Kenakata Kit Free', 'kenakata-kit' ) . '</h3><p>' . esc_html( kk_license_message( $s['code'] ) ) . '</p></div></div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $logo escaped above
+		if ( $s['dev'] ) {
+			echo '<p class="kk-card__desc">' . esc_html__( 'This is a test copy (localhost / .local / .test), so all Pro features are open here without a key.', 'kenakata-kit' ) . '</p>';
+		}
 	}
+	echo '<div class="kk-card">';
 	if ( ! $admin ) {
 		echo '<p class="kk-card__desc">' . esc_html__( 'Only an administrator can add or change the license key.', 'kenakata-kit' ) . '</p></div>';
 		return;
@@ -232,6 +235,9 @@ function kk_render_license_page() {
 	echo '<p><button type="submit" class="button button-primary">' . esc_html__( 'Save key', 'kenakata-kit' ) . '</button> ';
 	if ( '' !== $s['key'] ) {
 		echo '<button type="submit" name="kk_license_remove" value="1" class="button">' . esc_html__( 'Remove key', 'kenakata-kit' ) . '</button>';
+	}
+	if ( $is_ok ) {
+		echo '<p class="kk-card__desc">' . esc_html__( 'Moving to another website? Remove the key here, then ask us to move it to the new address.', 'kenakata-kit' ) . '</p>';
 	}
 	echo '</p></form></div>';
 

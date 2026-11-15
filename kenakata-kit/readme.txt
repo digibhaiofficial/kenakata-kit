@@ -3,7 +3,7 @@ Contributors: DigiBhai.com
 Plugin URI: https://digibhai.com/
 Requires at least: 6.3
 Requires PHP: 7.4
-Stable tag: 3.11.0
+Stable tag: 3.11.1
 License: GPLv2 or later
 
 Everything a Bangladeshi WooCommerce store usually needs. Settings: left admin menu → Kenakata Kit.
@@ -29,6 +29,10 @@ Products Grid, Products Carousel, Brands, Categories, Buy Now Button, Live Searc
 Older [ss_…] shortcodes keep working. Options: see the guide or Kenakata Kit → Shortcodes.
 
 == Changelog ==
+= 3.11.1 =
+* New: Kenakata Kit logo in the admin menu and on the settings screens.
+* Changed: with a Pro license, the settings header shows "Kenakata Kit PRO" and "Pro activated"; the small PRO tags on the store dashboard, incomplete orders and courier tabs only show while there is no license. The License page has a clear Pro / Free card.
+
 = 3.11.0 =
 * New: Free and Pro. Pro (store dashboard, one-tap courier booking and courier check, incomplete orders) turns on with a license key in Kenakata Kit → License. Everything else stays Free. Keys are checked on the site itself (signed keys, no license server); test copies on localhost / .local / .test run Pro without a key.
 * New: updates from GitHub. WordPress now shows "Update available" for Kenakata Kit and installs new versions from the GitHub releases. Free sites and Pro sites within their update period get updates; when a Pro update period ends, Pro keeps working and only new versions stop.

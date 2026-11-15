@@ -3,8 +3,7 @@
 .kk-admin * { box-sizing: border-box; }
 .kk-admin__top { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 16px 20px; margin-bottom: 16px; background: #fff; border: 1px solid var(--a-border); border-radius: 12px; }
 .kk-admin__brand { display: flex; align-items: center; gap: 14px; }
-.kk-admin__logo { display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 12px; background: var(--a-green); color: var(--a-on); }
-.kk-admin__logo svg { width: 26px; height: 26px; }
+.kk-admin__logo { display: block; width: 46px; height: 46px; }
 .kk-admin h1 { margin: 0; padding: 0; font-size: 22px; font-weight: 700; line-height: 1.2; }
 .kk-admin__ver { color: var(--a-muted); font-size: 13px; }
 .kk-admin__top-actions { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -191,3 +190,19 @@ p .kk-copy { display: inline-flex; width: auto; }
 
 /* Pro badge (License) */
 .kk-pro-badge { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 4px; background: var(--a-accent, #F59E0B); color: #1d1b20; font-size: 10px; font-weight: 700; letter-spacing: .04em; line-height: 1.6; vertical-align: middle; }
+
+/* PRO in the header when a license is active */
+.kk-admin h1 .kk-pro-title { display: inline-block; margin-left: 8px; padding: 3px 10px; border-radius: 6px; background: linear-gradient(135deg, #015d20, #2ab203); color: #fff; font-size: 13px; font-weight: 800; letter-spacing: .08em; line-height: 1.4; vertical-align: middle; text-decoration: none; box-shadow: 0 2px 6px rgba(1, 93, 32, .25); }
+.kk-admin h1 .kk-pro-title:hover, .kk-admin h1 .kk-pro-title:focus { color: #fff; filter: brightness(1.08); }
+.kk-admin .kk-pro-on { color: #157a32; }
+/* License page */
+.kk-lic-hero { display: flex; align-items: center; gap: 16px; padding: 18px 20px; border-radius: 12px; margin: 0 0 16px; background: linear-gradient(135deg, #015d20, #0b7a2c 60%, #2ab203); color: #fff; }
+.kk-lic-hero img { width: 56px; height: 56px; background: #fff; border-radius: 12px; padding: 6px; }
+.kk-lic-hero h3 { margin: 0 0 2px; color: #fff; font-size: 18px; }
+.kk-lic-hero p { margin: 0; opacity: .92; }
+.kk-lic-hero--free { background: #f6f7f7; color: var(--a-text); border: 1px solid var(--a-border); }
+.kk-lic-hero--free h3 { color: var(--a-text); }
+.kk-lic-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin: 0 0 14px; }
+.kk-lic-grid div { background: var(--a-tint); border: 1px solid var(--a-line); border-radius: 10px; padding: 10px 12px; }
+.kk-lic-grid span { display: block; color: var(--a-muted); font-size: 12px; }
+.kk-lic-grid b { font-size: 14px; word-break: break-word; }

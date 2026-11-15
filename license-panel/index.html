@@ -4,120 +4,241 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>Kenakata Kit · লাইসেন্স প্যানেল</title>
+<title>Kenakata Kit · License Panel</title>
+<link rel="icon" href="favicon.png">
 <style>
-:root{--p:#038348;--p-d:#025c33;--bg:#f6f5f2;--card:#fff;--line:#e3e1da;--t:#1d1b20;--m:#5f5e5a;--err:#a32d2d;--ok-bg:#e8f5ee;--err-bg:#fcebeb;--accent:#f59e0b}
-*{box-sizing:border-box}body{margin:0;font:15px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Bengali",sans-serif;background:var(--bg);color:var(--t)}
-header{background:var(--p);color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-header h1{font-size:18px;margin:0;font-weight:600}header small{opacity:.85}
-main{max-width:920px;margin:0 auto;padding:20px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin:0 0 16px}
-.card h2{font-size:17px;margin:0 0 12px}
-label{display:block;font-weight:600;margin:10px 0 4px}
-input,select,textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff;color:var(--t)}
-textarea{min-height:70px;font-family:ui-monospace,Consolas,monospace;font-size:13px}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:640px){.row{grid-template-columns:1fr}}
-button{font:inherit;font-weight:600;border-radius:8px;padding:9px 16px;border:1px solid var(--p);background:var(--p);color:#fff;cursor:pointer;margin:12px 8px 0 0}
-button.sec{background:#fff;color:var(--p)}button.danger{border-color:var(--err);background:#fff;color:var(--err)}
-button:disabled{opacity:.5;cursor:default}
-.msg{padding:10px 14px;border-radius:8px;margin:12px 0 0;display:none}.msg.ok{display:block;background:var(--ok-bg);color:var(--p-d)}.msg.err{display:block;background:var(--err-bg);color:var(--err)}
-.help{color:var(--m);font-size:13px;margin:4px 0 0}
-.key{word-break:break-all;font-family:ui-monospace,Consolas,monospace;font-size:13px;background:#f1efe8;border-radius:8px;padding:12px}
-.recovery{font-family:ui-monospace,Consolas,monospace;font-size:16px;letter-spacing:.06em;background:#fff8e6;border:2px dashed var(--accent);border-radius:8px;padding:14px;word-break:break-all}
-table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top}
-.tag{display:inline-block;padding:1px 7px;border-radius:5px;font-size:12px;background:#eaf3de;color:#27500a}.tag.rev{background:var(--err-bg);color:var(--err)}
-.hidden{display:none}nav button{margin:0 4px 0 0;padding:6px 12px;background:transparent;border-color:rgba(255,255,255,.6)}nav button.on{background:#fff;color:var(--p)}
+:root{--g:#015d20;--g2:#0b7a2c;--lime:#2ab203;--bg:#f3f6f3;--card:#fff;--line:#dfe6df;--t:#14201a;--m:#5d6b62;--err:#b42318;--errbg:#fdecea;--okbg:#e8f6ec;--warn:#9a6700;--warnbg:#fff6dd;--r:14px}
+*{box-sizing:border-box}html,body{margin:0}body{font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Bengali","Hind Siliguri",sans-serif;background:var(--bg);color:var(--t)}
+a{color:var(--g2)}button,input,select,textarea{font:inherit}
+.hidden{display:none!important}
+/* top bar */
+.top{position:sticky;top:0;z-index:5;background:linear-gradient(120deg,var(--g),var(--g2) 70%,#178f2e);color:#fff;box-shadow:0 2px 10px rgba(0,0,0,.12)}
+.top__in{max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto}.brand img{width:36px;height:36px}
+.brand b{font-size:17px;letter-spacing:.2px}.brand b i{font-style:normal;color:#8ef25f}.brand small{display:block;font-size:11px;opacity:.85;line-height:1.2}
+.nav{display:flex;gap:4px;flex-wrap:wrap}
+.nav button{background:transparent;border:0;color:#e7f5ea;padding:7px 11px;border-radius:9px;cursor:pointer;line-height:1.15;text-align:left}
+.nav button small{display:block;font-size:11px;opacity:.8}.nav button b{font-weight:600;font-size:14px}
+.nav button:hover{background:rgba(255,255,255,.12)}.nav button.on{background:#fff;color:var(--g)}
+main{max-width:1100px;margin:0 auto;padding:18px 16px 60px}
+/* cards & forms */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin:0 0 14px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.card h2{margin:0 0 4px;font-size:18px}.card h2 small,.lbl small{font-weight:400;color:var(--m);font-size:13px}
+.sub{color:var(--m);margin:0 0 12px;font-size:13.5px}
+.lbl{display:block;font-weight:600;margin:12px 0 5px;font-size:14px}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid #cfd8cf;border-radius:10px;background:#fff;color:var(--t)}
+input:focus,select:focus,textarea:focus{outline:2px solid #9be07e;border-color:var(--lime)}
+textarea{min-height:64px;font-family:ui-monospace,Consolas,monospace;font-size:13px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:720px){.row,.row3{grid-template-columns:1fr}}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--g);background:var(--g);color:#fff;border-radius:10px;padding:9px 15px;cursor:pointer;font-weight:600;margin:12px 8px 0 0;text-decoration:none;line-height:1.2}
+.btn:hover{background:var(--g2)}.btn small{font-weight:400;opacity:.85}
+.btn.sec{background:#fff;color:var(--g)}.btn.sec:hover{background:#f1f8f2}
+.btn.wa{background:#1fa855;border-color:#1fa855}.btn.wa:hover{background:#178a45}
+.btn.danger{background:#fff;color:var(--err);border-color:#f1b7b0}.btn.danger:hover{background:var(--errbg)}
+.btn.sm{padding:6px 10px;margin:2px 4px 2px 0;font-size:13px;border-radius:8px}
+.btn:disabled{opacity:.5;cursor:default}
+.msg{padding:10px 14px;border-radius:10px;margin:12px 0 0;display:none}.msg.ok{display:block;background:var(--okbg);color:#14532d}.msg.err{display:block;background:var(--errbg);color:var(--err)}.msg.warn{display:block;background:var(--warnbg);color:var(--warn)}
+.help{color:var(--m);font-size:12.5px;margin:4px 0 0}
+.key{word-break:break-all;font-family:ui-monospace,Consolas,monospace;font-size:12.5px;background:#f2f5f2;border:1px dashed #cfd8cf;border-radius:10px;padding:12px}
+/* login */
+.hero{border-radius:18px;overflow:hidden;background:#0b3d1c url(cover.jpg) center/cover;min-height:220px;display:flex;align-items:flex-end;margin:0 0 16px}
+.hero div{width:100%;padding:18px 20px;background:linear-gradient(transparent,rgba(0,0,0,.55));color:#fff}
+.hero h1{margin:0;font-size:22px}.hero p{margin:2px 0 0;opacity:.9}
+.narrow{max-width:520px;margin:0 auto}
+/* dashboard */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:0 0 14px}@media(max-width:820px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.stat span{display:block;color:var(--m);font-size:12.5px}.stat b{display:block;font-size:24px;line-height:1.2;margin-top:2px}
+.stat.hl{background:linear-gradient(135deg,var(--g),var(--g2));color:#fff;border:0}.stat.hl span{color:#d6efdc}
+.bars{display:flex;align-items:flex-end;gap:10px;height:150px;padding:8px 4px 0}
+.bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.bar i{display:block;width:100%;max-width:56px;background:linear-gradient(var(--lime),var(--g2));border-radius:7px 7px 3px 3px;min-height:3px}
+.bar span{font-size:11.5px;color:var(--m);margin-top:5px;white-space:nowrap}.bar em{font-style:normal;font-size:11.5px;font-weight:600;margin-bottom:3px}
+.grid2{display:grid;grid-template-columns:1.3fr 1fr;gap:14px}@media(max-width:820px){.grid2{grid-template-columns:1fr}}
+/* tables */
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+.tbl th{text-align:left;font-size:12px;color:var(--m);font-weight:600;padding:8px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:10px 6px;border-bottom:1px solid #eef2ee;vertical-align:top}
+.tbl tr:hover td{background:#fafcfa}
+.tag{display:inline-block;padding:1px 8px;border-radius:999px;font-size:12px;font-weight:600;background:#e8f6ec;color:#14532d;white-space:nowrap}
+.tag.rev{background:var(--errbg);color:var(--err)}.tag.exp{background:var(--warnbg);color:var(--warn)}.tag.life{background:#e9e7ff;color:#3c2fa0}
+.muted{color:var(--m);font-size:12.5px}
+.search{display:flex;gap:8px;align-items:center}.search input{flex:1}
+.banner{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--warnbg);color:var(--warn);border:1px solid #f0d58a;border-radius:12px;padding:10px 14px;margin:0 0 14px}
+.banner .btn{margin:0}
+/* modal */
+.modal{position:fixed;inset:0;z-index:20;background:rgba(10,30,15,.45);display:flex;align-items:flex-start;justify-content:center;padding:40px 14px;overflow:auto}
+.modal .card{max-width:560px;width:100%}
+.recovery{font-family:ui-monospace,Consolas,monospace;font-size:16px;letter-spacing:.06em;background:#fff8e6;border:2px dashed #e6b84a;border-radius:10px;padding:14px;word-break:break-all}
+.plans td input{padding:6px 8px}
 </style>
 </head>
 <body>
-<header><div><h1>Kenakata Kit · লাইসেন্স প্যানেল</h1><small>শুধু আপনার জন্য · গোপন চাবি এই ব্রাউজারের বাইরে কখনো যায় না</small></div>
-<nav id="nav" class="hidden"><button data-v="gen" class="on">নতুন কী</button><button data-v="ledger">খাতা</button><button data-v="check">কী যাচাই</button><button data-v="settings">ব্যাকআপ</button><button data-v="lock">লক</button></nav></header>
+<header class="top"><div class="top__in">
+  <div class="brand"><img src="logo-white.png" alt=""><div><b>Kenakata<i>Kit</i> · License Panel</b><small>লাইসেন্স প্যানেল · শুধু আপনার জন্য</small></div></div>
+  <nav class="nav hidden" id="nav">
+    <button data-v="dash"><b>Dashboard</b><small>ড্যাশবোর্ড</small></button>
+    <button data-v="gen"><b>New Key</b><small>নতুন কী</small></button>
+    <button data-v="cust"><b>Customers</b><small>কাস্টমার</small></button>
+    <button data-v="check"><b>Check Key</b><small>কী যাচাই</small></button>
+    <button data-v="settings"><b>Backup &amp; Settings</b><small>ব্যাকআপ ও সেটিংস</small></button>
+    <button data-v="lock"><b>Lock</b><small>লক</small></button>
+  </nav>
+</div></header>
 <main>
 
-<div id="v-nosupport" class="card hidden"><h2>এই ব্রাউজারে চলবে না</h2><p>এই প্যানেলের জন্য Ed25519 সমর্থন করে এমন নতুন ব্রাউজার লাগবে: Chrome / Edge 137+, Firefox 129+ বা Safari 17+। ব্রাউজার আপডেট করে আবার খুলুন।</p></div>
+<div id="v-nosupport" class="card hidden narrow"><h2>Browser too old <small>· ব্রাউজার পুরোনো</small></h2><p>এই প্যানেলের জন্য নতুন Chrome / Edge / Firefox লাগবে। ব্রাউজার আপডেট করে আবার খুলুন।</p></div>
 
-<div id="v-setup" class="card hidden">
-  <h2 id="s-title">প্রথমবার: নতুন গোপন চাবি তৈরি</h2>
-  <p id="s-intro">একটা শক্ত পাসওয়ার্ড দিন, অন্তত ১৬ অক্ষর। এই পাসওয়ার্ড দিয়েই প্যানেল খুলবেন। পাসওয়ার্ড হারালে রিকভারি কোড ছাড়া আর কোনো উপায় থাকবে না।</p>
-  <label for="s-pw">পাসওয়ার্ড</label><input id="s-pw" type="password" autocomplete="new-password">
-  <label for="s-pw2">আবার পাসওয়ার্ড</label><input id="s-pw2" type="password" autocomplete="new-password">
-  <button id="s-create">চাবি তৈরি করুন</button>
-  <button id="s-showimport" class="sec">আগের চাবি আছে (ফাইল / রিকভারি কোড)</button>
-  <div id="s-msg" class="msg"></div>
-  <div id="s-import" class="hidden">
-    <label for="s-file">চাবির ফাইল (kk-vault.json)</label><input id="s-file" type="file" accept=".json,application/json">
-    <p class="help">অথবা রিকভারি কোড দিয়ে চাবি ফেরত আনুন (তখন উপরের ঘরে নতুন পাসওয়ার্ড দিন):</p>
-    <label for="s-rec">রিকভারি কোড</label><input id="s-rec" autocomplete="off" spellcheck="false">
-    <button id="s-restore" class="sec">রিকভারি কোড দিয়ে ফেরত আনুন</button>
+<!-- first time in this browser: bring the key -->
+<div id="v-setup" class="hidden narrow">
+  <div class="hero"><div><h1>Welcome · স্বাগতম</h1><p>আপনার চাবি আনুন, তারপর পাসওয়ার্ড দিয়ে খুলুন।</p></div></div>
+  <div class="card">
+    <h2 id="s-title">Bring your key <small>· আপনার চাবি আনুন</small></h2>
+    <p class="sub" id="s-intro">এই ব্রাউজারে প্যানেল প্রথমবার খোলা হচ্ছে। আপনার চাবি আগে থেকেই আছে। নিচে <b>ব্যাকআপ ফাইল</b> (kk-backup…json বা kk-vault.json) দিন। ফাইলটা GitHub → <b>kenakata-license-panel</b> রিপোতেও আছে।</p>
+    <label class="lbl" for="s-file">Backup / key file <small>· ব্যাকআপ ফাইল</small></label><input id="s-file" type="file" accept=".json,application/json">
+    <details style="margin-top:14px"><summary class="muted" style="cursor:pointer">ফাইল নেই? কাগজের রিকভারি কোড দিয়ে ফেরত আনুন · Restore with recovery code</summary>
+      <label class="lbl" for="s-rec">Recovery code <small>· রিকভারি কোড</small></label><input id="s-rec" autocomplete="off" spellcheck="false">
+      <div class="row"><div><label class="lbl" for="s-pw">New password <small>· নতুন পাসওয়ার্ড</small></label><input id="s-pw" type="password" autocomplete="new-password"></div>
+      <div><label class="lbl" for="s-pw2">Again <small>· আবার</small></label><input id="s-pw2" type="password" autocomplete="new-password"></div></div>
+      <button class="btn" id="s-restore">Restore key <small>· চাবি ফেরত আনুন</small></button>
+      <button class="btn sec hidden" id="s-create">Create new key</button>
+    </details>
+    <div id="s-msg" class="msg"></div>
   </div>
 </div>
 
-<div id="v-recovery" class="card hidden">
-  <h2>রিকভারি কোড: এখনই কাগজে লিখে রাখুন</h2>
-  <p>এই কোডটা দিয়েই আপনার গোপন চাবি। পাসওয়ার্ড বা ফাইল সব হারালেও এটা দিয়ে চাবি ফেরত আনা যাবে। <strong>কাউকে দেবেন না, অনলাইনে কোথাও রাখবেন না।</strong> এটা আর কখনো দেখানো হবে না।</p>
+<div id="v-recovery" class="card hidden narrow">
+  <h2>Recovery code <small>· কাগজে লিখে রাখুন</small></h2>
+  <p class="sub">পাসওয়ার্ড বা ফাইল হারালেও এই কোড দিয়ে চাবি ফেরত আনা যাবে। কাউকে দেবেন না, অনলাইনে রাখবেন না।</p>
   <div id="r-code" class="recovery"></div>
-  <label><input type="checkbox" id="r-done" style="width:auto"> আমি কোডটা কাগজে লিখে নিরাপদ জায়গায় রেখেছি</label>
-  <button id="r-next" disabled>এগিয়ে যান</button>
+  <label class="lbl"><input type="checkbox" id="r-done" style="width:auto"> I wrote it on paper · কাগজে লিখেছি</label>
+  <button class="btn" id="r-next" disabled>Continue · এগিয়ে যান</button>
 </div>
 
-<div id="v-unlock" class="card hidden">
-  <h2>প্যানেল খুলুন</h2>
-  <label for="u-pw">পাসওয়ার্ড</label><input id="u-pw" type="password" autocomplete="current-password">
-  <button id="u-go">খুলুন</button>
-  <div id="u-msg" class="msg"></div>
-  <p class="help">পাবলিক কী: <code id="u-pub"></code></p>
+<div id="v-unlock" class="hidden narrow">
+  <div class="hero"><div><h1>KenakataKit License Panel</h1><p>Complete E-commerce Toolkit for Bangladesh</p></div></div>
+  <div class="card">
+    <h2>Unlock <small>· প্যানেল খুলুন</small></h2>
+    <label class="lbl" for="u-pw">Password <small>· পাসওয়ার্ড</small></label><input id="u-pw" type="password" autocomplete="current-password">
+    <button class="btn" id="u-go">Unlock · খুলুন</button>
+    <div id="u-msg" class="msg"></div>
+  </div>
 </div>
 
+<!-- DASHBOARD -->
+<div id="v-dash" class="hidden">
+  <div id="d-banners"></div>
+  <div class="stats">
+    <div class="stat hl"><span>Income this month · এই মাসের আয়</span><b id="d-month">৳0</b></div>
+    <div class="stat"><span>Total income · মোট আয়</span><b id="d-total">৳0</b></div>
+    <div class="stat"><span>Active licenses · চালু লাইসেন্স</span><b id="d-active">0</b></div>
+    <div class="stat"><span>Customers · কাস্টমার</span><b id="d-cust">0</b></div>
+  </div>
+  <div class="grid2">
+    <div class="card"><h2>Income, last 6 months <small>· গত ৬ মাসের আয়</small></h2><div class="bars" id="d-bars"></div></div>
+    <div class="card"><h2>Renewals due <small>· শিগগিরই মেয়াদ শেষ (৩০ দিন)</small></h2><div id="d-renew"></div></div>
+  </div>
+  <div class="card"><h2>Recent sales <small>· সাম্প্রতিক বিক্রি</small></h2><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Date · তারিখ</th><th>Customer · কাস্টমার</th><th>Website</th><th>Plan</th><th>৳</th><th></th></tr></thead><tbody id="d-recent"></tbody></table></div>
+    <button class="btn" data-go="gen">+ New Key <small>· নতুন কী</small></button></div>
+</div>
+
+<!-- NEW KEY -->
 <div id="v-gen" class="card hidden">
-  <h2>নতুন লাইসেন্স কী</h2>
+  <h2>Create New Key <small>· নতুন লাইসেন্স কী</small></h2>
+  <p class="sub">কাস্টমারের তথ্য দিন, প্ল্যান বাছুন, তারপর "Create". কী খাতায় জমা হবে আর এক চাপে WhatsApp-এ পাঠানো যাবে।</p>
   <div class="row">
-    <div><label for="g-name">কাস্টমারের নাম</label><input id="g-name"></div>
-    <div><label for="g-phone">ফোন</label><input id="g-phone" inputmode="tel"></div>
+    <div><label class="lbl" for="g-name">Customer name <small>· নাম</small></label><input id="g-name" autocomplete="off"></div>
+    <div><label class="lbl" for="g-phone">WhatsApp / phone <small>· ফোন</small></label><input id="g-phone" inputmode="tel" placeholder="01XXXXXXXXX" autocomplete="off"></div>
   </div>
-  <label for="g-plan">প্ল্যান</label>
-  <select id="g-plan"></select>
-  <p class="help" id="g-planhelp"></p>
-  <label for="g-domains">ওয়েবসাইট (এক লাইনে একটা, যেমন shop.com)</label>
-  <textarea id="g-domains" placeholder="shop.com"></textarea>
+  <div class="row">
+    <div><label class="lbl" for="g-plan">Plan <small>· প্ল্যান</small></label><select id="g-plan"></select><p class="help" id="g-planhelp"></p></div>
+    <div><label class="lbl" for="g-exp">Updates until <small>· আপডেট যতদিন</small></label><input id="g-exp" type="date"><p class="help">ফাঁকা = Lifetime</p></div>
+  </div>
+  <label class="lbl" for="g-domains">Website(s) <small>· ওয়েবসাইট, এক লাইনে একটা (shop.com)</small></label>
+  <textarea id="g-domains" placeholder="shop.com" style="min-height:52px"></textarea>
   <p class="help">www আর সাব-ডোমেইন (staging.shop.com) নিজে থেকেই চলবে।</p>
-  <div class="row">
-    <div><label for="g-exp">আপডেট চলবে যতদিন</label><input id="g-exp" type="date"><p class="help">ফাঁকা = লাইফটাইম</p></div>
-    <div><label for="g-paid">টাকা (৳)</label><input id="g-paid" inputmode="numeric"></div>
+  <div class="row3">
+    <div><label class="lbl" for="g-paid">Paid ৳ <small>· টাকা</small></label><input id="g-paid" inputmode="numeric"></div>
+    <div><label class="lbl" for="g-method">Payment <small>· মাধ্যম</small></label><select id="g-method"><option>bKash</option><option>Nagad</option><option>Rocket</option><option>Bank</option><option>Cash</option><option value="">Free / ফ্রি</option></select></div>
+    <div><label class="lbl" for="g-note">Note <small>· নোট</small></label><input id="g-note" autocomplete="off"></div>
   </div>
-  <label for="g-note">নোট (শুধু খাতায় থাকবে)</label><input id="g-note">
-  <button id="g-go">কী তৈরি করুন</button>
+  <button class="btn" id="g-go">Create Key <small>· কী তৈরি করুন</small></button>
   <div id="g-msg" class="msg"></div>
-  <div id="g-out" class="hidden">
-    <label>লাইসেন্স কী</label><div id="g-key" class="key"></div>
-    <button id="g-copy" class="sec">কী কপি</button><button id="g-copymsg" class="sec">WhatsApp-এর বার্তা কপি</button>
+  <div id="g-out" class="hidden" style="margin-top:14px">
+    <label class="lbl">License key <small>· লাইসেন্স কী</small></label><div id="g-key" class="key"></div>
+    <a class="btn wa" id="g-wa" target="_blank" rel="noopener">Send on WhatsApp <small>· হোয়াটসঅ্যাপে পাঠান</small></a>
+    <button class="btn sec" id="g-copy">Copy key <small>· কপি</small></button>
+    <button class="btn sec" id="g-copymsg">Copy message <small>· বার্তা কপি</small></button>
   </div>
 </div>
 
-<div id="v-ledger" class="card hidden">
-  <h2>কাস্টমারের খাতা</h2>
-  <p class="help">খাতা এই ব্রাউজারে থাকে। প্রতি বিক্রির পর "খাতা ডাউনলোড" করে private রিপোর customers.json-এ রাখুন (বা আমাকে বলুন)।</p>
-  <button id="l-export" class="sec">খাতা ডাউনলোড (JSON)</button><button id="l-csv" class="sec">CSV ডাউনলোড</button>
-  <label for="l-import">খাতা আমদানি (customers.json)</label><input id="l-import" type="file" accept=".json">
-  <div style="overflow-x:auto;margin-top:12px"><table><thead><tr><th>তারিখ</th><th>কী নম্বর</th><th>কাস্টমার</th><th>ওয়েবসাইট</th><th>প্ল্যান</th><th>মেয়াদ</th><th></th></tr></thead><tbody id="l-rows"></tbody></table></div>
-  <label>revoked.json (বাতিল কী-এর তালিকা, public রিপোতে রাখতে হবে)</label><div id="l-revoked" class="key"></div>
+<!-- CUSTOMERS -->
+<div id="v-cust" class="hidden">
+  <div id="c-banners"></div>
+  <div class="card">
+    <h2>Customers <small>· কাস্টমার ও লাইসেন্স</small></h2>
+    <p class="sub">ফোন নম্বর, নাম, ওয়েবসাইট বা কী নম্বর দিয়ে খুঁজুন। কেউ কী হারালে ফোন মিলিয়ে এক চাপে WhatsApp-এ আবার পাঠান।</p>
+    <div class="search"><input id="c-q" type="search" placeholder="Search · খুঁজুন: 017…, নাম, shop.com"></div>
+    <div style="overflow-x:auto;margin-top:10px"><table class="tbl"><thead><tr><th>Customer · কাস্টমার</th><th>Website · ওয়েবসাইট</th><th>Plan · প্ল্যান</th><th>Updates · আপডেট</th><th>Actions · কাজ</th></tr></thead><tbody id="c-rows"></tbody></table></div>
+    <p class="muted" id="c-count"></p>
+  </div>
 </div>
 
+<!-- CHECK -->
 <div id="v-check" class="card hidden">
-  <h2>কী যাচাই</h2>
-  <label for="c-key">লাইসেন্স কী</label><textarea id="c-key"></textarea>
-  <button id="c-go">যাচাই করুন</button>
-  <div id="c-msg" class="msg"></div>
+  <h2>Check Key <small>· কী যাচাই</small></h2>
+  <p class="sub">কোনো কী আসল কিনা, কোন ওয়েবসাইটের জন্য আর কতদিন, দেখুন।</p>
+  <textarea id="k-key" placeholder="KK1...."></textarea>
+  <button class="btn" id="k-go">Check · যাচাই করুন</button>
+  <div id="k-msg" class="msg"></div>
 </div>
 
-<div id="v-settings" class="card hidden">
-  <h2>ব্যাকআপ আর প্ল্যান</h2>
-  <p>তালাবদ্ধ চাবির ফাইল (kk-vault.json): পাসওয়ার্ড ছাড়া কেউ খুলতে পারবে না। এটা private GitHub রিপো, Google Drive আর পেনড্রাইভে রাখুন।</p>
-  <button id="b-vault" class="sec">kk-vault.json ডাউনলোড</button>
-  <label>পাবলিক কী (প্লাগিনে বসানো থাকে, গোপন নয়)</label><div id="b-pub" class="key"></div>
-  <label for="b-plans">প্ল্যানের তালিকা (JSON: নাম, কয় মাস (0 = লাইফটাইম), কয়টা সাইট)</label>
-  <textarea id="b-plans" style="min-height:120px"></textarea>
-  <button id="b-saveplans" class="sec">প্ল্যান সেভ</button>
-  <div id="b-msg" class="msg"></div>
+<!-- SETTINGS -->
+<div id="v-settings" class="hidden">
+  <div class="card">
+    <h2>Backup <small>· ব্যাকআপ (সব কিছু এক ফাইলে)</small></h2>
+    <p class="sub"><b>কেন?</b> প্যানেলের সব তথ্য (তালাবদ্ধ চাবি + কাস্টমারের খাতা + প্ল্যান) এই ব্রাউজারে থাকে। ব্রাউজার মুছে গেলে বা নতুন কম্পিউটারে গেলে এই <b>একটা ফাইল</b> দিলেই সব ফিরে আসবে। ফাইলটা পাসওয়ার্ড ছাড়া খোলা যায় না, তবু GitHub-এর <b>private</b> রিপো বা Google Drive-এ রাখুন।</p>
+    <p class="muted" id="b-last"></p>
+    <button class="btn" id="b-full">Download backup <small>· ব্যাকআপ ডাউনলোড</small></button>
+    <label class="btn sec" style="position:relative;overflow:hidden">Restore backup <small>· ব্যাকআপ ফেরত</small><input id="b-restore" type="file" accept=".json" style="position:absolute;inset:0;opacity:0;cursor:pointer"></label>
+    <button class="btn sec" id="b-csv">Excel list (CSV) <small>· Excel-এ খোলার তালিকা</small></button>
+    <p class="help">"Excel list" শুধু দেখার জন্য: কাস্টমারের তালিকা Excel / Google Sheets-এ খুলতে। ব্যাকআপ হিসেবে "Download backup" ব্যবহার করুন।</p>
+    <div id="b-msg" class="msg"></div>
+  </div>
+  <div class="card">
+    <h2>Plans &amp; prices <small>· প্ল্যান ও দাম</small></h2>
+    <p class="sub">নতুন কী বানানোর সময় এই তালিকা থেকে বাছা যাবে। মাস 0 = Lifetime।</p>
+    <div style="overflow-x:auto"><table class="tbl plans"><thead><tr><th>Name · নাম</th><th>Months · মাস</th><th>Sites · সাইট</th><th>Price ৳ · দাম</th><th></th></tr></thead><tbody id="p-rows"></tbody></table></div>
+    <button class="btn sec" id="p-add">+ Add plan</button><button class="btn" id="p-save">Save plans · সেভ</button>
+    <div id="p-msg" class="msg"></div>
+  </div>
+  <div class="card">
+    <h2>WhatsApp message <small>· হোয়াটসঅ্যাপ বার্তা</small></h2>
+    <p class="sub">ব্যবহার করা যাবে: {name} {key} {domains} {expiry} {id}</p>
+    <textarea id="w-tpl" style="min-height:170px;font-family:inherit;font-size:14px"></textarea>
+    <button class="btn" id="w-save">Save · সেভ</button><button class="btn sec" id="w-reset">Default · আগের মতো</button>
+    <div id="w-msg" class="msg"></div>
+  </div>
+  <div class="card">
+    <h2>Public key <small>· পাবলিক কী (গোপন নয়, প্লাগিনে বসানো)</small></h2>
+    <div id="b-pub" class="key"></div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div id="m-edit" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="m-title">
+  <div class="card">
+    <h2 id="m-title">Edit license <small>· লাইসেন্স বদলান</small></h2>
+    <p class="sub" id="m-sub"></p>
+    <div class="row"><div><label class="lbl" for="m-name">Name · নাম</label><input id="m-name"></div><div><label class="lbl" for="m-phone">Phone · ফোন</label><input id="m-phone" inputmode="tel"></div></div>
+    <label class="lbl" for="m-domains">Website(s) <small>· ওয়েবসাইট (এক লাইনে একটা)</small></label><textarea id="m-domains" style="min-height:52px"></textarea>
+    <div class="row"><div><label class="lbl" for="m-exp">Updates until · আপডেট যতদিন</label><input id="m-exp" type="date"><p class="help">ফাঁকা = Lifetime</p></div>
+      <div><label class="lbl" for="m-note">Note · নোট</label><input id="m-note"></div></div>
+    <p class="help">ওয়েবসাইট বা মেয়াদ বদলালে <b>নতুন কী</b> তৈরি হবে। ওয়েবসাইট বদলালে পুরোনো কী বাতিল হবে (revoked.json প্রকাশ করতে হবে)।</p>
+    <button class="btn" id="m-save">Save · সেভ</button><button class="btn sec" id="m-renew">Renew +12 months · নবায়ন</button><button class="btn sec" id="m-close">Close · বন্ধ</button>
+    <div id="m-msg" class="msg"></div>
+  </div>
 </div>
 </main>
 
@@ -125,18 +246,21 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
 (function () {
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
-  var VAULT = 'kk_vault', LEDGER = 'kk_ledger', PLANS = 'kk_plans';
+  var VAULT = 'kk_vault', LEDGER = 'kk_ledger', PLANS = 'kk_plans', TPL = 'kk_wa_tpl', BACKUP_AT = 'kk_backup_at', REV_PUB = 'kk_rev_published';
   var PKCS8_PREFIX = new Uint8Array([0x30,0x2e,0x02,0x01,0x00,0x30,0x05,0x06,0x03,0x2b,0x65,0x70,0x04,0x22,0x04,0x20]);
   var ITER = 600000;
   // The one signing key of Kenakata Kit (its public half is in the plugin). The panel never makes another one.
   var EXPECTED_PUB = 'JGQVoQMA0IEGc9qJNseU9uDPREpiFxPwvlzaAB7CQ0I=';
+  var GH_REVOKED = 'https://github.com/digibhaiofficial/kenakata-kit/edit/main/revoked.json';
   var DEFAULT_PLANS = [
-    { key: 'pro', name: 'Pro · ১ সাইট · ১ বছর', months: 12, sites: 1 },
-    { key: 'agency', name: 'এজেন্সি · ৫ সাইট · ১ বছর', months: 12, sites: 5 },
-    { key: 'lifetime', name: 'লাইফটাইম · ১ সাইট', months: 0, sites: 1 }
+    { key: 'pro', name: 'Pro · 1 site · 1 year', months: 12, sites: 1, price: 3000 },
+    { key: 'agency', name: 'Agency · 5 sites · 1 year', months: 12, sites: 5, price: 9000 },
+    { key: 'lifetime', name: 'Lifetime · 1 site', months: 0, sites: 1, price: 8000 }
   ];
-  var signKey = null, pubB64 = '', last = null;
+  var DEFAULT_TPL = 'আসসালামু আলাইকুম {name},\nআপনার Kenakata Kit Pro লাইসেন্স কী নিচে দিলাম:\n\n{key}\n\nওয়েবসাইট: {domains}\nআপডেট: {expiry}\n\nবসানোর নিয়ম: WordPress → Kenakata Kit → License → কী পেস্ট করে "Save key"।\nডাউনলোড: https://github.com/digibhaiofficial/kenakata-kit/releases/latest\n\nধন্যবাদ, DigiBhai.com';
+  var signKey = null, pubB64 = '', last = null, editing = null;
 
+  /* ---------- helpers ---------- */
   function store(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(k) || 'null'); localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } }
   function b64(u8) { var s = ''; u8 = new Uint8Array(u8); for (var i = 0; i < u8.length; i++) s += String.fromCharCode(u8[i]); return btoa(s); }
   function unb64(s) { var b = atob(s), u = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
@@ -144,176 +268,337 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
   function unb64url(s) { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return unb64(s); }
   function hex(u8) { return Array.prototype.map.call(u8, function (x) { return ('0' + x.toString(16)).slice(-2); }).join(''); }
   function unhex(h) { h = h.replace(/[^0-9a-f]/gi, ''); if (h.length !== 64) return null; var u = new Uint8Array(32); for (var i = 0; i < 32; i++) u[i] = parseInt(h.substr(i * 2, 2), 16); return u; }
-  function msg(id, text, ok) { var m = $(id); m.textContent = text; m.className = 'msg ' + (ok ? 'ok' : 'err'); }
+  function msg(id, text, kind) { var m = $(id); m.textContent = text; m.className = 'msg ' + (kind === true ? 'ok' : (kind || 'err')); }
   function download(name, text, type) { var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: type || 'application/json' })); a.download = name; document.body.appendChild(a); a.click(); a.remove(); }
-  function today() { return new Date().toISOString().slice(0, 10); }
+  function today() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+  function addMonths(dateStr, m) { var d = dateStr ? new Date(dateStr + 'T12:00:00') : new Date(); if (d < new Date()) d = new Date(); d.setMonth(d.getMonth() + m); return d.toISOString().slice(0, 10); }
   function plans() { var p = store(PLANS); return Array.isArray(p) && p.length ? p : DEFAULT_PLANS; }
   function ledger() { var l = store(LEDGER); return Array.isArray(l) ? l : []; }
+  function saveLedger(l) { store(LEDGER, l); store('kk_dirty', 1); }
+  function taka(n) { n = Math.round(+n || 0); return '৳' + n.toLocaleString('en-IN'); }
+  function el(tag, attrs) { var e = document.createElement(tag); Object.keys(attrs || {}).forEach(function (k) { if (k === 'text') e.textContent = attrs[k]; else if (k === 'on') Object.keys(attrs.on).forEach(function (ev) { e.addEventListener(ev, attrs.on[ev]); }); else e.setAttribute(k, attrs[k]); }); for (var i = 2; i < arguments.length; i++) { var c = arguments[i]; if (c == null) continue; e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); } return e; }
+  function waNumber(p) { var d = String(p || '').replace(/\D/g, ''); if (/^01\d{9}$/.test(d)) return '88' + d; if (/^1\d{9}$/.test(d)) return '880' + d; if (/^8801\d{9}$/.test(d)) return d; return d; }
+  function cleanPhone(p) { var d = String(p || '').replace(/\D/g, ''); if (/^8801\d{9}$/.test(d)) return d.slice(2); if (/^1\d{9}$/.test(d)) return '0' + d; return d; }
+  function cleanDomain(d) { d = d.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '').replace(/:\d+$/, '').replace(/^www\./, ''); return /^[a-z0-9.-]+\.[a-z]{2,}$/.test(d) ? d : null; }
+  function parseDomains(text) { var raw = String(text || '').split(/[\s,]+/).filter(Boolean), ds = [], bad = []; raw.forEach(function (d) { var c = cleanDomain(d); if (c) { if (ds.indexOf(c) < 0) ds.push(c); } else bad.push(d); }); return { ds: ds, bad: bad }; }
+  function expText(r) { return r.exp || 'Lifetime'; }
+  function tpl() { return store(TPL) || DEFAULT_TPL; }
+  function waMessage(r) { return tpl().replace(/\{name\}/g, r.name || '').replace(/\{key\}/g, r.key).replace(/\{domains\}/g, r.domains.join(', ')).replace(/\{expiry\}/g, r.exp ? r.exp + ' পর্যন্ত' : 'Lifetime').replace(/\{id\}/g, r.id); }
+  function waLink(r) { var n = waNumber(r.phone); return 'https://wa.me/' + (n || '') + '?text=' + encodeURIComponent(waMessage(r)); }
+  function copy(t, okId) { (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { msg(okId, 'Copied · কপি হয়েছে।', true); }, function () { msg(okId, 'কপি হলো না, হাত দিয়ে সিলেক্ট করে কপি করুন।'); }); }
+  function status(r) { if (r.revoked) return 'rev'; if (r.exp && r.exp < today()) return 'exp'; return r.exp ? 'ok' : 'life'; }
+  function statusTag(r) { var s = status(r); return el('span', { 'class': 'tag ' + (s === 'ok' ? '' : s), text: s === 'rev' ? 'Cancelled · বাতিল' : s === 'exp' ? 'Expired · মেয়াদ শেষ' : s === 'life' ? 'Lifetime' : 'Active · চালু' }); }
 
-  var views = ['nosupport', 'setup', 'recovery', 'unlock', 'gen', 'ledger', 'check', 'settings'];
-  function show(v) {
-    views.forEach(function (x) { $('v-' + x).classList.toggle('hidden', x !== v); });
-    $('nav').classList.toggle('hidden', !signKey);
-    Array.prototype.forEach.call(document.querySelectorAll('#nav button'), function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); });
-    if (v === 'ledger') renderLedger();
-    if (v === 'settings') { $('b-pub').textContent = pubB64; $('b-plans').value = JSON.stringify(plans(), null, 2); }
-  }
-
+  /* ---------- crypto ---------- */
   async function deriveAES(pw, salt) {
     var base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveKey']);
     return crypto.subtle.deriveKey({ name: 'PBKDF2', hash: 'SHA-256', salt: salt, iterations: ITER }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
   }
-  async function pubFromSeed(seed) {
-    var pkcs8 = new Uint8Array(48); pkcs8.set(PKCS8_PREFIX); pkcs8.set(seed, 16);
-    var k = await crypto.subtle.importKey('pkcs8', pkcs8, { name: 'Ed25519' }, true, ['sign']);
-    var jwk = await crypto.subtle.exportKey('jwk', k);
-    return unb64url(jwk.x);
-  }
+  async function pubFromSeed(seed) { var p = new Uint8Array(48); p.set(PKCS8_PREFIX); p.set(seed, 16); var k = await crypto.subtle.importKey('pkcs8', p, { name: 'Ed25519' }, true, ['sign']); return unb64url((await crypto.subtle.exportKey('jwk', k)).x); }
   async function lockSeed(seed, pw) {
     var salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
-    var aes = await deriveAES(pw, salt);
-    var ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, aes, seed));
-    var pub = await pubFromSeed(seed);
-    return { kind: 'kenakata-kit-license-vault', v: 1, kdf: 'PBKDF2-SHA256', iter: ITER, salt: b64(salt), iv: b64(iv), ct: b64(ct), pub: b64(pub), created: today() };
+    var ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, await deriveAES(pw, salt), seed));
+    return { kind: 'kenakata-kit-license-vault', v: 1, kdf: 'PBKDF2-SHA256', iter: ITER, salt: b64(salt), iv: b64(iv), ct: b64(ct), pub: b64(await pubFromSeed(seed)), created: today() };
   }
-  async function useSeed(seed) {
-    var pkcs8 = new Uint8Array(48); pkcs8.set(PKCS8_PREFIX); pkcs8.set(seed, 16);
-    signKey = await crypto.subtle.importKey('pkcs8', pkcs8, { name: 'Ed25519' }, false, ['sign']);
+  async function useSeed(seed) { var p = new Uint8Array(48); p.set(PKCS8_PREFIX); p.set(seed, 16); signKey = await crypto.subtle.importKey('pkcs8', p, { name: 'Ed25519' }, false, ['sign']); }
+  async function supported() { try { await crypto.subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']); return true; } catch (e) { return false; } }
+  async function signPayload(payload) {
+    var body = b64url(new TextEncoder().encode(JSON.stringify(payload)));
+    var sig = new Uint8Array(await crypto.subtle.sign({ name: 'Ed25519' }, signKey, new TextEncoder().encode(body)));
+    return 'KK1.' + body + '.' + b64url(sig);
   }
-  async function supported() {
-    try { await crypto.subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']); return true; } catch (e) { return false; }
+  function newId() { return 'K' + today().replace(/-/g, '') + '-' + hex(crypto.getRandomValues(new Uint8Array(3))).toUpperCase(); }
+  async function makeKey(id, ds, planKey, exp) { return signPayload({ v: 1, id: id, d: ds, p: planKey || 'pro', e: exp || '', i: today() }); }
+
+  /* ---------- views ---------- */
+  var views = ['nosupport', 'setup', 'recovery', 'unlock', 'dash', 'gen', 'cust', 'check', 'settings'];
+  function show(v) {
+    views.forEach(function (x) { $('v-' + x).classList.toggle('hidden', x !== v); });
+    $('nav').classList.toggle('hidden', !signKey);
+    Array.prototype.forEach.call(document.querySelectorAll('#nav button'), function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); });
+    if (v === 'dash') renderDash();
+    if (v === 'cust') renderCustomers();
+    if (v === 'settings') renderSettings();
+    window.scrollTo(0, 0);
   }
 
+  /* ---------- setup / unlock ---------- */
   async function setupWith(seed, fromRecovery) {
     var pw = $('s-pw').value, pw2 = $('s-pw2').value;
-    if (pw.length < 16) return msg('s-msg', 'পাসওয়ার্ড অন্তত ১৬ অক্ষরের দিন।');
+    if (pw.length < 8) return msg('s-msg', 'পাসওয়ার্ড অন্তত ৮ অক্ষরের দিন।');
     if (pw !== pw2) return msg('s-msg', 'দুই ঘরের পাসওয়ার্ড মেলেনি।');
     msg('s-msg', 'একটু অপেক্ষা করুন…', true);
     var vault = await lockSeed(seed, pw);
     if (EXPECTED_PUB && vault.pub !== EXPECTED_PUB) return msg('s-msg', 'এই রিকভারি কোড আপনার আসল চাবির নয়। কাগজের অন্য কোডটা দিয়ে চেষ্টা করুন।');
-    store(VAULT, vault); pubB64 = vault.pub;
-    await useSeed(seed);
+    store(VAULT, vault); pubB64 = vault.pub; await useSeed(seed);
     $('s-pw').value = $('s-pw2').value = '';
-    if (fromRecovery) { show('gen'); return; }
-    $('r-code').textContent = hex(seed).toUpperCase().match(/.{1,8}/g).join(' ');
-    show('recovery');
+    if (fromRecovery) { show('dash'); return; }
+    $('r-code').textContent = hex(seed).toUpperCase().match(/.{1,8}/g).join(' '); show('recovery');
   }
-
-  $('s-create').onclick = function () { setupWith(crypto.getRandomValues(new Uint8Array(32)), false).catch(function (e) { msg('s-msg', 'সমস্যা: ' + e.message); }); };
-  $('s-showimport').onclick = function () { $('s-import').classList.toggle('hidden'); };
-  $('s-restore').onclick = function () { var s = unhex($('s-rec').value); if (!s) return msg('s-msg', 'রিকভারি কোডটা ঠিক নেই (৬৪টা অক্ষর হওয়ার কথা)।'); setupWith(s, true).catch(function (e) { msg('s-msg', 'সমস্যা: ' + e.message); }); };
-  $('s-file').onchange = function () {
-    var f = this.files[0]; if (!f) return;
-    f.text().then(function (t) { var v = JSON.parse(t); if (!v || v.kind !== 'kenakata-kit-license-vault') throw new Error('এটা চাবির ফাইল নয়'); if (EXPECTED_PUB && v.pub !== EXPECTED_PUB) throw new Error('এটা পুরোনো/ভুল চাবির ফাইল। GitHub-এর kenakata-license-panel রিপোর kk-vault.json দিন'); store(VAULT, v); boot(); }).catch(function (e) { msg('s-msg', 'ফাইলটা পড়া গেল না: ' + e.message); });
-  };
+  $('s-create').onclick = function () { setupWith(crypto.getRandomValues(new Uint8Array(32)), false).catch(function (e) { msg('s-msg', e.message); }); };
+  $('s-restore').onclick = function () { var s = unhex($('s-rec').value); if (!s) return msg('s-msg', 'রিকভারি কোডটা ঠিক নেই (৬৪টা অক্ষর হওয়ার কথা)।'); setupWith(s, true).catch(function (e) { msg('s-msg', e.message); }); };
+  function importBackup(obj, msgId) {
+    var vault = obj && obj.kind === 'kenakata-kit-backup' ? obj.vault : obj;
+    if (!vault || vault.kind !== 'kenakata-kit-license-vault') throw new Error('এটা Kenakata Kit-এর ব্যাকআপ / চাবির ফাইল নয়');
+    if (EXPECTED_PUB && vault.pub !== EXPECTED_PUB) throw new Error('এটা পুরোনো/ভুল চাবির ফাইল। GitHub-এর kenakata-license-panel রিপোর kk-vault.json দিন');
+    store(VAULT, vault);
+    if (obj.kind === 'kenakata-kit-backup') {
+      var have = {}, l = ledger(); l.forEach(function (r) { have[r.id] = 1; });
+      (obj.ledger || []).forEach(function (r) { if (r && r.id && !have[r.id]) l.push(r); });
+      l.sort(function (a, b) { return a.date < b.date ? 1 : -1; }); store(LEDGER, l);
+      if (Array.isArray(obj.plans) && obj.plans.length) store(PLANS, obj.plans);
+      if (obj.tpl) store(TPL, obj.tpl);
+      if (obj.rev_published) store(REV_PUB, obj.rev_published);
+    }
+  }
+  $('s-file').onchange = function () { var f = this.files[0]; if (!f) return; f.text().then(function (t) { importBackup(JSON.parse(t)); boot(); }).catch(function (e) { msg('s-msg', 'ফাইলটা নেওয়া গেল না: ' + e.message); }); };
   $('r-done').onchange = function () { $('r-next').disabled = !this.checked; };
-  $('r-next').onclick = function () { $('r-code').textContent = ''; show('settings'); msg('b-msg', 'চাবি তৈরি হয়েছে। এখন kk-vault.json ডাউনলোড করে ব্যাকআপ রাখুন।', true); };
-
+  $('r-next').onclick = function () { $('r-code').textContent = ''; show('settings'); msg('b-msg', 'চাবি তৈরি হয়েছে। এখন "Download backup" চেপে ফাইলটা নিরাপদে রাখুন।', true); };
   $('u-go').onclick = async function () {
-    var v = store(VAULT);
+    var v = store(VAULT); $('u-go').disabled = true;
     try {
-      var aes = await deriveAES($('u-pw').value, unb64(v.salt));
-      var seed = new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(v.iv) }, aes, unb64(v.ct)));
-      await useSeed(seed); pubB64 = v.pub; $('u-pw').value = ''; show('gen');
-    } catch (e) { msg('u-msg', 'পাসওয়ার্ড ভুল।'); }
+      var seed = new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(v.iv) }, await deriveAES($('u-pw').value, unb64(v.salt)), unb64(v.ct)));
+      await useSeed(seed); pubB64 = v.pub; $('u-pw').value = ''; show('dash');
+    } catch (e) { msg('u-msg', 'Wrong password · পাসওয়ার্ড ভুল।'); }
+    $('u-go').disabled = false;
   };
   $('u-pw').onkeydown = function (e) { if (e.key === 'Enter') $('u-go').click(); };
 
+  /* ---------- revoked.json ---------- */
+  function revokedIds() {
+    var ids = [];
+    ledger().forEach(function (r) { if (r.revoked) ids.push(r.id); (r.history || []).forEach(function (h) { if (h.revoked) ids.push(h.id); }); });
+    return ids.sort();
+  }
+  function revokedJson() { return JSON.stringify({ revoked: revokedIds() }, null, 2) + '\n'; }
+  function revBanner(box) {
+    box.textContent = '';
+    if ((store(REV_PUB) || '') === revokedJson() || (!revokedIds().length && !store(REV_PUB))) return;
+    var b = el('div', { 'class': 'banner' },
+      el('span', {}, el('b', { text: 'Cancelled keys not published yet · বাতিল কী এখনো প্রকাশ হয়নি। ' }), 'বোতাম চাপলে লেখাটা কপি হবে আর GitHub-এর পাতা খুলবে: সব মুছে পেস্ট করুন, তারপর "Commit changes"।'),
+      el('span', {},
+        el('button', { 'class': 'btn sm', text: 'Publish · প্রকাশ করুন', on: { click: function () { var t = revokedJson(); (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.resolve()).finally(function () { window.open(GH_REVOKED, '_blank', 'noopener'); }); } } }),
+        el('button', { 'class': 'btn sm sec', text: 'Done · করেছি', on: { click: function () { store(REV_PUB, revokedJson()); revBanner(box); } } })));
+    box.appendChild(b);
+  }
+
+  /* ---------- dashboard ---------- */
+  function renderDash() {
+    var l = ledger(), month = today().slice(0, 7), mInc = 0, tInc = 0, active = 0, phones = {};
+    l.forEach(function (r) {
+      var amount = +r.paid || 0; tInc += amount; if (String(r.date).slice(0, 7) === month) mInc += amount;
+      (r.payments || []).forEach(function (p) { tInc += +p.amount || 0; if (String(p.date).slice(0, 7) === month) mInc += +p.amount || 0; });
+      var s = status(r); if (s === 'ok' || s === 'life') active++;
+      phones[(r.phone || r.name || r.id)] = 1;
+    });
+    $('d-month').textContent = taka(mInc); $('d-total').textContent = taka(tInc); $('d-active').textContent = active; $('d-cust').textContent = Object.keys(phones).length;
+    // banners: backup reminder + revoked
+    var bb = $('d-banners'); bb.textContent = '';
+    var revBox = el('div'); bb.appendChild(revBox); revBanner(revBox);
+    if (store('kk_dirty') && l.length) bb.appendChild(el('div', { 'class': 'banner' }, el('span', {}, el('b', { text: 'Backup due · ব্যাকআপ নেওয়া বাকি। ' }), 'শেষ ব্যাকআপের পর নতুন বিক্রি হয়েছে।'), el('button', { 'class': 'btn sm', text: 'Download backup · ডাউনলোড', on: { click: fullBackup } })));
+    // bars: 6 months
+    var bars = $('d-bars'); bars.textContent = ''; var months = [], d = new Date(); d.setDate(1);
+    for (var i = 5; i >= 0; i--) { var x = new Date(d.getFullYear(), d.getMonth() - i, 1); months.push(x.getFullYear() + '-' + ('0' + (x.getMonth() + 1)).slice(-2)); }
+    var sums = months.map(function (m) { var s = 0; l.forEach(function (r) { if (String(r.date).slice(0, 7) === m) s += +r.paid || 0; (r.payments || []).forEach(function (p) { if (String(p.date).slice(0, 7) === m) s += +p.amount || 0; }); }); return s; });
+    var max = Math.max.apply(null, sums.concat([1]));
+    var names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    months.forEach(function (m, i) { var bar = el('div', { 'class': 'bar' }, el('em', { text: sums[i] ? taka(sums[i]) : '' }), el('i', { style: 'height:' + Math.max(2, Math.round(sums[i] / max * 110)) + 'px' }), el('span', { text: names[+m.slice(5) - 1] })); bars.appendChild(bar); });
+    // renewals
+    var soon = new Date(); soon.setDate(soon.getDate() + 30); var soonS = soon.toISOString().slice(0, 10);
+    var due = l.filter(function (r) { return !r.revoked && r.exp && r.exp <= soonS; }).sort(function (a, b) { return a.exp < b.exp ? -1 : 1; });
+    var rb = $('d-renew'); rb.textContent = '';
+    if (!due.length) rb.appendChild(el('p', { 'class': 'muted', text: 'কারো মেয়াদ শিগগির শেষ হচ্ছে না। · Nothing due.' }));
+    due.slice(0, 8).forEach(function (r) {
+      var msgTxt = 'আসসালামু আলাইকুম ' + (r.name || '') + ',\nআপনার Kenakata Kit Pro-র আপডেটের মেয়াদ ' + r.exp + ' তারিখে শেষ' + (r.exp < today() ? ' হয়েছে' : ' হবে') + '। নবায়ন করতে চাইলে জানাবেন। ধন্যবাদ!';
+      rb.appendChild(el('div', { style: 'display:flex;justify-content:space-between;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid #eef2ee' },
+        el('span', {}, el('b', { text: r.name || r.domains[0] }), el('br'), el('span', { 'class': 'muted', text: r.domains.join(', ') + ' · ' + r.exp })),
+        r.phone ? el('a', { 'class': 'btn sm wa', href: 'https://wa.me/' + waNumber(r.phone) + '?text=' + encodeURIComponent(msgTxt), target: '_blank', rel: 'noopener', text: 'Remind · মনে করান' }) : null));
+    });
+    // recent
+    var tb = $('d-recent'); tb.textContent = '';
+    if (!l.length) tb.appendChild(el('tr', {}, el('td', { colspan: '6', 'class': 'muted', text: 'এখনো কোনো বিক্রি নেই। "New Key" দিয়ে শুরু করুন।' })));
+    l.slice(0, 6).forEach(function (r) { tb.appendChild(el('tr', {}, el('td', { text: r.date }), el('td', { text: (r.name || '—') + (r.phone ? ' · ' + r.phone : '') }), el('td', { text: r.domains.join(', ') }), el('td', { text: r.plan }), el('td', { text: r.paid ? taka(r.paid) : '—' }), el('td', {}, statusTag(r)))); });
+  }
+
+  /* ---------- new key ---------- */
   function fillPlans() {
-    var sel = $('g-plan'); sel.innerHTML = '';
-    plans().forEach(function (p, i) { var o = document.createElement('option'); o.value = i; o.textContent = p.name; sel.appendChild(o); });
+    var sel = $('g-plan'); sel.textContent = '';
+    plans().forEach(function (p, i) { sel.appendChild(el('option', { value: String(i), text: p.name + (p.price ? ' · ' + taka(p.price) : '') })); });
     applyPlan();
   }
   function applyPlan() {
     var p = plans()[+$('g-plan').value] || plans()[0];
-    if (p.months > 0) { var d = new Date(); d.setMonth(d.getMonth() + p.months); $('g-exp').value = d.toISOString().slice(0, 10); } else { $('g-exp').value = ''; }
-    $('g-planhelp').textContent = 'সর্বোচ্চ ' + p.sites + 'টা ওয়েবসাইট · ' + (p.months > 0 ? p.months + ' মাস আপডেট' : 'লাইফটাইম আপডেট');
+    $('g-exp').value = p.months > 0 ? addMonths('', p.months) : '';
+    $('g-paid').value = p.price || '';
+    $('g-planhelp').textContent = 'সর্বোচ্চ ' + p.sites + 'টা ওয়েবসাইট · ' + (p.months > 0 ? p.months + ' মাস আপডেট' : 'Lifetime');
   }
   $('g-plan').onchange = applyPlan;
-
-  function cleanDomain(d) { d = d.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '').replace(/:\d+$/, '').replace(/^www\./, ''); return /^[a-z0-9.-]+\.[a-z]{2,}$/.test(d) ? d : null; }
-
   $('g-go').onclick = async function () {
-    var p = plans()[+$('g-plan').value] || plans()[0];
-    var raw = $('g-domains').value.split(/[\s,]+/).filter(Boolean), ds = [], bad = [];
-    raw.forEach(function (d) { var c = cleanDomain(d); if (c) { if (ds.indexOf(c) < 0) ds.push(c); } else bad.push(d); });
-    if (bad.length) return msg('g-msg', 'এই ঠিকানাগুলো ঠিক নেই: ' + bad.join(', '));
-    if (!ds.length) return msg('g-msg', 'অন্তত একটা ওয়েবসাইট লিখুন।');
-    if (ds.length > p.sites) return msg('g-msg', 'এই প্ল্যানে সর্বোচ্চ ' + p.sites + 'টা ওয়েবসাইট।');
-    var exp = $('g-exp').value;
-    var id = 'K' + today().replace(/-/g, '') + '-' + hex(crypto.getRandomValues(new Uint8Array(3))).toUpperCase();
-    var payload = { v: 1, id: id, d: ds, p: p.key || 'pro', e: exp || '', i: today() };
-    var body = b64url(new TextEncoder().encode(JSON.stringify(payload)));
-    var sig = new Uint8Array(await crypto.subtle.sign({ name: 'Ed25519' }, signKey, new TextEncoder().encode(body)));
-    var key = 'KK1.' + body + '.' + b64url(sig);
-    var row = { date: today(), id: id, name: $('g-name').value.trim(), phone: $('g-phone').value.trim(), domains: ds, plan: p.name, exp: exp || '', paid: $('g-paid').value.trim(), note: $('g-note').value.trim(), key: key, revoked: false };
-    var l = ledger(); l.unshift(row); store(LEDGER, l);
-    last = row;
+    var p = plans()[+$('g-plan').value] || plans()[0], dm = parseDomains($('g-domains').value);
+    if (dm.bad.length) return msg('g-msg', 'এই ঠিকানাগুলো ঠিক নেই: ' + dm.bad.join(', '));
+    if (!dm.ds.length) return msg('g-msg', 'অন্তত একটা ওয়েবসাইট লিখুন। · Add a website.');
+    if (dm.ds.length > p.sites) return msg('g-msg', 'এই প্ল্যানে সর্বোচ্চ ' + p.sites + 'টা ওয়েবসাইট।');
+    var phone = cleanPhone($('g-phone').value);
+    if (phone && !/^01[3-9]\d{8}$/.test(phone) && phone.length < 10) return msg('g-msg', 'ফোন নম্বরটা ঠিক নেই (01XXXXXXXXX)।');
+    var exp = $('g-exp').value, id = newId();
+    var key = await makeKey(id, dm.ds, p.key, exp);
+    var row = { date: today(), id: id, name: $('g-name').value.trim(), phone: phone, domains: dm.ds, plan: p.name, planKey: p.key || 'pro', exp: exp || '', paid: $('g-paid').value.trim(), method: $('g-method').value, note: $('g-note').value.trim(), key: key, revoked: false, history: [] };
+    var l = ledger(); l.unshift(row); saveLedger(l); last = row;
     $('g-key').textContent = key; $('g-out').classList.remove('hidden');
-    msg('g-msg', 'কী তৈরি হয়েছে আর খাতায় উঠেছে (' + id + ')। খাতা ডাউনলোড করে রাখতে ভুলবেন না।', true);
+    $('g-wa').href = waLink(row); $('g-wa').classList.toggle('hidden', !row.phone);
+    msg('g-msg', 'Key created · কী তৈরি হয়েছে (' + id + ') আর খাতায় উঠেছে।', true);
+    ['g-name', 'g-phone', 'g-domains', 'g-note'].forEach(function (x) { $(x).value = ''; });
   };
-  function copy(t, okId) { (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { msg(okId, 'কপি হয়েছে।', true); }, function () { msg(okId, 'কপি হলো না, হাত দিয়ে সিলেক্ট করে কপি করুন।'); }); }
   $('g-copy').onclick = function () { copy(last.key, 'g-msg'); };
-  $('g-copymsg').onclick = function () {
-    copy('আসসালামু আলাইকুম' + (last.name ? ' ' + last.name : '') + ',\nআপনার Kenakata Kit Pro লাইসেন্স কী নিচে দিলাম।\nওয়েবসাইট: ' + last.domains.join(', ') + '\nআপডেট: ' + (last.exp ? last.exp + ' পর্যন্ত' : 'লাইফটাইম') + '\n\nবসানোর নিয়ম: WordPress → Kenakata Kit → License → কী পেস্ট করে "Save key"।\n\n' + last.key, 'g-msg');
-  };
+  $('g-copymsg').onclick = function () { copy(waMessage(last), 'g-msg'); };
 
-  function revokedJson() { return JSON.stringify({ revoked: ledger().filter(function (r) { return r.revoked; }).map(function (r) { return r.id; }) }, null, 2); }
-  function renderLedger() {
-    var tb = $('l-rows'); tb.innerHTML = '';
-    ledger().forEach(function (r, i) {
-      var tr = document.createElement('tr');
-      [r.date, r.id, r.name + (r.phone ? ' · ' + r.phone : ''), r.domains.join(', '), r.plan, r.exp || 'লাইফটাইম'].forEach(function (t) { var td = document.createElement('td'); td.textContent = t; tr.appendChild(td); });
-      var td = document.createElement('td');
-      if (r.revoked) { var s = document.createElement('span'); s.className = 'tag rev'; s.textContent = 'বাতিল'; td.appendChild(s); }
-      else { var b = document.createElement('button'); b.className = 'danger'; b.style.margin = '0'; b.textContent = 'বাতিল'; b.onclick = function () { if (confirm(r.id + ' কী বাতিল করবেন? revoked.json আপডেট করতে হবে।')) { var l = ledger(); l[i].revoked = true; store(LEDGER, l); renderLedger(); } }; td.appendChild(b); }
-      tr.appendChild(td); tb.appendChild(tr);
+  /* ---------- customers ---------- */
+  function renderCustomers() {
+    revBanner($('c-banners'));
+    var q = $('c-q').value.trim().toLowerCase(), qd = q.replace(/\D/g, ''), tb = $('c-rows'); tb.textContent = '';
+    var l = ledger(), shown = 0;
+    l.forEach(function (r, i) {
+      var hay = [r.name, r.phone, r.domains.join(' '), r.id, r.note].join(' ').toLowerCase();
+      var rd = String(r.phone || '').replace(/\D/g, ''), qd2 = qd.replace(/^880/, '0').replace(/^88(?=01)/, '');
+      if (q && hay.indexOf(q) < 0 && !(qd.length >= 4 && (rd.indexOf(qd) > -1 || rd.indexOf(qd2) > -1))) return;
+      shown++;
+      var acts = el('td', {},
+        r.phone && !r.revoked ? el('a', { 'class': 'btn sm wa', href: waLink(r), target: '_blank', rel: 'noopener', text: 'WhatsApp' }) : null,
+        el('button', { 'class': 'btn sm sec', text: 'Copy key', on: { click: function () { navigator.clipboard && navigator.clipboard.writeText(r.key); this.textContent = 'Copied ✓'; } } }),
+        el('button', { 'class': 'btn sm sec', text: 'Edit', on: { click: function () { openEdit(i); } } }),
+        !r.revoked ? el('button', { 'class': 'btn sm danger', text: 'Cancel', on: { click: function () { if (confirm(r.id + ' কী বাতিল করবেন? · Cancel this key?')) { var x = ledger(); x[i].revoked = true; saveLedger(x); renderCustomers(); } } } }) : null);
+      tb.appendChild(el('tr', {},
+        el('td', {}, el('b', { text: r.name || '—' }), el('br'), el('span', { 'class': 'muted', text: (r.phone || '') + ' · ' + r.id })),
+        el('td', { text: r.domains.join(', ') }),
+        el('td', {}, el('span', { text: r.plan }), el('br'), el('span', { 'class': 'muted', text: (r.paid ? taka(r.paid) : '') + (r.method ? ' · ' + r.method : '') })),
+        el('td', {}, statusTag(r), el('br'), el('span', { 'class': 'muted', text: expText(r) })),
+        acts));
     });
-    $('l-revoked').textContent = revokedJson();
+    if (!shown) tb.appendChild(el('tr', {}, el('td', { colspan: '5', 'class': 'muted', text: q ? 'কিছু পাওয়া যায়নি। · No match.' : 'এখনো কোনো কাস্টমার নেই।' })));
+    $('c-count').textContent = shown + ' / ' + l.length;
   }
-  $('l-export').onclick = function () { download('customers.json', JSON.stringify(ledger(), null, 2)); };
-  $('l-csv').onclick = function () {
-    var q = function (s) { return '"' + String(s == null ? '' : s).replace(/"/g, '""') + '"'; };
-    var lines = [['date', 'id', 'name', 'phone', 'domains', 'plan', 'updates_until', 'paid', 'note', 'revoked'].join(',')].concat(ledger().map(function (r) { return [r.date, r.id, r.name, r.phone, r.domains.join(' '), r.plan, r.exp, r.paid, r.note, r.revoked ? 'yes' : ''].map(q).join(','); }));
-    download('customers.csv', '﻿' + lines.join('\n'), 'text/csv');
+  $('c-q').oninput = renderCustomers;
+
+  /* ---------- edit / renew ---------- */
+  function openEdit(i) {
+    var r = ledger()[i]; editing = i;
+    $('m-sub').textContent = r.id + ' · ' + r.plan + (r.revoked ? ' · বাতিল' : '');
+    $('m-name').value = r.name || ''; $('m-phone').value = r.phone || ''; $('m-domains').value = r.domains.join('\n'); $('m-exp').value = r.exp || ''; $('m-note').value = r.note || '';
+    $('m-msg').className = 'msg'; $('m-edit').classList.remove('hidden'); $('m-name').focus();
+  }
+  function closeEdit() { $('m-edit').classList.add('hidden'); editing = null; }
+  $('m-close').onclick = closeEdit;
+  $('m-edit').addEventListener('click', function (e) { if (e.target === this) closeEdit(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && editing !== null) closeEdit(); });
+  async function reissue(r, ds, exp, revokeOld) {
+    var base = r.baseId || r.id, n = (r.history || []).length + 2;
+    var nid = base + '-R' + n;
+    var key = await makeKey(nid, ds, r.planKey || 'pro', exp);
+    r.history = r.history || []; r.history.push({ id: r.id, key: r.key, domains: r.domains, exp: r.exp, date: today(), revoked: !!revokeOld });
+    r.baseId = base; r.id = nid; r.key = key; r.domains = ds; r.exp = exp;
+    return r;
+  }
+  $('m-save').onclick = async function () {
+    var l = ledger(), r = l[editing], dm = parseDomains($('m-domains').value);
+    if (dm.bad.length) return msg('m-msg', 'এই ঠিকানাগুলো ঠিক নেই: ' + dm.bad.join(', '));
+    if (!dm.ds.length) return msg('m-msg', 'অন্তত একটা ওয়েবসাইট লিখুন।');
+    r.name = $('m-name').value.trim(); r.phone = cleanPhone($('m-phone').value); r.note = $('m-note').value.trim();
+    var exp = $('m-exp').value, domainsChanged = dm.ds.join(',') !== r.domains.join(','), expChanged = exp !== (r.exp || '');
+    if ((domainsChanged || expChanged) && !r.revoked) {
+      await reissue(r, dm.ds, exp, domainsChanged);
+      saveLedger(l); msg('m-msg', 'নতুন কী তৈরি হয়েছে (' + r.id + ')।' + (domainsChanged ? ' পুরোনো কী বাতিলের তালিকায় গেছে, "Publish" করুন।' : '') + ' এখন WhatsApp-এ পাঠান।', true);
+      var b = el('a', { 'class': 'btn wa', href: waLink(r), target: '_blank', rel: 'noopener', text: 'Send new key on WhatsApp · নতুন কী পাঠান' }); $('m-msg').appendChild(el('br')); $('m-msg').appendChild(b);
+    } else { saveLedger(l); msg('m-msg', 'Saved · সেভ হয়েছে।', true); }
+    renderCustomers();
   };
-  $('l-import').onchange = function () {
-    var f = this.files[0]; if (!f) return;
-    f.text().then(function (t) { var a = JSON.parse(t); if (!Array.isArray(a)) throw 0; var have = {}; var l = ledger(); l.forEach(function (r) { have[r.id] = 1; }); a.forEach(function (r) { if (r && r.id && !have[r.id]) l.push(r); }); l.sort(function (x, y) { return x.date < y.date ? 1 : -1; }); store(LEDGER, l); renderLedger(); }).catch(function () { alert('ফাইলটা পড়া গেল না।'); });
+  $('m-renew').onclick = async function () {
+    var l = ledger(), r = l[editing]; if (r.revoked) return msg('m-msg', 'বাতিল কী নবায়ন করা যায় না।');
+    var amount = prompt('টাকা কত পেয়েছেন? (৳) · Amount received', String((plans().filter(function (p) { return p.key === r.planKey; })[0] || {}).price || ''));
+    if (amount === null) return;
+    var exp = addMonths(r.exp, 12);
+    await reissue(r, r.domains, exp, false);
+    r.payments = r.payments || []; if (+amount) r.payments.push({ date: today(), amount: +amount, note: 'renewal' });
+    saveLedger(l); $('m-exp').value = exp;
+    msg('m-msg', 'নবায়ন হয়েছে: ' + exp + ' পর্যন্ত। নতুন কী পাঠান।', true);
+    $('m-msg').appendChild(el('br')); $('m-msg').appendChild(el('a', { 'class': 'btn wa', href: waLink(r), target: '_blank', rel: 'noopener', text: 'Send on WhatsApp · পাঠান' }));
+    renderCustomers();
   };
 
-  $('c-go').onclick = async function () {
+  /* ---------- check ---------- */
+  $('k-go').onclick = async function () {
     try {
-      var parts = $('c-key').value.replace(/\s+/g, '').split('.');
-      if (parts.length !== 3 || parts[0] !== 'KK1') throw new Error('ফরম্যাট ঠিক নেই');
+      var parts = $('k-key').value.replace(/\s+/g, '').split('.');
+      if (parts.length !== 3 || parts[0] !== 'KK1') throw new Error('ফরম্যাট ঠিক নেই · not a KK1 key');
       var pub = await crypto.subtle.importKey('raw', unb64(pubB64), { name: 'Ed25519' }, false, ['verify']);
       var ok = await crypto.subtle.verify({ name: 'Ed25519' }, pub, unb64url(parts[2]), new TextEncoder().encode(parts[1]));
-      var data = JSON.parse(new TextDecoder().decode(unb64url(parts[1])));
-      msg('c-msg', (ok ? '✓ আসল কী। ' : '✗ সই মেলেনি, কী আসল নয়। ') + 'নম্বর ' + data.id + ' · ' + data.d.join(', ') + ' · আপডেট: ' + (data.e || 'লাইফটাইম'), ok);
-    } catch (e) { msg('c-msg', 'যাচাই করা গেল না: ' + e.message); }
+      var d = JSON.parse(new TextDecoder().decode(unb64url(parts[1])));
+      var rev = revokedIds().indexOf(d.id) > -1;
+      var who = ledger().filter(function (r) { return r.id === d.id || (r.history || []).some(function (h) { return h.id === d.id; }); })[0];
+      msg('k-msg', (ok ? (rev ? '✗ Real key but CANCELLED · আসল কী, কিন্তু বাতিল। ' : '✓ Genuine key · আসল কী। ') : '✗ Not genuine · কী আসল নয়। ') + d.id + ' · ' + d.d.join(', ') + ' · ' + (d.e || 'Lifetime') + (who ? ' · ' + (who.name || '') + ' ' + (who.phone || '') : ''), ok && !rev);
+    } catch (e) { msg('k-msg', 'যাচাই করা গেল না: ' + e.message); }
   };
 
-  $('b-vault').onclick = function () { download('kk-vault.json', JSON.stringify(store(VAULT), null, 2)); };
-  $('b-saveplans').onclick = function () {
-    try { var p = JSON.parse($('b-plans').value); if (!Array.isArray(p) || !p.every(function (x) { return x.name && x.sites >= 1 && x.months >= 0; })) throw 0; store(PLANS, p); fillPlans(); msg('b-msg', 'প্ল্যান সেভ হয়েছে।', true); }
-    catch (e) { msg('b-msg', 'JSON ঠিক নেই। প্রতিটায় name, months, sites লাগবে।'); }
+  /* ---------- settings / backup ---------- */
+  function fullBackup() {
+    var data = { kind: 'kenakata-kit-backup', v: 2, created: new Date().toISOString(), vault: store(VAULT), ledger: ledger(), plans: plans(), tpl: store(TPL) || '', rev_published: store(REV_PUB) || '' };
+    download('kk-backup-' + today() + '.json', JSON.stringify(data, null, 2));
+    store(BACKUP_AT, new Date().toISOString()); store('kk_dirty', 0);
+    if ($('b-last')) renderSettings();
+  }
+  $('b-full').onclick = fullBackup;
+  $('b-restore').onchange = function () {
+    var f = this.files[0]; if (!f) return;
+    f.text().then(function (t) { importBackup(JSON.parse(t)); msg('b-msg', 'Restored · ফেরত আনা হয়েছে।', true); renderSettings(); }).catch(function (e) { msg('b-msg', e.message); });
   };
+  $('b-csv').onclick = function () {
+    var q = function (s) { return '"' + String(s == null ? '' : s).replace(/"/g, '""') + '"'; };
+    var lines = [['date', 'key id', 'name', 'phone', 'websites', 'plan', 'updates until', 'paid', 'method', 'status', 'note'].join(',')].concat(ledger().map(function (r) { return [r.date, r.id, r.name, r.phone, r.domains.join(' '), r.plan, r.exp || 'lifetime', r.paid, r.method, status(r), r.note].map(q).join(','); }));
+    download('kenakata-customers-' + today() + '.csv', '﻿' + lines.join('\n'), 'text/csv');
+  };
+  function renderSettings() {
+    $('b-pub').textContent = pubB64;
+    var at = store(BACKUP_AT); $('b-last').textContent = at ? 'Last backup · শেষ ব্যাকআপ: ' + at.slice(0, 16).replace('T', ' ') : 'এখনো ব্যাকআপ নেওয়া হয়নি · No backup yet.';
+    var tb = $('p-rows'); tb.textContent = '';
+    plans().forEach(function (p) { addPlanRow(p); });
+    $('w-tpl').value = tpl();
+  }
+  function addPlanRow(p) {
+    p = p || { key: '', name: '', months: 12, sites: 1, price: 0 };
+    var tr = el('tr', { 'data-key': p.key || '' },
+      el('td', {}, el('input', { value: p.name, 'aria-label': 'name' })), el('td', {}, el('input', { value: String(p.months), type: 'number', min: '0', 'aria-label': 'months' })),
+      el('td', {}, el('input', { value: String(p.sites), type: 'number', min: '1', 'aria-label': 'sites' })), el('td', {}, el('input', { value: String(p.price || 0), type: 'number', min: '0', 'aria-label': 'price' })),
+      el('td', {}, el('button', { 'class': 'btn sm danger', text: '×', on: { click: function () { tr.remove(); } } })));
+    $('p-rows').appendChild(tr);
+  }
+  $('p-add').onclick = function () { addPlanRow(); };
+  $('p-save').onclick = function () {
+    var out = [], bad = false;
+    Array.prototype.forEach.call($('p-rows').children, function (tr, i) {
+      var v = Array.prototype.map.call(tr.querySelectorAll('input'), function (x) { return x.value.trim(); });
+      if (!v[0]) { bad = true; return; }
+      out.push({ key: tr.getAttribute('data-key') || ('plan' + (i + 1)), name: v[0], months: Math.max(0, +v[1] || 0), sites: Math.max(1, +v[2] || 1), price: Math.max(0, +v[3] || 0) });
+    });
+    if (bad || !out.length) return msg('p-msg', 'প্রতিটা প্ল্যানের নাম দিন।');
+    store(PLANS, out); fillPlans(); msg('p-msg', 'Saved · সেভ হয়েছে।', true);
+  };
+  $('w-save').onclick = function () { store(TPL, $('w-tpl').value); msg('w-msg', 'Saved · সেভ হয়েছে।', true); };
+  $('w-reset').onclick = function () { store(TPL, null); try { localStorage.removeItem(TPL); } catch (e) {} $('w-tpl').value = DEFAULT_TPL; msg('w-msg', 'Default restored.', true); };
 
-  Array.prototype.forEach.call(document.querySelectorAll('#nav button'), function (b) {
-    b.onclick = function () { var v = b.getAttribute('data-v'); if (v === 'lock') { signKey = null; show('unlock'); return; } show(v); };
-  });
+  /* ---------- nav + boot ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll('#nav button'), function (b) { b.onclick = function () { var v = b.getAttribute('data-v'); if (v === 'lock') { signKey = null; show('unlock'); return; } show(v); }; });
+  document.addEventListener('click', function (e) { var g = e.target.closest && e.target.closest('[data-go]'); if (g) show(g.getAttribute('data-go')); });
 
   async function boot() {
     if (!window.crypto || !crypto.subtle || !(await supported())) { show('nosupport'); return; }
+    // older ledgers: add the fields this version uses
+    var l = ledger(), changed = false;
+    l.forEach(function (r) { if (!r.history) { r.history = []; changed = true; } if (!r.planKey) { r.planKey = /life/i.test(r.plan) ? 'lifetime' : (/agen|এজেন্সি/i.test(r.plan) ? 'agency' : 'pro'); changed = true; } });
+    if (changed) store(LEDGER, l);
     fillPlans();
     var v = store(VAULT);
-    if (v && v.ct && EXPECTED_PUB && v.pub !== EXPECTED_PUB) { v = null; } // an old test key: ignore it
-    if (v && v.ct) { pubB64 = v.pub; $('u-pub').textContent = v.pub; show('unlock'); return; }
-    if (EXPECTED_PUB) {
-      $('s-create').classList.add('hidden'); $('s-showimport').classList.add('hidden'); $('s-import').classList.remove('hidden');
-      $('s-intro').textContent = 'এই ব্রাউজারে প্যানেল প্রথমবার খুলছেন। আপনার চাবি আগে থেকেই আছে: kk-vault.json ফাইলটা দিন (GitHub → kenakata-license-panel রিপো থেকে নামানো), তারপর পাসওয়ার্ড দিয়ে খুলুন। ফাইল না থাকলে কাগজের রিকভারি কোড আর একটা নতুন পাসওয়ার্ড দিন।';
-      $('s-title').textContent = 'আপনার চাবি আনুন';
-    }
+    if (v && v.ct && EXPECTED_PUB && v.pub !== EXPECTED_PUB) v = null; // an old test key: ignore it
+    if (v && v.ct) { pubB64 = v.pub; show('unlock'); setTimeout(function () { $('u-pw').focus(); }, 50); return; }
+    if (!EXPECTED_PUB) { $('s-create').classList.remove('hidden'); }
     show('setup');
   }
   boot();

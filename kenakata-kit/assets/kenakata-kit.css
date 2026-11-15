@@ -140,6 +140,8 @@
 .kk-pcard .added_to_cart { grid-column: 1 / -1; display: block; text-align: center; font-size: 13px; font-weight: 600; color: var(--kk-primary); text-decoration: underline; }
 /* Side cart opens by itself: no extra "View cart" link next to any Add to cart button (cards, product page, Elementor widgets). The ✓ stays. */
 .kk-drawer-auto .added_to_cart.wc-forward { display: none !important; }
+/* The header cart (Elementor "Menu Cart" / theme) opens the side cart instead: its own panel stays hidden. */
+.kk-drawer-take .elementor-menu-cart__container, .kk-drawer-take .site-header-cart .widget_shopping_cart, .kk-drawer-take .ast-site-header-cart .ast-site-header-cart-data { display: none !important; }
 /* Narrow cards on bigger screens (5–6 per row, tablets): cart button becomes an icon so both buttons fit. */
 .kk-pcard__body { container-type: inline-size; }
 @media (min-width: 601px) {

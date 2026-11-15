@@ -4,7 +4,7 @@ Plugin URI: https://digibhai.com/
 Requires at least: 6.3
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 3.16.1
+Stable tag: 3.16.2
 License: GPLv2 or later
 
 Everything a Bangladeshi WooCommerce store usually needs. Settings: left admin menu → Kenakata Kit.
@@ -30,6 +30,9 @@ Products Grid, Products Carousel, Brands, Categories, Buy Now Button, Live Searc
 Older [ss_…] shortcodes keep working. Options: see the guide or Kenakata Kit → Shortcodes.
 
 == Changelog ==
+= 3.16.2 =
+* Side cart: new switch "Also open it from the header cart icon" (off by default). With a header made with Elementor's "Menu Cart" widget (or a theme cart icon), a click opens the Kenakata side cart and their own panel stays hidden, so the shop has one cart.
+
 = 3.16.1 =
 * Speed & health (off until turned on): "Block editor styles only where blocks are used". Pages built with Elementor skip the block editor's style file (about 100 KB before compression, render-blocking). Posts written with blocks, cart, checkout and My account keep it.
 * Store dashboard: typing an option name and then tapping the values field no longer rebuilds the fields (the tap was lost).

@@ -356,6 +356,7 @@ function kk_fields() {
 
 		/* ---------------- Side cart ---------------- */
 		'cart_drawer_enable'   => kk_f( 'cart', 'toggle', __( 'Enable side cart', 'kenakata-kit' ), __( 'Clicking the "Cart Icon" widget or the [kk_cart_icon] shortcode opens the cart from the side.', 'kenakata-kit' ) ),
+		'cart_drawer_takeover' => kk_f( 'cart', 'toggle', __( 'Also open it from the header cart icon', 'kenakata-kit' ), __( 'For a header made with Elementor\'s "Menu Cart" widget or a theme cart icon: a click opens this side cart instead of their own cart panel, so there is only one cart. Turn off to get their panel back.', 'kenakata-kit' ), array( 'show_if' => 'cart_drawer_enable' ) ),
 		'cart_drawer_auto_open'=> kk_f( 'cart', 'toggle', __( 'Open the side cart after Add to cart', 'kenakata-kit' ), '', array( 'show_if' => 'cart_drawer_enable' ) ),
 		'cart_drawer_title'    => kk_f( 'cart', 'text', __( 'Side cart title', 'kenakata-kit' ), '', array( 'show_if' => 'cart_drawer_enable' ) ),
 		'cart_drawer_width'    => kk_f( 'cart', 'number', __( 'Side cart width', 'kenakata-kit' ), __( 'Phones always use almost the full width.', 'kenakata-kit' ), array( 'min' => 300, 'max' => 640, 'unit' => 'px', 'show_if' => 'cart_drawer_enable' ) ),

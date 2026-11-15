@@ -4,7 +4,7 @@
 	'use strict';
 	var D = window.kkData || { i18n: {}, slider: {} };
 	// wp_localize_script() turns numbers into strings ("0" would count as true): make the on/off flags real numbers.
-	['popup', 'drawer', 'drawerAuto', 'ajaxSingle', 'cartRedirect', 'minChars'].forEach(function (k) { D[k] = Number(D[k]) || 0; });
+	['popup', 'drawer', 'drawerAuto', 'drawerTake', 'ajaxSingle', 'cartRedirect', 'minChars'].forEach(function (k) { D[k] = Number(D[k]) || 0; });
 	D.i18n = D.i18n || {};
 	var T = function (key, n) { return String((D.i18n || {})[key] || '').replace('%d', n).replace('%s', n); };
 	var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -332,6 +332,18 @@
 			document.documentElement.classList.remove('kk-drawer-open');
 			setTimeout(function () { drawer.hidden = true; }, reduce ? 0 : 260);
 			if (last && last.focus) last.focus();
+		}
+		// Header cart icons of Elementor's "Menu Cart" widget and common themes open the side cart (capture phase, before their own handlers).
+		if (D.drawerTake) {
+			var take = '.elementor-menu-cart__toggle_button, .elementor-menu-cart__toggle .elementor-button, a.cart-contents, .site-header-cart > li > a, .ast-site-header-cart .ast-cart-menu-wrap, .header-cart-link';
+			var takeOpen = function (e) {
+				var t = e.target.closest && e.target.closest(take);
+				if (!t || t.closest('.kk-drawer')) return;
+				e.preventDefault(); e.stopImmediatePropagation(); e.stopPropagation();
+				if (e.type === 'click') open();
+			};
+			document.addEventListener('click', takeOpen, true);
+			document.addEventListener('mouseover', function (e) { if (e.target.closest && e.target.closest(take)) e.stopImmediatePropagation(); }, true); // "open on hover" panels stay shut
 		}
 		document.addEventListener('click', function (e) {
 			var t = e.target.closest && e.target.closest('[data-kk-drawer]');

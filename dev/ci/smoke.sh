@@ -369,6 +369,14 @@ curl -sL -o /tmp/body "$URL/?p=$BP"
 check "post written with blocks keeps it" 'grep -q "wp-block-library-css" /tmp/body'
 wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["speed_block_css"] = 0; kk_update_settings( $s );'
 
+echo "== 3.16.2: header cart icon opens the side cart"
+wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["cart_drawer_enable"] = 1; $s["cart_drawer_takeover"] = 1; kk_update_settings( $s );'
+curl -sL -o /tmp/body "$URL/?page_id=$CARDS"
+check "takeover on: body class, script told, no PHP errors" 'grep -q "kk-drawer-take" /tmp/body && grep -q "\"drawerTake\":1\|drawerTake\":\"1\"" /tmp/body && clean /tmp/body'
+wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["cart_drawer_takeover"] = 0; kk_update_settings( $s );'
+curl -sL -o /tmp/body "$URL/?page_id=$CARDS"
+check "takeover off: header carts left alone" '! grep -q "kk-drawer-take" /tmp/body'
+
 echo "== Bots"
 wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["speed_robots_shop"] = 1; $s["speed_bot_block"] = 1; $s["speed_ai_block"] = 1; kk_update_settings( $s );'
 check "robots.txt keeps crawlers off search/sort/filter pages and names the blocked bots" 'curl -s "$URL/?robots=1" | grep -q "orderby" && curl -s "$URL/?robots=1" | grep -q "User-agent: AhrefsBot"'

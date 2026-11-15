@@ -2124,4 +2124,6 @@ Collect: %5$s`],
 [`আপনার bKash / Nagad / Rocket অ্যাপ খুলে এই Transaction ID খুঁজে টাকার পরিমাণ মিলিয়ে নিন, তারপর একটা বোতাম চাপুন।`, `Open your bKash / Nagad / Rocket app, find this Transaction ID and check the amount, then press a button.`],
 [`ব্লক এডিটরের স্টাইল শুধু যেখানে ব্লক আছে`, `Block editor styles only where blocks are used`],
 [`Elementor দিয়ে বানানো পেজে ব্লক এডিটরের স্টাইল ফাইল লাগে না (প্রায় ১০০ KB, কমপ্রেস করে ১৫ KB, পেজ দেখানোর আগেই লোড হয়)। ব্লক দিয়ে লেখা পোস্ট/পেজ, কার্ট, চেকআউট আর My account-এ এটা থাকে।`, `Pages built with Elementor do not need the block editor's style file (about 100 KB, 15 KB compressed, loaded before the page shows). Posts and pages written with blocks, cart, checkout and My account keep it.`],
+[`হেডারের কার্ট আইকন থেকেও এটা খুলবে`, `Also open it from the header cart icon`],
+[`Elementor-এর "Menu Cart" উইজেট বা থিমের কার্ট আইকন দিয়ে বানানো হেডারে: ক্লিক করলে তাদের নিজের প্যানেলের বদলে এই সাইড কার্ট খোলে, তাই সাইটে একটাই কার্ট থাকে। তাদের প্যানেল ফেরত চাইলে বন্ধ করুন।`, `For a header made with Elementor's "Menu Cart" widget or a theme cart icon: a click opens this side cart instead of their own cart panel, so there is only one cart. Turn off to get their panel back.`],
 ];

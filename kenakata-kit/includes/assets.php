@@ -85,6 +85,9 @@ function kk_body_classes( $classes ) {
 	if ( kk_opt( 'card_enable' ) ) {
 		$classes[] = 'kk-cards';
 	}
+	if ( kk_opt( 'cart_drawer_enable' ) && kk_opt( 'cart_drawer_takeover' ) && ! ( function_exists( 'is_cart' ) && ( is_cart() || is_checkout() ) ) ) {
+		$classes[] = 'kk-drawer-take'; // the header's own cart panel is hidden: the side cart opens instead
+	}
 	// The side cart opens by itself after "Add to cart": WooCommerce's extra "View cart" link next to the button is then not needed.
 	if ( kk_opt( 'cart_drawer_enable' ) && kk_opt( 'cart_drawer_auto_open' ) && ! ( function_exists( 'is_cart' ) && ( is_cart() || is_checkout() ) ) ) {
 		$classes[] = 'kk-drawer-auto';
@@ -187,6 +190,7 @@ add_action( 'wp_enqueue_scripts', function () {
 		'popup'      => kk_opt( 'popup_enable' ) && ! is_user_logged_in() ? 1 : 0,
 		'drawer'     => kk_opt( 'cart_drawer_enable' ) ? 1 : 0,
 		'drawerAuto' => kk_opt( 'cart_drawer_enable' ) && kk_opt( 'cart_drawer_auto_open' ) ? 1 : 0,
+		'drawerTake' => kk_opt( 'cart_drawer_enable' ) && kk_opt( 'cart_drawer_takeover' ) ? 1 : 0,
 		'ajaxSingle' => kk_opt( 'cart_drawer_enable' ) && kk_opt( 'cart_drawer_ajax' ) ? 1 : 0,
 		'wcAjax'     => class_exists( 'WC_AJAX' ) ? WC_AJAX::get_endpoint( '%%endpoint%%' ) : '',
 		'slider'     => array(

@@ -1,7 +1,8 @@
 # Kenakata Kit — instructions for Claude
 
 You are continuing development of **Kenakata Kit**, a WordPress/WooCommerce plugin for Bangladeshi online shops,
-written by DigiBhai.com (the owner talks in Bengali; reply in Bengali, keep code, comments and UI source strings in English).
+written by DigiBhai.com. **Language: always talk to and report to the owner in simple Bengali (বাংলা) — every reply, every
+report, every question.** Keep code, comments and UI source strings in English.
 Read `HANDOFF.md` (in the private repo `kenakata-license-panel`) for the current status, the roadmap and open decisions.
 
 ## Folder layout

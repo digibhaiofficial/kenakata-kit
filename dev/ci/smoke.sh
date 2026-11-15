@@ -367,6 +367,10 @@ curl -sL -o /tmp/body "$URL/?page_id=$CARDS"
 check "page without blocks: no block-library CSS" '! grep -q "wp-block-library-css" /tmp/body && clean /tmp/body'
 curl -sL -o /tmp/body "$URL/?p=$BP"
 check "post written with blocks keeps it" 'grep -q "wp-block-library-css" /tmp/body'
+echo '<?php add_action( "wp_enqueue_scripts", function () { wp_enqueue_style( "wp-block-library" ); }, 500 );' > "$WP/wp-content/mu-plugins/kk-late-blocks.php"
+curl -sL -o /tmp/body "$URL/?page_id=$CARDS"
+check "also when another plugin adds it back late" '! grep -q "wp-block-library-css" /tmp/body && clean /tmp/body'
+rm -f "$WP/wp-content/mu-plugins/kk-late-blocks.php"
 wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["speed_block_css"] = 0; kk_update_settings( $s );'
 
 echo "== 3.16.2: header cart icon opens the side cart"

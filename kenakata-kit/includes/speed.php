@@ -89,7 +89,7 @@ if ( kk_opt( 'speed_wc_assets' ) ) {
 
 // Block editor styles only where blocks are used (pages built with Elementor or shortcodes do not need them).
 if ( kk_opt( 'speed_block_css' ) ) {
-	add_action( 'wp_enqueue_scripts', function () {
+	$kk_block_css = function () {
 		if ( is_singular() && has_blocks( get_post() ) ) {
 			return;
 		}
@@ -99,7 +99,9 @@ if ( kk_opt( 'speed_block_css' ) ) {
 		foreach ( array( 'wp-block-library', 'wp-block-library-theme', 'classic-theme-styles', 'wc-blocks-style', 'wc-blocks-vendors-style' ) as $h ) {
 			wp_dequeue_style( $h );
 		}
-	}, 100 );
+	};
+	add_action( 'wp_enqueue_scripts', $kk_block_css, 100 );
+	add_action( 'wp_print_styles', $kk_block_css, 1 ); // again just before printing: some plugins add it back late
 }
 
 /* =========================================================================

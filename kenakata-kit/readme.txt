@@ -32,6 +32,7 @@ Older [ss_â€¦] shortcodes keep working. Options: see the guide or Kenakata Kit â
 == Changelog ==
 = 3.16.2 =
 * Side cart: new switch "Also open it from the header cart icon" (off by default). With a header made with Elementor's "Menu Cart" widget (or a theme cart icon), a click opens the Kenakata side cart and their own panel stays hidden, so the shop has one cart.
+* Speed: "Block editor styles only where blocks are used" also works when another plugin adds the file back late.
 
 = 3.16.1 =
 * Speed & health (off until turned on): "Block editor styles only where blocks are used". Pages built with Elementor skip the block editor's style file (about 100 KB before compression, render-blocking). Posts written with blocks, cart, checkout and My account keep it.

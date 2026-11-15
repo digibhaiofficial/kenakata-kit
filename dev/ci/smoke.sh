@@ -416,6 +416,11 @@ wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["gd_risk_enable"
 curl -s -o /tmp/body -b /tmp/c5 -c /tmp/c5 -X POST --data-urlencode "security=$UN" --data-urlencode "post_data=billing_phone=01712000333" "$URL/?wc-ajax=update_order_review"
 check "switched off → cash on delivery for everyone" 'grep -q "payment_method_cod" /tmp/body'
 
+echo "== 3.18: guide and help links"
+get "$URL/wp-admin/admin.php?page=kenakata-kit&tab=courier" >/dev/null
+check "courier settings link to the courier panels" 'grep -q "kk-help-link" /tmp/body && grep -q "steadfast.com.bd/login" /tmp/body && grep -q "merchant.pathao.com" /tmp/body && clean /tmp/body'
+check "guide has the roadmap with settings buttons" 'grep -q "id=\"roadmap\"" "$WP/wp-content/plugins/kenakata-kit/docs/index.html" && grep -q "data-tab=\"courier\"" "$WP/wp-content/plugins/kenakata-kit/docs/index.html"'
+
 echo "== Bots"
 wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["speed_robots_shop"] = 1; $s["speed_bot_block"] = 1; $s["speed_ai_block"] = 1; kk_update_settings( $s );'
 check "robots.txt keeps crawlers off search/sort/filter pages and names the blocked bots" 'curl -s "$URL/?robots=1" | grep -q "orderby" && curl -s "$URL/?robots=1" | grep -q "User-agent: AhrefsBot"'

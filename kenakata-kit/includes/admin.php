@@ -434,8 +434,8 @@ function kk_render_form( $tab, $preview ) {
 							echo '</div><div class="kk-card">';
 						}
 						echo '<h3 class="kk-card__title">' . esc_html( $f['label'] ) . '</h3>';
-						if ( $f['desc'] ) {
-							echo '<p class="kk-card__desc">' . esc_html( $f['desc'] ) . '</p>';
+						if ( $f['desc'] || ! empty( $f['link'] ) ) {
+							echo '<p class="kk-card__desc">' . esc_html( $f['desc'] ) . kk_field_link( $f ) . '</p>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in kk_field_link()
 						}
 						$first = false;
 						continue;
@@ -461,6 +461,20 @@ function kk_render_form( $tab, $preview ) {
 	<?php
 }
 
+/**
+ * "Where do I find this?" link under a field or heading: 'link' => array( url, text ). Outside sites open in a new tab;
+ * admin links (starting with the admin URL) open in the same tab.
+ */
+function kk_field_link( $f ) {
+	if ( empty( $f['link'] ) || ! is_array( $f['link'] ) || empty( $f['link'][0] ) ) {
+		return '';
+	}
+	$url   = (string) $f['link'][0];
+	$text  = isset( $f['link'][1] ) ? (string) $f['link'][1] : __( 'Open', 'kenakata-kit' );
+	$own   = 0 === strpos( $url, admin_url() );
+	return ' <a class="kk-help-link" href="' . esc_url( $url ) . '"' . ( $own ? '' : ' target="_blank" rel="noopener noreferrer"' ) . '>' . esc_html( $text ) . ( $own ? ' →' : ' ↗' ) . '</a>';
+}
+
 function kk_render_field( $key, $f ) {
 	$id    = 'kk_' . $key;
 	$name  = 'kk_settings[' . $key . ']';
@@ -468,8 +482,8 @@ function kk_render_field( $key, $f ) {
 	$attrs = ! empty( $f['show_if'] ) ? ' data-show-if="' . esc_attr( $f['show_if'] ) . '"' : '';
 	echo '<div class="kk-row kk-row--' . esc_attr( $f['type'] ) . '"' . $attrs . ' data-key="' . esc_attr( $key ) . '">'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped above
 	echo '<div class="kk-row__label"><label for="' . esc_attr( $id ) . '">' . esc_html( $f['label'] ) . '</label>';
-	if ( $f['desc'] ) {
-		echo '<p class="kk-row__desc" id="' . esc_attr( $id ) . '-desc">' . esc_html( $f['desc'] ) . '</p>';
+	if ( $f['desc'] || ! empty( $f['link'] ) ) {
+		echo '<p class="kk-row__desc" id="' . esc_attr( $id ) . '-desc">' . esc_html( $f['desc'] ) . kk_field_link( $f ) . '</p>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in kk_field_link()
 	}
 	echo '</div><div class="kk-row__control">';
 	$describe = $f['desc'] ? ' aria-describedby="' . esc_attr( $id ) . '-desc"' : '';

@@ -4,7 +4,7 @@ Plugin URI: https://digibhai.com/
 Requires at least: 6.3
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 3.17.0
+Stable tag: 3.18.0
 License: GPLv2 or later
 
 Everything a Bangladeshi WooCommerce store usually needs. Settings: left admin menu → Kenakata Kit.
@@ -30,6 +30,10 @@ Products Grid, Products Carousel, Brands, Categories, Buy Now Button, Live Searc
 Older [ss_…] shortcodes keep working. Options: see the guide or Kenakata Kit → Shortcodes.
 
 == Changelog ==
+= 3.18.0 =
+* Guide: new "step by step" roadmap (six stages, each with a button that opens the right settings tab) and a new chapter for daily work: products with options, confirming orders and couriers, printing, bKash / Nagad / Rocket, the fake-order shield, the sales report and keeping the site fast. The version shown in the guide is now always current.
+* Settings: "where do I find this?" links under fields (Steadfast, Pathao, RedX, eCourier and BD Courier panels, Cloudflare Turnstile keys, WooCommerce payment methods and store address, adding a team member, creating a page).
+
 = 3.17.0 =
 * New (off until turned on): Fake-order shield in Fake-order protection. Blocked numbers: block a phone number from the order screen or the store dashboard with one tap (or type numbers in the settings); its orders are refused, or may only be paid in advance. Pay first after many returns: customers whose earlier orders here were mostly cancelled / failed / refunded (or whose saved Courier check is low) do not get cash on delivery. Only your own orders are looked at; nothing outside is asked at checkout.
 * Mobile payment: the wallet's cash-out charge is added automatically as a line in the order when the customer picks bKash (1.85%), Nagad (1.5%), Rocket (1.8%) or Upay (1.4%); each rate can be changed or set to 0. With "Only the delivery charge" the charge is on the advance only. The "fixed advance" setting was removed.

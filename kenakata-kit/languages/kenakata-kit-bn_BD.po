@@ -8867,3 +8867,36 @@ msgstr "Upay দিয়ে দিলে কাস্টমারের টা�
 
 msgid "\"Only the delivery charge\" stops most fake orders: the customer pays the delivery charge now (plus the wallet charge) and the rest in cash on delivery. The courier collect amount and labels use what is left, after you press \"Payment received\"."
 msgstr "\"শুধু ডেলিভারি চার্জ\" দিলে বেশিরভাগ ফেক অর্ডার বন্ধ হয়: কাস্টমার এখন ডেলিভারি চার্জ (সাথে ওয়ালেট চার্জ) দেয়, বাকিটা ক্যাশ অন ডেলিভারি। \"পেমেন্ট পেয়েছি\" চাপার পর কুরিয়ারের কালেক্ট অ্যামাউন্ট আর লেবেলে বাকি টাকাটাই যায়।"
+
+msgid "Open"
+msgstr "খুলুন"
+
+msgid "Open the Steadfast merchant panel"
+msgstr "Steadfast মার্চেন্ট প্যানেল খুলুন"
+
+msgid "Open the Pathao merchant panel"
+msgstr "Pathao মার্চেন্ট প্যানেল খুলুন"
+
+msgid "Open RedX"
+msgstr "RedX খুলুন"
+
+msgid "Open eCourier"
+msgstr "eCourier খুলুন"
+
+msgid "Open BD Courier"
+msgstr "BD Courier খুলুন"
+
+msgid "Get the keys from Cloudflare (free)"
+msgstr "Cloudflare থেকে কী নিন (ফ্রি)"
+
+msgid "Add a team member"
+msgstr "টিমের সদস্য যোগ করুন"
+
+msgid "WooCommerce payment methods"
+msgstr "WooCommerce পেমেন্ট অপশন"
+
+msgid "WooCommerce store address"
+msgstr "WooCommerce-এর দোকানের ঠিকানা"
+
+msgid "Create a page"
+msgstr "পেজ বানান"

@@ -231,3 +231,7 @@ p .kk-copy { display: inline-flex; width: auto; }
 .kk-clog tr.is-bad td:nth-child(4) { color: #b32d2e; }
 .kk-clog tr.is-ok td:nth-child(4) { color: #116329; }
 .kk-clog code { font-size: 11px; background: none; padding: 0; }
+
+/* 3.18: "where do I find this?" links under fields */
+.kk-help-link { display: inline-block; margin-left: 4px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.kk-help-link:hover { text-decoration: underline; }

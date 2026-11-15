@@ -110,6 +110,21 @@ footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border
 	.widget dl { grid-template-columns: 1fr; }
 	.widget dt { margin-top: 6px; }
 }
+.road { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin: 18px 0 8px; counter-reset: r; }
+.road__step { position: relative; display: flex; flex-direction: column; gap: 6px; padding: 18px 18px 16px 18px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
+.road__step::before { counter-increment: r; content: counter(r); position: absolute; top: -12px; left: 16px; display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: var(--brand); color: #fff; font-weight: 700; font-size: 15px; box-shadow: 0 0 0 4px var(--bg); }
+.road__step h3 { margin: 6px 0 0; font-size: 19px; }
+.road__time { font-size: 13px; color: var(--muted); }
+.road__step ul { margin: 4px 0 0; padding-left: 20px; font-size: 15.5px; }
+.road__step .go { margin-top: auto; align-self: flex-start; }
+.go { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 999px; background: var(--soft); color: var(--brand-d); font-weight: 700; font-size: 14px; text-decoration: none; }
+.go:hover { background: var(--brand); color: #fff; }
+.badge-free, .badge-pro { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; vertical-align: middle; }
+.badge-free { background: var(--soft); color: var(--brand-d); }
+.badge-pro { background: var(--soft-accent); color: var(--accent); }
+.flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 12px 0; font-size: 15px; }
+.flow span { padding: 6px 12px; border-radius: 10px; background: var(--surface); border: 1px solid var(--border); }
+.flow b { color: var(--muted); }
 </style>
 </head>
 <body>
@@ -121,6 +136,7 @@ footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border
 	<input id="q" class="toc__search" type="search" placeholder="খুঁজুন… (যেমন: Bottom Bar, ব্যাজ, WhatsApp)">
 	<ol>
 		<li><a href="#intro">১. কেনাকাটা কিট কী</a></li>
+		<li><a href="#roadmap">★ ধাপে ধাপে শুরু (রোডম্যাপ)</a></li>
 		<li><a href="#install">২. ইনস্টল ও আপডেট</a></li>
 		<li><a href="#quickstart">৩. প্রথম ১০ মিনিটের সেটআপ</a></li>
 		<li><a href="#admin">৪. সেটিংস পেজ চেনা</a><ol><li><a href="#language">ভাষা: ইংরেজি না বাংলা</a></li><li><a href="#menu-map">মেনুর নাম: ইংরেজি ↔ বাংলা</a></li></ol></li>
@@ -148,6 +164,17 @@ footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border
 				<li><a href="#s-tools">Tools (Export / Import)</a></li>
 			</ol>
 		</li>
+		<li><a href="#daily">★ রোজকার কাজ: অর্ডার থেকে ডেলিভারি</a>
+			<ol>
+				<li><a href="#d-products">অপশনসহ প্রোডাক্ট (সাইজ, রং)</a></li>
+				<li><a href="#d-orders">অর্ডার কনফার্ম ও কুরিয়ার</a></li>
+				<li><a href="#d-print">ইনভয়েস ও লেবেল প্রিন্ট</a></li>
+				<li><a href="#d-mpay">bKash / Nagad / Rocket</a></li>
+				<li><a href="#d-shield">ফেক অর্ডার শিল্ড</a></li>
+				<li><a href="#d-report">বিক্রির হিসাব</a></li>
+				<li><a href="#d-speed">সাইট দ্রুত রাখা</a></li>
+			</ol>
+		</li>
 		<li><a href="#widgets">৬. Elementor উইজেট</a></li>
 		<li><a href="#recipes">৭. ধাপে ধাপে কাজ</a></li>
 		<li><a href="#shortcodes">৮. শর্টকোড</a></li>
@@ -169,7 +196,7 @@ footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border
 		<li>ছবিসহ রিভিউ, সাইজ/রঙের বাটন আর ১৫টি Elementor উইজেট।</li>
 	</ul>
 	<p>কোড না জেনেও সব কিছু বদলানো যায়।</p>
-	<p class="hero__meta">ভার্সন ৩.৪.০ · তৈরি করেছে DigiBhai.com · প্রয়োজন: WordPress ৬.৩+, WooCommerce, PHP ৭.৪+ · Elementor থাকলে উইজেট, না থাকলে শর্টকোড</p>
+	<p class="hero__meta">ভার্সন <span data-kk-version>৩</span> · তৈরি করেছে DigiBhai.com · প্রয়োজন: WordPress ৬.৩+, WooCommerce, PHP ৭.৪+ · Elementor থাকলে উইজেট, না থাকলে শর্টকোড</p>
 </header>
 
 <section id="intro">
@@ -190,6 +217,68 @@ footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border
 	<div class="card"><h4>কাস্টমারকে জানায়</h4>সুন্দর থ্যাংক-ইউ পেজ, ফোন নম্বর দিয়ে অর্ডার ট্র্যাকিং, কুরিয়ারের ট্র্যাকিং লিংক।</div>
 	<div class="card"><h4>দেখতে সুন্দর</h4>মোবাইলে ঠিকঠাক প্রোডাক্ট কার্ড, ছাড়ের ব্যাজ "-১২%", ব্র্যান্ড ও ক্যাটাগরি ক্যারোসেল, লাইভ সার্চ।</div>
 </div>
+</section>
+
+<section id="roadmap">
+<h2>ধাপে ধাপে শুরু (রোডম্যাপ)</h2>
+<p>সব ফিচার একসাথে চালু করার দরকার নেই। নিচের ক্রমে এক এক করে চালু করুন, প্রতিটার পর সাইট দেখে নিন। প্রতিটা কার্ডের নিচের বোতাম সরাসরি সেই সেটিংসে নিয়ে যায়। কোনো ফিচার নিজে চালু না করা পর্যন্ত বন্ধ থাকে, আর যেকোনো সময় বন্ধ করলে সাইট আগের মতো হয়ে যায়।</p>
+<div class="road">
+	<div class="road__step">
+		<h3>দোকানের ভিত্তি</h3><span class="road__time">প্রথম দিন · ১০ মিনিট</span>
+		<ul>
+			<li>WooCommerce-এ ডেলিভারি চার্জ (Inside / Outside Dhaka) আর Cash on delivery</li>
+			<li>চেকআউট সহজ করুন, থ্যাংক-ইউ আর ট্র্যাকিং পেজ</li>
+			<li>WhatsApp নম্বর দিন</li>
+		</ul>
+		<a class="go" data-tab="dashboard" href="#quickstart">ড্যাশবোর্ডের চেকলিস্ট দেখুন →</a>
+	</div>
+	<div class="road__step">
+		<h3>দেখতে সুন্দর, কেনা সহজ</h3><span class="road__time">প্রথম দিন</span>
+		<ul>
+			<li>রং আর ফন্ট (Colours &amp; design)</li>
+			<li>প্রোডাক্ট কার্ড, Buy Now বাটন</li>
+			<li>সাইড কার্ট, মোবাইলের Bottom Bar, লাইভ সার্চ</li>
+		</ul>
+		<a class="go" data-tab="design" href="#s-design">ডিজাইন সেটিংস →</a>
+	</div>
+	<div class="road__step">
+		<h3>ভুয়া অর্ডার আটকান</h3><span class="road__time">প্রথম সপ্তাহ</span>
+		<ul>
+			<li>১১ ডিজিটের নম্বর যাচাই, একই নম্বর থেকে বারবার অর্ডার বন্ধ</li>
+			<li>ব্লক করা নম্বর, বারবার ফেরত দিলে আগে পেমেন্ট</li>
+			<li>কার্ট-বট গার্ড (সার্ভারের চাপ কমায়)</li>
+		</ul>
+		<a class="go" data-tab="guard" href="#d-shield">সুরক্ষা সেটিংস →</a>
+	</div>
+	<div class="road__step">
+		<h3>টাকা নেওয়া</h3><span class="road__time">যখন দরকার</span>
+		<ul>
+			<li>bKash / Nagad / Rocket ম্যানুয়াল পেমেন্ট (TrxID দিয়ে)</li>
+			<li>পুরো টাকা, বা শুধু ডেলিভারি চার্জ অগ্রিম</li>
+			<li>ক্যাশ-আউট চার্জ নিজে থেকে যোগ হয়</li>
+		</ul>
+		<a class="go" data-tab="mobilepay" href="#d-mpay">মোবাইল পেমেন্ট →</a>
+	</div>
+	<div class="road__step">
+		<h3>অর্ডার সামলানো <span class="badge-pro">Pro</span></h3><span class="road__time">রোজকার কাজ</span>
+		<ul>
+			<li>স্টোর ড্যাশবোর্ড: ফোন থেকে অর্ডার, প্রোডাক্ট, স্টক</li>
+			<li>এক চাপে কুরিয়ারে পাঠানো, Sync বোতাম</li>
+			<li>ইনভয়েস আর লেবেল প্রিন্ট</li>
+		</ul>
+		<a class="go" data-tab="courier" href="#d-orders">কুরিয়ার সেটিংস →</a>
+	</div>
+	<div class="road__step">
+		<h3>দ্রুত আর নিরাপদ সাইট</h3><span class="road__time">সব শেষে, একবার</span>
+		<ul>
+			<li>Speed &amp; health-এর চেকআপ দেখে লাল জিনিস ঠিক করুন</li>
+			<li>পেজ ক্যাশ (LiteSpeed Cache), ছবি WebP</li>
+			<li>Security-র সুইচগুলো</li>
+		</ul>
+		<a class="go" data-tab="speed" href="#d-speed">স্পিড ও হেলথ →</a>
+	</div>
+</div>
+<div class="tip"><strong>নিয়ম একটাই</strong>একবারে একটা জিনিস চালু করুন, সাইট খুলে দেখুন, তারপর পরেরটা। কিছু অদ্ভুত লাগলে শুধু সেই সুইচটা বন্ধ করে দিন; অন্য কিছু বদলায় না। ক্যাশ প্লাগইন থাকলে বদলের পর ক্যাশ মুছুন।</div>
 </section>
 
 <section id="install">
@@ -715,6 +804,64 @@ footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border
 </ul>
 </section>
 
+<section id="daily">
+<h2>রোজকার কাজ: অর্ডার থেকে ডেলিভারি</h2>
+<div class="flow"><span>অর্ডার আসে</span><b>→</b><span>ফোনে কনফার্ম</span><b>→</b><span>পেমেন্ট মিলানো</span><b>→</b><span>কুরিয়ারে পাঠানো</span><b>→</b><span>লেবেল প্রিন্ট</span><b>→</b><span>Sync / ডেলিভারি</span></div>
+
+<h3 id="d-products">অপশনসহ প্রোডাক্ট (সাইজ, রং) <span class="badge-pro">Pro</span></h3>
+<ol class="steps">
+	<li>স্টোর ড্যাশবোর্ড → <span class="path">প্রোডাক্ট → নতুন প্রোডাক্ট</span>। নাম লিখুন।</li>
+	<li><strong>"অপশনসহ"</strong> বাছুন। অপশনের নাম লিখুন (যেমন সাইজ), তারপর মান লিখে Enter চাপুন (S, M, L)। আরেকটা অপশন লাগলে "আরেকটা অপশন যোগ করুন" (যেমন রং)।</li>
+	<li><strong>"সব কম্বিনেশন বানাও"</strong> চাপুন। প্রতিটা কম্বিনেশনের দাম দিন, বা "সব অপশনে একই দাম বা স্টক" দিয়ে একবারে বসান। চাইলে প্রতিটার ছবি দিন।</li>
+	<li>ক্যাটাগরি বা ব্র্যান্ড না থাকলে সেখানেই "+ নতুন ক্যাটাগরি / ব্র্যান্ড" চাপুন। তারপর সেভ।</li>
+</ol>
+<div class="tip"><strong>টিপ</strong>আগে ব্যবহার করা নাম আর মান টাইপ করার সময় সাজেশনে আসে, তাই সব প্রোডাক্টে একই বানান থাকে।</div>
+
+<h3 id="d-orders">অর্ডার কনফার্ম ও কুরিয়ার <span class="badge-pro">Pro</span></h3>
+<ol class="steps">
+	<li><span class="path">Kenakata Kit → Courier booking</span>-এ যে কুরিয়ার ব্যবহার করেন সেটা চালু করে তার API তথ্য দিন (প্রতিটা ঘরের নিচে কোথায় পাবেন লেখা আছে, লিংকসহ)। "Test connection" চেপে দেখুন।</li>
+	<li>নতুন অর্ডারে কাস্টমারকে কল বা WhatsApp করুন। সন্দেহ হলে <strong>Courier check</strong> চাপুন: এই নম্বরে আগে কতগুলো পার্সেল গেছে আর কতগুলো ফেরত এসেছে।</li>
+	<li>কনফার্ম হলে <strong>"Send to Steadfast"</strong> (বা যে কুরিয়ার) চাপুন। ট্র্যাকিং নিজে থেকে বসে, অর্ডার Shipped হয়ে যায়।</li>
+	<li>অনেক অর্ডার একসাথে: <span class="path">WooCommerce → Orders</span>-এ টিক দিয়ে Bulk actions → "Send to …" (এক চাপে সর্বোচ্চ ১৫টা)।</li>
+	<li>পার্সেলের খবর জানতে স্টোর ড্যাশবোর্ডের অর্ডার লিস্টে <strong>"কুরিয়ার Sync"</strong> চাপুন। ব্যাকগ্রাউন্ডে কিছু চলে না, তাই সার্ভারের উপর চাপ পড়ে না।</li>
+</ol>
+
+<h3 id="d-print">ইনভয়েস ও লেবেল প্রিন্ট <span class="badge-free">ফ্রি</span></h3>
+<ol class="steps">
+	<li><span class="path">Kenakata Kit → Invoice &amp; label</span> চালু করুন। দোকানের ফোন, ঠিকানা আর লেবেলের সাইজ বাছুন (থার্মাল 100×150, 75×100, বা সাধারণ প্রিন্টারে A4-এ ৬টা)।</li>
+	<li>একটা অর্ডার: অর্ডারের পাতায় "Print invoice" / "Print label"।</li>
+	<li>অনেকগুলো: স্টোর ড্যাশবোর্ডে স্ট্যাটাস বাছুন (যেমন Processing), তারপর "লেবেল প্রিন্ট"। অথবা WooCommerce → Orders → Bulk actions।</li>
+</ol>
+<div class="tip"><strong>টিপ</strong>প্রিন্টের ঘরে "Margins: None" আর "Scale: 100%" রাখুন, তাহলে লেবেল ঠিক মাপে আসবে।</div>
+
+<h3 id="d-mpay">bKash / Nagad / Rocket <span class="badge-free">ফ্রি</span></h3>
+<ol class="steps">
+	<li><span class="path">Kenakata Kit → Mobile payment</span>-এ নম্বর আর অ্যাকাউন্টের ধরন (পার্সোনাল / এজেন্ট / মার্চেন্ট) দিন। যে ঘর খালি, সেই ওয়ালেট দেখাবে না।</li>
+	<li>কত নেবেন বাছুন: পুরো টাকা, অথবা শুধু ডেলিভারি চার্জ অগ্রিম (বাকি ক্যাশ অন ডেলিভারি)।</li>
+	<li>ক্যাশ-আউট চার্জ (bKash ১.৮৫%, Nagad ১.৫%, Rocket ১.৮%, Upay ১.৪%) নিজে থেকে যোগ হয়; বদলাতে বা ০ করতে পারেন।</li>
+	<li>অর্ডার এলে "On hold" থাকে। আপনার অ্যাপে TrxID আর টাকা মিলিয়ে <strong>"পেমেন্ট পেয়েছি"</strong> চাপুন (অর্ডারের পাতা বা স্টোর ড্যাশবোর্ড)। না পেলে "পাইনি"।</li>
+</ol>
+<div class="warn"><strong>মনে রাখুন</strong>এটা ম্যানুয়াল: টাকা সত্যি এসেছে কিনা আপনাকেই অ্যাপে দেখে নিতে হবে। একই TrxID দুটো অর্ডারে চলে না।</div>
+
+<h3 id="d-shield">ফেক অর্ডার শিল্ড <span class="badge-free">ফ্রি</span></h3>
+<ul>
+	<li><strong>নম্বর ব্লক:</strong> <span class="path">Fake-order protection → Blocked numbers</span> চালু করুন। তারপর যেকোনো অর্ডার থেকে "নম্বরটা ব্লক করুন"। ব্লক করা নম্বরের অর্ডার নেওয়া হবে না, বা শুধু অগ্রিম পেমেন্টে নেওয়া হবে।</li>
+	<li><strong>বারবার ফেরত দিলে আগে পেমেন্ট:</strong> যাদের আগের অর্ডারের বেশিরভাগ বাতিল বা ফেরত, তাদের চেকআউটে ক্যাশ অন ডেলিভারি দেখাবে না। এর জন্য মোবাইল পেমেন্ট চালু থাকতে হবে।</li>
+	<li>নতুন কাস্টমার, অ্যাডমিন আর শপ ম্যানেজারের উপর কখনো প্রযোজ্য নয়।</li>
+</ul>
+
+<h3 id="d-report">বিক্রির হিসাব <span class="badge-pro">Pro</span></h3>
+<p>স্টোর ড্যাশবোর্ডের হোমে "বিক্রির হিসাব" চাপুন: আজ, গতকাল, ৭ দিন, ৩০ দিন, এই মাস, গত মাস, বা যেকোনো তারিখ। অর্ডার, বিক্রি, গড় অর্ডার আর বিক্রি হওয়া পণ্যের সংখ্যা দেখায়। হিসাব ৫ মিনিট জমা থাকে, তাই বারবার দেখলেও সার্ভারে চাপ পড়ে না।</p>
+
+<h3 id="d-speed">সাইট দ্রুত রাখা</h3>
+<ol class="steps">
+	<li><span class="path">Kenakata Kit → Speed &amp; health</span>-এর চেকআপ দেখুন। লাল বা হলুদ লাইনের পাশে কী করতে হবে লেখা আছে।</li>
+	<li>LiteSpeed সার্ভারে LiteSpeed Cache চালু রাখুন (একটাই পেজ-ক্যাশ প্লাগইন রাখুন)।</li>
+	<li>"WooCommerce files only on shop pages", "Block editor styles only where blocks are used" আর বট ব্লকের সুইচগুলো একটা একটা করে চালু করে সাইট দেখে নিন।</li>
+	<li>ছবি: বড় ছবি আপলোডের আগে ছোট করুন (প্রোডাক্টের জন্য ১২০০px যথেষ্ট), সম্ভব হলে WebP।</li>
+</ol>
+</section>
+
 <section id="widgets">
 <h2>৬. Elementor উইজেট</h2>
 <p>Elementor এডিটরের বাম প্যানেলে সার্চে <strong>"Kenakata"</strong> বা উইজেটের নাম লিখুন, অথবা নিচে স্ক্রল করে <strong>Kenakata Kit · DigiBhai</strong> বিভাগ খুলুন।</p>
@@ -1014,6 +1161,11 @@ footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border
 
 <section id="changelog">
 <h2>১১. পরিবর্তনের তালিকা</h2>
+<h4>৩.১৮.০</h4>
+<ul>
+	<li><strong>গাইড:</strong> নতুন "ধাপে ধাপে শুরু" রোডম্যাপ (৬টা ধাপ, প্রতিটায় সেটিংস খোলার বোতাম) আর "রোজকার কাজ" অধ্যায়: অপশনসহ প্রোডাক্ট, অর্ডার ও কুরিয়ার, প্রিন্ট, bKash / Nagad / Rocket, ফেক অর্ডার শিল্ড, বিক্রির হিসাব, সাইট দ্রুত রাখা।</li>
+	<li><strong>সেটিংস:</strong> ঘরের নিচে "কোথায় পাবেন" লিংক: Steadfast, Pathao, RedX, eCourier, BD Courier প্যানেল, Cloudflare Turnstile, WooCommerce পেমেন্ট ও ঠিকানা, টিমের সদস্য যোগ, পেজ বানানো।</li>
+</ul>
 <h4>৩.১৭.০</h4>
 <ul>
 	<li><strong>নতুন (চালু না করা পর্যন্ত বন্ধ): ফেক-অর্ডার শিল্ড</strong> (ফেক অর্ডার সুরক্ষা ট্যাব)। <em>ব্লক করা নম্বর:</em> অর্ডারের পাতা বা স্টোর ড্যাশবোর্ড থেকে এক চাপে নম্বর ব্লক করুন (বা সেটিংসে লিখে দিন); সেই নম্বরের অর্ডার নেওয়া হবে না, বা শুধু অগ্রিম পেমেন্টে নেওয়া হবে। <em>বারবার ফেরত দিলে আগে পেমেন্ট:</em> যাদের আগের অর্ডার বেশিরভাগ বাতিল/ফেরত (বা কুরিয়ার চেকে কম সফলতা), তাদের জন্য ক্যাশ অন ডেলিভারি দেখাবে না। শুধু আপনার নিজের অর্ডার দেখা হয়, চেকআউটে বাইরে কিছু জিজ্ঞেস করা হয় না।</li>
@@ -1236,6 +1388,23 @@ footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border
 	});
 	toc.addEventListener('click', function (e) { if (e.target.closest('a') && window.innerWidth <= 900) { toc.classList.remove('is-open'); btn.setAttribute('aria-expanded', 'false'); } });
 })();
+</script>
+<script>
+(function () {
+	// "Open the settings" buttons: inside the admin (the guide is shown in a frame) they open the right settings tab.
+	var base = '';
+	try { if (window.parent !== window && /page=kenakata-kit/.test(window.parent.location.href)) { base = window.parent.location.href; } } catch (e) { base = ''; }
+	if (!base && /page=kenakata-kit/.test(document.referrer)) { base = document.referrer; }
+	document.querySelectorAll('a[data-tab]').forEach(function (a) {
+		if (!base) { return; } // opened on its own: the button jumps to the section in this guide
+		var u = new URL(base);
+		u.searchParams.set('tab', a.getAttribute('data-tab'));
+		a.href = u.toString();
+		a.target = '_top';
+	});
+	var v = new URLSearchParams(location.search).get('v');
+	if (v) { document.querySelectorAll('[data-kk-version]').forEach(function (el) { el.textContent = v; }); }
+}());
 </script>
 </body>
 </html>

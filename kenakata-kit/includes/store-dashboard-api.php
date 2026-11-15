@@ -273,6 +273,33 @@ function kk_sd_orders_list( WP_REST_Request $req ) {
 	);
 }
 
+/**
+ * "Sync courier" in the orders list: the latest courier status of orders sent from here that are still on the way
+ * (newest first, up to 40 per press). Runs only when pressed.
+ */
+function kk_sd_courier_sync() {
+	if ( ! function_exists( 'kk_bulk_courier_run' ) || ! kk_bulk_courier_actions() ) {
+		return new WP_Error( 'kk_sd_no_courier', __( 'No courier is connected.', 'kenakata-kit' ), array( 'status' => 400 ) );
+	}
+	if ( ! kk_lock( 'kk_sd_csync', 60 ) ) {
+		return new WP_Error( 'kk_sd_busy', __( 'A sync is already running. Please wait a minute.', 'kenakata-kit' ), array( 'status' => 409 ) );
+	}
+	$statuses = array_intersect( array( 'shipped', 'processing', 'on-hold' ), array_keys( kk_sd_statuses() ) );
+	$ids      = wc_get_orders( array(
+		'type'         => 'shop_order',
+		'status'       => array_values( $statuses ),
+		'limit'        => 120,
+		'orderby'      => 'date',
+		'order'        => 'DESC',
+		'return'       => 'ids',
+		'meta_query'   => array( array( 'key' => '_kk_courier_booking', 'compare' => 'EXISTS' ) ), // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+	) );
+	$res = kk_bulk_courier_run( 'kk_courier_sync', (array) $ids );
+	kk_unlock( 'kk_sd_csync' );
+	kk_sd_flush_summary();
+	return $res;
+}
+
 function kk_sd_order_update( WP_REST_Request $req ) {
 	$order = kk_sd_get_order( $req['id'] );
 	if ( is_wp_error( $order ) ) {
@@ -1465,6 +1492,7 @@ add_action( 'rest_api_init', function () {
 	) );
 
 	$route( 'orders', 'GET', 'edit_shop_orders', 'kk_sd_orders_list' );
+	$route( 'courier-sync', 'POST', 'edit_shop_orders', 'kk_sd_courier_sync' );
 	$route( 'orders/' . $id, 'GET', 'edit_shop_orders', function ( WP_REST_Request $req ) {
 		$order = kk_sd_get_order( $req['id'] );
 		return is_wp_error( $order ) ? $order : kk_sd_order_full( $order );

@@ -222,6 +222,21 @@ function check(name, ok, info) { if (ok) { pass++; console.log('  ✓ ' + name);
   check('brand and new category saved', (vp.brand_ids || []).includes(90) && (vp.category_ids || []).length === 1, [vp.brand_ids, vp.category_ids]);
   await shot('06b-product-options');
 
+  console.log('Print + courier sync');
+  await hash('#/orders?status=processing');
+  await waitFor(`return document.querySelector('.sd-tools') && document.querySelector('.sd-order')`);
+  await ev(`window.__opened=[];window.open=function(u){window.__opened.push(u);return null;};return 1`);
+  await ev(`[...document.querySelectorAll('.sd-tools .sd-btn')].find(b=>b.textContent==='Print labels').click();return 1`);
+  const opened = await ev(`return window.__opened[0]||''`);
+  check('print labels opens the print page with the shown orders', /action=kk_print/.test(opened) && /kind=label/.test(opened) && /ids=\d+(,\d+)*/.test(opened), opened);
+  await ev(`[...document.querySelectorAll('.sd-tools .sd-btn')].find(b=>b.textContent==='Sync courier').click();return 1`);
+  await waitFor(`return [...document.querySelectorAll('.sd-toast')].some(t=>/Updated 2 orders/.test(t.textContent))`);
+  check('sync courier reports what it did', true);
+  await hash('#/orders/902');
+  await waitFor(`return document.querySelector('.sd-tools .sd-btn')`);
+  await ev(`window.__opened=[];window.open=function(u){window.__opened.push(u);return null;};document.querySelector('.sd-tools .sd-btn').click();return 1`);
+  check('order screen prints its invoice', /kind=invoice&ids=902$/.test(await ev(`return window.__opened[0]||''`)));
+
   console.log('Sales report periods');
   await hash('#/');
   await waitFor(`return document.querySelector('.sd-insight, .sd-insights, [class*=insight]')`);

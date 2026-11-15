@@ -3,7 +3,7 @@
  * Plugin Name:       Kenakata Kit – WooCommerce Toolkit for Bangladesh
  * Plugin URI:        https://digibhai.com/
  * Description:       Everything a Bangladeshi WooCommerce store needs: Buy Now, simple checkout with delivery areas, fake-order protection, thank-you page, order tracking by phone, live search, login popup, product cards, brand/category carousels, WhatsApp, variation buttons, photo reviews, side cart, mobile bar and 15 Elementor widgets. English and Bengali (বাংলা). Settings: left menu → Kenakata Kit.
- * Version:           3.14.0
+ * Version:           3.15.0
  * Requires at least: 6.3
  * Requires PHP:      7.4
  * Requires Plugins:  woocommerce
@@ -21,7 +21,7 @@ defined( 'ABSPATH' ) || exit;
 
 $GLOBALS['kk_load_ms'] = -microtime( true ); // time spent loading this plugin (Speed & health shows it)
 
-define( 'KK_VERSION', '3.14.0' );
+define( 'KK_VERSION', '3.15.0' );
 define( 'KK_FILE', __FILE__ );
 define( 'KK_DIR', __DIR__ );
 define( 'KK_URL', plugin_dir_url( __FILE__ ) );
@@ -145,6 +145,15 @@ function kk_defaults() {
 		'tr_require_order'      => 0,
 		'tr_live_courier'       => 0,
 		'tr_auto_complete'      => 0,
+		'print_enable'          => 0,
+		'print_shop_name'       => '',
+		'print_shop_phone'      => '',
+		'print_shop_address'    => '',
+		'print_logo'            => 1,
+		'print_barcode'         => 1,
+		'print_show_sku'        => 0,
+		'print_label_size'      => '100x150',
+		'print_invoice_note'    => 'Thank you for shopping with us!',
 		'tr_text_received'      => 'We have your order and will confirm it by phone.',
 		'tr_text_processing'    => 'We are preparing your order for delivery.',
 		'tr_text_shipped'       => 'Your parcel is on the way.',
@@ -785,7 +794,7 @@ add_action( 'plugins_loaded', function () {
 		kk_load_admin();
 		require_once KK_DIR . '/includes/updater.php';
 	}
-	foreach ( array( 'rest', 'assets', 'product-card', 'products', 'buy-now', 'cart-guard', 'checkout', 'free-delivery', 'order-guard', 'orders', 'courier', 'incomplete', 'search', 'account', 'my-account', 'wishlist', 'qa', 'terms', 'extras', 'variations', 'reviews', 'bottom-bar', 'security', 'speed', 'cron-health', 'store-dashboard', 'elementor' ) as $file ) {
+	foreach ( array( 'rest', 'assets', 'product-card', 'products', 'buy-now', 'cart-guard', 'checkout', 'free-delivery', 'order-guard', 'orders', 'courier', 'print', 'incomplete', 'search', 'account', 'my-account', 'wishlist', 'qa', 'terms', 'extras', 'variations', 'reviews', 'bottom-bar', 'security', 'speed', 'cron-health', 'store-dashboard', 'elementor' ) as $file ) {
 		if ( ! $pro && in_array( $file, kk_pro_modules(), true ) ) {
 			continue;
 		}

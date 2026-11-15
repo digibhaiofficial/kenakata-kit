@@ -273,6 +273,38 @@ get "$URL/wp-admin/admin.php?page=kenakata-kit&tab=license" >/dev/null
 [ -n "$KEYSAVE" ] && wpc option update kk_license_key "$KEYSAVE" >/dev/null
 check "License tab (no key): 'Order on WhatsApp' button with this site's address" 'grep -q "kk-buy-pro" /tmp/body && grep -q "wa.me/8801728366779" /tmp/body && grep -q "localhost" /tmp/body && clean /tmp/body'
 
+echo "== 3.15: invoices, labels, courier sync only when pressed"
+PO=$(wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["print_enable"] = 1; $s["print_shop_phone"] = "01700000000"; kk_update_settings( $s ); $p = new WC_Product_Simple(); $p->set_name( "Print Test Tee" ); $p->set_regular_price( 500 ); $p->set_sku( "PTT-1" ); $p->save(); $o = wc_create_order(); $o->add_product( $p, 2 ); $o->set_billing_first_name( "Rahim" ); $o->set_billing_last_name( "Uddin" ); $o->set_billing_phone( "01712345679" ); $o->set_billing_address_1( "House 5, Road 2, Mirpur" ); $o->set_billing_city( "Dhaka" ); $o->set_payment_method( "cod" ); $o->set_payment_method_title( "Cash on delivery" ); $sh = new WC_Order_Item_Shipping(); $sh->set_method_title( "Inside Dhaka" ); $sh->set_total( 60 ); $o->add_item( $sh ); $o->calculate_totals(); $o->set_status( "processing" ); $o->save(); echo $o->get_id();' 2>/dev/null | tail -1)
+curl -sL -o /tmp/body -b "$JAR" "$(wpc eval "echo kk_sd_url();")"
+PURL=$(grep -oP '"print":"\K[^"]+' /tmp/body | head -1 | sed 's#\\/#/#g; s#\\u0026#\&#g')
+check "store dashboard gets a print link" '[ -n "$PURL" ] && echo "$PURL" | grep -q "action=kk_print"'
+code=$(curl -s -o /tmp/body -w "%{http_code}" -b "$JAR" "$PURL&kind=invoice&ids=$PO")
+check "invoice prints ($code): items, total, cash to collect, barcode" '[ "$code" = 200 ] && clean /tmp/body && grep -q "kkp-inv" /tmp/body && grep -q "Print Test Tee" /tmp/body && grep -q "Rahim Uddin" /tmp/body && grep -q "1,060\|1060" /tmp/body && grep -q "kkp-sum__cod" /tmp/body && grep -q "kkp-bc" /tmp/body && grep -q "window.print" /tmp/body'
+code=$(curl -s -o /tmp/body -w "%{http_code}" -b "$JAR" "$PURL&kind=label&ids=$PO,$OID")
+check "labels print ($code): two labels, phone, area, sender" '[ "$code" = 200 ] && clean /tmp/body && [ "$(grep -o "class=\"kkp-lab\"" /tmp/body | wc -l)" = 2 ] && grep -q "01712345679" /tmp/body && grep -q "Inside Dhaka" /tmp/body && grep -q "01700000000" /tmp/body'
+code=$(curl -s -o /tmp/body -w "%{http_code}" -b "$JAR" "$URL/wp-admin/admin-post.php?action=kk_print&kind=invoice&ids=$PO&_wpnonce=bad")
+check "print link with a wrong key is refused ($code)" '[ "$code" = 403 ] && ! grep -q "Print Test Tee" /tmp/body'
+code=$(curl -s -o /tmp/body -w "%{http_code}" "$URL/wp-admin/admin-post.php?action=kk_print&kind=invoice&ids=$PO")
+check "visitors cannot print orders ($code)" '! grep -q "Print Test Tee" /tmp/body'
+get "$URL/wp-admin/admin.php?page=wc-orders" >/dev/null; [ -s /tmp/body ] && grep -q "kk_print_invoice" /tmp/body || get "$URL/wp-admin/edit.php?post_type=shop_order" >/dev/null
+check "orders list has Print invoices / Print shipping labels" 'grep -q "kk_print_invoice" /tmp/body && grep -q "kk_print_label" /tmp/body'
+red=$(wpc eval 'wp_set_current_user( 1 ); echo kk_bulk_handle( "x", "kk_print_label", array( '"$PO"' ) );' 2>/dev/null)
+check "bulk Print shipping labels goes to the print page" 'echo "$red" | grep -q "kind=label" && echo "$red" | grep -q "ids='"$PO"'"'
+cat > "$WP/wp-content/mu-plugins/kk-fake-courier.php" <<'PHP'
+<?php
+add_filter( 'pre_http_request', function ( $pre, $args, $url ) {
+	if ( false === strpos( $url, 'status_by_cid' ) ) { return $pre; }
+	update_option( 'kk_fake_calls', (int) get_option( 'kk_fake_calls' ) + 1 );
+	return array( 'headers' => array(), 'body' => '{"status":200,"delivery_status":"in_review"}', 'response' => array( 'code' => 200, 'message' => 'OK' ), 'cookies' => array() );
+}, 10, 3 );
+PHP
+SYN=$(wpc eval 'update_option( "kk_fake_calls", 0 ); $o = wc_create_order(); $o->update_meta_data( "_kk_courier_booking", array( "provider" => "steadfast", "consignment_id" => "777", "tracking_code" => "XYZ", "status" => "pending", "booked_at" => time() ) ); $o->set_status( "processing" ); $o->save(); wp_set_current_user( 1 ); $r = kk_bulk_courier_run( "kk_courier_sync", array( $o->get_id(), '"$PO"', '"$LID"' ) ); echo $r["done"], "|", $r["skipped"], "|", get_option( "kk_fake_calls" ), "|", wc_get_order( $o->get_id() )->get_meta( "_kk_courier_booking" )["status"];' 2>/dev/null | tail -1)
+check "Sync: asks the courier only for parcels still on the way (done|skipped|calls|status = $SYN)" '[ "$SYN" = "1|2|1|in_review" ]'
+rm -f "$WP/wp-content/mu-plugins/kk-fake-courier.php"
+wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["print_enable"] = 0; kk_update_settings( $s );'
+code=$(curl -s -o /tmp/body -w "%{http_code}" -b "$JAR" "$PURL&kind=invoice&ids=$PO")
+check "print switched off → no print page ($code)" '[ "$code" = 403 ] && ! grep -q "Print Test Tee" /tmp/body'
+
 echo "== Bots"
 wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["speed_robots_shop"] = 1; $s["speed_bot_block"] = 1; $s["speed_ai_block"] = 1; kk_update_settings( $s );'
 check "robots.txt keeps crawlers off search/sort/filter pages and names the blocked bots" 'curl -s "$URL/?robots=1" | grep -q "orderby" && curl -s "$URL/?robots=1" | grep -q "User-agent: AhrefsBot"'

@@ -8292,3 +8292,182 @@ msgstr "এখনো কোনো কুরিয়ার যুক্ত ন�
 
 msgid "Free version: store dashboard, courier booking and incomplete orders need a Pro key (License tab)"
 msgstr "ফ্রি ভার্সন: স্টোর ড্যাশবোর্ড, কুরিয়ার বুকিং আর অসম্পূর্ণ অর্ডারের জন্য Pro কী লাগবে (License ট্যাব)"
+
+msgid "Invoice"
+msgstr "ইনভয়েস"
+
+msgid "Bill to"
+msgstr "ক্রেতা"
+
+msgid "Qty"
+msgstr "পরিমাণ"
+
+msgid "SKU"
+msgstr "SKU"
+
+msgid "Tax"
+msgstr "ট্যাক্স"
+
+msgid "Cash on delivery: collect"
+msgstr "ক্যাশ অন ডেলিভারি: নিতে হবে"
+
+msgid "Paid"
+msgstr "পরিশোধিত"
+
+msgid "Customer note"
+msgstr "কাস্টমারের নোট"
+
+msgid "Collect (COD)"
+msgstr "নিতে হবে (COD)"
+
+msgid "%d item"
+msgid_plural "%d items"
+msgstr[0] "%dটি পণ্য"
+msgstr[1] "%dটি পণ্য"
+
+msgid "Shipping labels"
+msgstr "শিপিং লেবেল"
+
+msgid "Invoices"
+msgstr "ইনভয়েস"
+
+msgid "%1$s: %2$d orders"
+msgstr "%1$s: %2$dটি অর্ডার"
+
+msgid "Print"
+msgstr "প্রিন্ট"
+
+msgid "Printing is turned off. An administrator can turn it on in Kenakata Kit → Invoice & label."
+msgstr "প্রিন্ট বন্ধ আছে। অ্যাডমিন Kenakata Kit → ইনভয়েস ও লেবেল থেকে চালু করতে পারেন।"
+
+msgid "This link has expired. Go back and press Print again."
+msgstr "লিংকের মেয়াদ শেষ। ফিরে গিয়ে আবার প্রিন্ট চাপুন।"
+
+msgid "No orders to print."
+msgstr "প্রিন্ট করার মতো অর্ডার নেই।"
+
+msgid "Sync courier status"
+msgstr "কুরিয়ার স্ট্যাটাস Sync"
+
+msgid "Print invoices"
+msgstr "ইনভয়েস প্রিন্ট"
+
+msgid "Print shipping labels"
+msgstr "শিপিং লেবেল প্রিন্ট"
+
+msgid "Printing is turned off. Turn it on in Kenakata Kit → Invoice & label."
+msgstr "প্রিন্ট বন্ধ আছে। Kenakata Kit → ইনভয়েস ও লেবেল থেকে চালু করুন।"
+
+msgid "Courier status updated for %1$d orders. Skipped %2$d (not sent from here, already delivered or cancelled, or over the limit for one press)."
+msgstr "%1$dটি অর্ডারের কুরিয়ার স্ট্যাটাস আপডেট হয়েছে। %2$dটি বাদ (এখান থেকে পাঠানো হয়নি, আগেই ডেলিভারি/বাতিল, বা এক চাপের সীমার বাইরে)।"
+
+msgid "Sent %1$d orders to the courier. Skipped %2$d (already sent, not Processing / On hold / Pending, or over the limit for one press)."
+msgstr "%1$dটি অর্ডার কুরিয়ারে পাঠানো হয়েছে। %2$dটি বাদ (আগেই পাঠানো, Processing / On hold / Pending নয়, বা এক চাপের সীমার বাইরে)।"
+
+msgid "Print invoice"
+msgstr "ইনভয়েস প্রিন্ট"
+
+msgid "Print label"
+msgstr "লেবেল প্রিন্ট"
+
+msgid "Invoice & label"
+msgstr "ইনভয়েস ও লেবেল"
+
+msgid "Print invoices and shipping labels for one order or many at once: tick orders in WooCommerce → Orders and choose \"Print invoices\" or \"Print shipping labels\" (Bulk actions), or press Print in the store dashboard. With a courier connected (Pro), the same menu can send many orders to the courier and sync their status, only when you press it."
+msgstr "এক বা একসাথে অনেক অর্ডারের ইনভয়েস আর শিপিং লেবেল প্রিন্ট করুন: WooCommerce → Orders-এ অর্ডারগুলো টিক দিয়ে Bulk actions থেকে \"ইনভয়েস প্রিন্ট\" বা \"শিপিং লেবেল প্রিন্ট\" বাছুন, অথবা স্টোর ড্যাশবোর্ডে প্রিন্ট চাপুন। কুরিয়ার যুক্ত থাকলে (Pro) একই মেনু থেকে অনেক অর্ডার একসাথে কুরিয়ারে পাঠানো আর স্ট্যাটাস Sync করা যায়, শুধু আপনি চাপলে।"
+
+msgid "Print invoices and shipping labels"
+msgstr "ইনভয়েস ও শিপিং লেবেল প্রিন্ট"
+
+msgid "Adds Print to the orders list (Bulk actions), the order screen and the store dashboard."
+msgstr "অর্ডার লিস্ট (Bulk actions), অর্ডারের পাতা আর স্টোর ড্যাশবোর্ডে প্রিন্ট যোগ হয়।"
+
+msgid "Shop name"
+msgstr "দোকানের নাম"
+
+msgid "Empty = the site title."
+msgstr "খালি = সাইটের নাম।"
+
+msgid "Shop phone"
+msgstr "দোকানের ফোন"
+
+msgid "Shown on the invoice and as the sender on the label."
+msgstr "ইনভয়েসে আর লেবেলে প্রেরক হিসেবে দেখায়।"
+
+msgid "Shop address"
+msgstr "দোকানের ঠিকানা"
+
+msgid "Empty = the store address in WooCommerce → Settings → General."
+msgstr "খালি = WooCommerce → Settings → General-এর স্টোর ঠিকানা।"
+
+msgid "Show the site logo on the invoice"
+msgstr "ইনভয়েসে সাইটের লোগো দেখাও"
+
+msgid "The logo from Appearance → Customize → Site Identity."
+msgstr "Appearance → Customize → Site Identity-এর লোগো।"
+
+msgid "Barcode"
+msgstr "বারকোড"
+
+msgid "The order number on invoices and the courier tracking code (or the order number) on labels, as a barcode that scanners can read."
+msgstr "ইনভয়েসে অর্ডার নম্বর আর লেবেলে কুরিয়ারের ট্র্যাকিং কোড (বা অর্ডার নম্বর) বারকোড হিসেবে, স্ক্যানার দিয়ে পড়া যায়।"
+
+msgid "Show SKU on the invoice"
+msgstr "ইনভয়েসে SKU দেখাও"
+
+msgid "Choose the paper of your label printer. A4 prints 6 labels per sheet for an ordinary printer."
+msgstr "আপনার লেবেল প্রিন্টারের কাগজ বাছুন। সাধারণ প্রিন্টারের জন্য A4: এক পাতায় ৬টা লেবেল।"
+
+msgid "100 × 150 mm (4 × 6 inch, thermal)"
+msgstr "100 × 150 মিমি (4 × 6 ইঞ্চি, থার্মাল)"
+
+msgid "75 × 100 mm (3 × 4 inch, thermal)"
+msgstr "75 × 100 মিমি (3 × 4 ইঞ্চি, থার্মাল)"
+
+msgid "A4 sheet: 6 labels"
+msgstr "A4 পাতা: ৬টা লেবেল"
+
+msgid "Note at the bottom of the invoice"
+msgstr "ইনভয়েসের নিচের নোট"
+
+msgid "For example a thank-you, your return policy or your Facebook page."
+msgstr "যেমন ধন্যবাদ, রিটার্ন পলিসি বা আপনার ফেসবুক পেজ।"
+
+msgid "Invoice & label printing"
+msgstr "ইনভয়েস ও লেবেল প্রিন্ট"
+
+msgid "Print one order or many at once."
+msgstr "এক বা একসাথে অনেক অর্ডার প্রিন্ট।"
+
+msgid "Print labels"
+msgstr "লেবেল প্রিন্ট"
+
+msgid "Prints the orders shown below. Pick a status first, e.g. Processing."
+msgstr "নিচে দেখানো অর্ডারগুলো প্রিন্ট হবে। আগে একটা স্ট্যাটাস বাছুন, যেমন Processing।"
+
+msgid "Sync courier"
+msgstr "কুরিয়ার Sync"
+
+msgid "Asks the courier for the latest status of the orders sent from here (up to 40, newest first)."
+msgstr "এখান থেকে পাঠানো অর্ডারগুলোর সর্বশেষ স্ট্যাটাস কুরিয়ারের কাছ থেকে আনে (নতুনগুলো আগে, সর্বোচ্চ ৪০টা)।"
+
+msgid "Syncing…"
+msgstr "Sync হচ্ছে…"
+
+msgid "Updated {done} orders, skipped {skipped}."
+msgstr "{done}টি অর্ডার আপডেট হয়েছে, {skipped}টি বাদ।"
+
+msgid "No courier is connected."
+msgstr "কোনো কুরিয়ার যুক্ত নেই।"
+
+msgid "A sync is already running. Please wait a minute."
+msgstr "একটা Sync এখন চলছে। এক মিনিট অপেক্ষা করুন।"
+
+msgid "Thank you for shopping with us!"
+msgstr "আমাদের থেকে কেনার জন্য ধন্যবাদ!"
+
+msgid "Sender"
+msgstr "প্রেরক"
+
+msgid "Receiver"
+msgstr "প্রাপক"

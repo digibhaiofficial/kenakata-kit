@@ -166,6 +166,7 @@ function api(req, res, route, q, body) {
   }
   if (route === 'categories') return send(res, 200, cats);
   if (route === 'brands') return send(res, 200, brands);
+  if (route === 'courier-sync' && req.method === 'POST') return send(res, 200, { done: 2, skipped: 1, errors: [] });
   if (route === 'attributes') return send(res, 200, attrSugg);
   if (route === 'terms' && req.method === 'POST') {
     if (!body.name) return err(res, 400, 'kk_sd_no_name', 'Please enter a name.');
@@ -210,7 +211,7 @@ http.createServer((req, res) => {
   if (u.pathname === '/dashboard/' || u.pathname === '/dashboard') {
     const cfg = {
       rest: `http://localhost:${PORT}/wp-json/kenakata/v1/sd/`, nonce: u.searchParams.get('badnonce') ? 'x' : 'test-nonce', site: 'Purple Flora', home: `http://localhost:${PORT}/`, logo: '',
-      user: { name: 'Shop Owner' }, caps: { orders: true, products: true, publishProduct: true, posts: true, publishPost: true, upload: true, terms: true, money: true, admin: !u.searchParams.get('manager') }, brands: true, maxVariations: 100,
+      user: { name: 'Shop Owner' }, caps: { orders: true, products: true, publishProduct: true, posts: true, publishPost: true, upload: true, terms: true, money: true, admin: !u.searchParams.get('manager') }, brands: true, maxVariations: 100, print: '/wp-admin/admin-post.php?action=kk_print&_wpnonce=abc', courierSync: true,
       adminUrl: u.searchParams.get('manager') ? '' : `http://localhost:${PORT}/wp-admin/`, logoutUrl: `http://localhost:${PORT}/wp-login.php?action=logout`, profileUrl: `http://localhost:${PORT}/wp-admin/profile.php`, statuses: STATUSES, couriers: COURIERS, currency: '৳', lowStock: 3, i18n: u.searchParams.get('lang') === 'bn' ? i18nBn : i18n,
     };
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });

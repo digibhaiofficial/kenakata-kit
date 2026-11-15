@@ -4,7 +4,7 @@ Plugin URI: https://digibhai.com/
 Requires at least: 6.3
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 3.14.0
+Stable tag: 3.15.0
 License: GPLv2 or later
 
 Everything a Bangladeshi WooCommerce store usually needs. Settings: left admin menu → Kenakata Kit.
@@ -30,6 +30,11 @@ Products Grid, Products Carousel, Brands, Categories, Buy Now Button, Live Searc
 Older [ss_…] shortcodes keep working. Options: see the guide or Kenakata Kit → Shortcodes.
 
 == Changelog ==
+= 3.15.0 =
+* New (off until turned on): Invoice & label printing. Tick orders in WooCommerce → Orders → Bulk actions → "Print invoices" or "Print shipping labels", use the buttons on the order screen, or press Print in the store dashboard (one order, or all orders shown in the list). A4 invoices with logo, items, totals, cash to collect and a barcode; labels 100 × 150 mm, 75 × 100 mm or 6 per A4 sheet, with the courier tracking code as a barcode.
+* Courier (Pro): Bulk actions "Send to <courier>" (up to 15 orders per press, only orders not sent yet) and "Sync courier status" (up to 40, only parcels still on the way). Store dashboard: "Sync courier" button on the orders list. Nothing runs in the background.
+* Fix: the courier bulk tools now load the courier code before using it.
+
 = 3.14.0 =
 * Store dashboard: products with options. Choose "Simple product" or "With options", give the options any names (Size, Colour, Weight…) and values (S, M, L…); names and values used before are suggested. "Make all combinations" creates one option per combination, each with its own price, sale price, stock and picture; "Same price for all" fills them at once. A simple product can get options later. Names that match WooCommerce → Products → Attributes use those shared lists.
 * Store dashboard: brand on the product form (optional) and "+ New category" / "+ New brand" right there. The Store Manager role may now add categories and brands.

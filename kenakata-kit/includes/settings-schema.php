@@ -24,6 +24,7 @@ function kk_tabs() {
 		'storedash'  => array( 'group' => __( 'Sales', 'kenakata-kit' ), 'label' => __( 'Store dashboard', 'kenakata-kit' ), 'icon' => 'store', 'intro' => __( 'A simple screen for running the shop without WordPress admin: today\'s orders, call or WhatsApp the customer, courier and tracking, products, prices, stock and blog posts. Works well on phones.', 'kenakata-kit' ) , 'pro' => true),
 		'incomplete' => array( 'group' => __( 'Sales', 'kenakata-kit' ), 'label' => __( 'Incomplete orders', 'kenakata-kit' ), 'icon' => 'forms', 'intro' => __( 'See the customers who reached your checkout and typed their phone number but did not place the order. Call them: many only needed a nudge, and you can turn their cart into an order in one tap.', 'kenakata-kit' ) , 'pro' => true),
 		'courier'    => array( 'group' => __( 'Sales', 'kenakata-kit' ), 'label' => __( 'Courier booking', 'kenakata-kit' ), 'icon' => 'location', 'intro' => __( 'Choose your courier and add its API keys once. Then every order gets a "Send to courier" button in the store dashboard and on the order screen: one tap books the parcel, saves the tracking and marks the order Shipped.', 'kenakata-kit' ) , 'pro' => true),
+		'print'      => array( 'group' => __( 'Sales', 'kenakata-kit' ), 'label' => __( 'Invoice & label', 'kenakata-kit' ), 'icon' => 'printer', 'intro' => __( 'Print invoices and shipping labels for one order or many at once: tick orders in WooCommerce → Orders and choose "Print invoices" or "Print shipping labels" (Bulk actions), or press Print in the store dashboard. With a courier connected (Pro), the same menu can send many orders to the courier and sync their status, only when you press it.', 'kenakata-kit' ) ),
 		'tracking'   => array( 'group' => __( 'Sales', 'kenakata-kit' ), 'label' => __( 'Order tracking & courier', 'kenakata-kit' ), 'icon' => 'location', 'intro' => __( 'Customers check their order status with their phone number. A courier tracking link added to the order is shown too.', 'kenakata-kit' ) ),
 		'search'     => array( 'group' => __( 'Customers', 'kenakata-kit' ), 'label' => __( 'Live Search', 'kenakata-kit' ), 'icon' => 'search', 'intro' => __( 'Shows products while typing (with image and price).', 'kenakata-kit' ) ),
 		'account'    => array( 'group' => __( 'Customers', 'kenakata-kit' ), 'label' => __( 'Login popup', 'kenakata-kit' ), 'icon' => 'admin-users', 'intro' => __( 'Login and registration with phone or email, in a popup without leaving the page.', 'kenakata-kit' ) ),
@@ -193,6 +194,17 @@ function kk_fields() {
 		'ty_message'           => kk_f( 'thankyou', 'textarea', __( 'Message', 'kenakata-kit' ) ),
 		'ty_track_text'        => kk_f( 'thankyou', 'text', __( 'Tracking button text', 'kenakata-kit' ) ),
 		'ty_shop_text'         => kk_f( 'thankyou', 'text', __( '"Continue shopping" button text', 'kenakata-kit' ) ),
+
+		/* ---------------- Print ---------------- */
+		'print_enable'         => kk_f( 'print', 'toggle', __( 'Print invoices and shipping labels', 'kenakata-kit' ), __( 'Adds Print to the orders list (Bulk actions), the order screen and the store dashboard.', 'kenakata-kit' ) ),
+		'print_shop_name'      => kk_f( 'print', 'text', __( 'Shop name', 'kenakata-kit' ), __( 'Empty = the site title.', 'kenakata-kit' ) ),
+		'print_shop_phone'     => kk_f( 'print', 'text', __( 'Shop phone', 'kenakata-kit' ), __( 'Shown on the invoice and as the sender on the label.', 'kenakata-kit' ) ),
+		'print_shop_address'   => kk_f( 'print', 'textarea', __( 'Shop address', 'kenakata-kit' ), __( 'Empty = the store address in WooCommerce → Settings → General.', 'kenakata-kit' ) ),
+		'print_logo'           => kk_f( 'print', 'toggle', __( 'Show the site logo on the invoice', 'kenakata-kit' ), __( 'The logo from Appearance → Customize → Site Identity.', 'kenakata-kit' ) ),
+		'print_barcode'        => kk_f( 'print', 'toggle', __( 'Barcode', 'kenakata-kit' ), __( 'The order number on invoices and the courier tracking code (or the order number) on labels, as a barcode that scanners can read.', 'kenakata-kit' ) ),
+		'print_show_sku'       => kk_f( 'print', 'toggle', __( 'Show SKU on the invoice', 'kenakata-kit' ) ),
+		'print_label_size'     => kk_f( 'print', 'select', __( 'Label size', 'kenakata-kit' ), __( 'Choose the paper of your label printer. A4 prints 6 labels per sheet for an ordinary printer.', 'kenakata-kit' ), array( 'options' => array( '100x150' => __( '100 × 150 mm (4 × 6 inch, thermal)', 'kenakata-kit' ), '75x100' => __( '75 × 100 mm (3 × 4 inch, thermal)', 'kenakata-kit' ), 'a4' => __( 'A4 sheet: 6 labels', 'kenakata-kit' ) ) ) ),
+		'print_invoice_note'   => kk_f( 'print', 'textarea', __( 'Note at the bottom of the invoice', 'kenakata-kit' ), __( 'For example a thank-you, your return policy or your Facebook page.', 'kenakata-kit' ) ),
 
 		/* ---------------- Tracking ---------------- */
 		'tr_page'              => kk_f( 'tracking', 'select', __( 'Tracking page', 'kenakata-kit' ), __( 'This page needs the "Order Tracking" widget or the [kk_order_tracking] shortcode. Default: the page with the slug "track-order".', 'kenakata-kit' ), array( 'options' => $pages ) ),
@@ -459,6 +471,7 @@ function kk_modules() {
 		'co_enable'          => array( __( 'Simple checkout', 'kenakata-kit' ), 'checkout', __( 'Name, phone, address, delivery area.', 'kenakata-kit' ) ),
 		'co_throttle_enable' => array( __( 'Repeat-order block', 'kenakata-kit' ), 'guard', __( 'One order per number within a set time.', 'kenakata-kit' ) ),
 		'ty_enable'          => array( __( 'Thank-you page', 'kenakata-kit' ), 'thankyou', __( 'Your own page after ordering.', 'kenakata-kit' ) ),
+		'print_enable'       => array( __( 'Invoice & label printing', 'kenakata-kit' ), 'print', __( 'Print one order or many at once.', 'kenakata-kit' ) ),
 		'sd_enable'          => array( __( 'Store dashboard', 'kenakata-kit' ), 'storedash', __( 'Orders, products and stock at /dashboard – no wp-admin needed.', 'kenakata-kit' ) ),
 		'search_enable'      => array( __( 'Live Search', 'kenakata-kit' ), 'search', __( 'Results with image and price while typing.', 'kenakata-kit' ) ),
 		'popup_enable'       => array( __( 'Login popup', 'kenakata-kit' ), 'account', __( 'Login/registration with phone number.', 'kenakata-kit' ) ),

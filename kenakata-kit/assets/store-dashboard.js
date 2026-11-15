@@ -67,7 +67,9 @@
 		warn: '<path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17h.01"/>',
 		cartx: '<circle cx="9" cy="20" r="1.6"/><circle cx="18" cy="20" r="1.6"/><path d="M3 4h2.5l2.2 10.2a1.5 1.5 0 0 0 1.5 1.2h8.2a1.5 1.5 0 0 0 1.5-1.1L21 8H7"/><path d="m11 9 4 4m0-4-4 4"/>',
 		shield: '<path d="M12 3 4 6v6c0 4.5 3.2 8 8 9 4.8-1 8-4.5 8-9V6z"/><path d="m9 12 2 2 4-4"/>',
-		truck: '<path d="M3 6h11v10H3zM14 9h4l3 3v4h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/>'
+		truck: '<path d="M3 6h11v10H3zM14 9h4l3 3v4h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/>',
+		printer: '<path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/>',
+		sync: '<path d="M20 11a8 8 0 0 0-14.8-3.5M4 4v4h4"/><path d="M4 13a8 8 0 0 0 14.8 3.5M20 20v-4h-4"/>'
 	};
 	var WA = '<path fill="currentColor" stroke="none" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4a.4.4 0 0 0 0-.4l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .1-1.2c0-.2-.2-.2-.5-.4Z"/>';
 	function icon(name) {
@@ -682,14 +684,41 @@
 					return h('a', { class: 'sd-chip' + (c[0] === status ? ' is-active' : ''), href: href, role: 'tab', 'aria-selected': c[0] === status ? 'true' : 'false' },
 						h('span', { text: c[1] }), c[0] && counts[c[0]] !== undefined ? h('b', { text: String(counts[c[0]]) }) : null);
 				}));
+			var shown = [];
 			var list = pagedList(function (page) {
 				return api('orders?' + qs({ status: status, search: search, page: page }));
-			}, orderRow);
+			}, function (o) { shown.push(o.id); return orderRow(o); });
 			var root = h('div', { class: 'sd-view' }, pageHead(t('orders')),
 				searchBox(search, t('searchOrders'), function (v) { go('orders?' + qs({ status: status, search: v })); }),
-				chips, list.el);
+				chips, orderTools(shown), list.el);
 			return list.load().then(function () { return root; });
 		});
+	}
+
+	/** Print / Sync buttons above the orders list. Print takes the orders loaded in the list (more after "Load more"). */
+	function printUrl(kind, ids) { return C.print + '&kind=' + kind + '&ids=' + ids.join(','); }
+	function openPrint(kind, ids) {
+		if (!ids.length) { toast(t('nothingToPrint'), 'error'); return; }
+		window.open(printUrl(kind, ids), '_blank', 'noopener');
+	}
+	function orderTools(shown) {
+		var sync = C.courierSync ? button(t('syncCourier'), { class: 'sd-btn sd-btn--sm sd-btn--ghost', title: t('syncHelp') }, 'sync') : null;
+		if (sync) {
+			sync.addEventListener('click', function () {
+				busy(sync, true, t('syncing'));
+				api('courier-sync', { method: 'POST', body: {} }).then(function (res) {
+					busy(sync, false);
+					toast(fill(t('syncDone'), { done: res.done, skipped: res.skipped }) + (res.errors && res.errors.length ? ' ' + res.errors[0] : ''), res.errors && res.errors.length ? 'error' : '');
+					summaryCache = null;
+					route();
+				}, function (e) { busy(sync, false); toast(e.message, 'error'); });
+			});
+		}
+		if (!C.print && !sync) { return null; }
+		return h('div', { class: 'sd-tools' },
+			C.print ? button(t('printInvoices'), { class: 'sd-btn sd-btn--sm sd-btn--ghost', title: t('printListHelp'), onclick: function () { openPrint('invoice', shown); } }, 'printer') : null,
+			C.print ? button(t('printLabels'), { class: 'sd-btn sd-btn--sm sd-btn--ghost', title: t('printListHelp'), onclick: function () { openPrint('label', shown); } }, 'printer') : null,
+			sync);
 	}
 
 	function viewOrder(id) {
@@ -939,6 +968,11 @@
 		var root = h('div', { class: 'sd-view' });
 		root.appendChild(pageHead(t('order') + ' #' + o.number, { back: '#/orders', sub: o.date ? o.date.text : '' }));
 		root.firstChild.querySelector('.sd-head__row').appendChild(badge(o.status, o.status_label));
+		if (C.print) {
+			root.appendChild(h('div', { class: 'sd-tools' },
+				button(t('printInvoice'), { class: 'sd-btn sd-btn--sm sd-btn--ghost', onclick: function () { openPrint('invoice', [o.id]); } }, 'printer'),
+				button(t('printLabel'), { class: 'sd-btn sd-btn--sm sd-btn--ghost', onclick: function () { openPrint('label', [o.id]); } }, 'printer')));
+		}
 
 		// Customer.
 		var hist = o.history || { total: 0 };

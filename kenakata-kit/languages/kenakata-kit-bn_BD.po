@@ -8034,3 +8034,27 @@ msgstr "(Pathao: %s)"
 
 msgid "Note: this courier's TEST server is switched on in the settings. For real parcels and real login details, switch it off."
 msgstr "খেয়াল করুন: সেটিংসে এই কুরিয়ারের টেস্ট সার্ভার চালু আছে। আসল পার্সেল আর আসল লগইন তথ্যের জন্য এটা বন্ধ করুন।"
+
+msgid "Less load from bots"
+msgstr "বট থেকে কম চাপ"
+
+msgid "On a busy shop most page views that cannot be served from the cache come from bots. These switches keep useful crawlers (Google, Bing, Facebook, WhatsApp) and stop the rest."
+msgstr "ব্যস্ত শপে ক্যাশ থেকে দেওয়া যায় না এমন বেশিরভাগ পেজ ভিউ আসে বট থেকে। এই সুইচগুলো কাজের ক্রলার (Google, Bing, Facebook, WhatsApp) রেখে বাকিগুলো থামায়।"
+
+msgid "Keep crawlers off search, sort and filter pages"
+msgstr "সার্চ, সাজানো আর ফিল্টারের পেজ থেকে ক্রলার দূরে রাখুন"
+
+msgid "Adds rules to robots.txt so search engines skip ?s=, ?orderby=, filters, cart, checkout and account pages: endless page combinations that can never be cached. Products, categories and posts stay fully indexed."
+msgstr "robots.txt-এ নিয়ম যোগ করে, যাতে সার্চ ইঞ্জিন ?s=, ?orderby=, ফিল্টার, কার্ট, চেকআউট আর অ্যাকাউন্ট পেজ এড়িয়ে যায়: এগুলোর অসংখ্য রূপ, কখনো ক্যাশ হয় না। প্রোডাক্ট, ক্যাটাগরি আর পোস্ট আগের মতোই ইনডেক্স থাকে।"
+
+msgid "Block SEO-tool and scraper bots"
+msgstr "SEO-টুল আর স্ক্র্যাপার বট আটকান"
+
+msgid "Ahrefs, Semrush, MJ12, DotBot, PetalBot, Bytespider, Baidu, Yandex and similar get a tiny \"Forbidden\" answer instead of a full page. They bring no customers in Bangladesh. (If you use Ahrefs or Semrush for your own SEO, leave this off.)"
+msgstr "Ahrefs, Semrush, MJ12, DotBot, PetalBot, Bytespider, Baidu, Yandex ইত্যাদি পুরো পেজের বদলে ছোট্ট একটা \"Forbidden\" উত্তর পায়। বাংলাদেশে এরা কোনো কাস্টমার আনে না। (নিজের SEO-র জন্য Ahrefs বা Semrush ব্যবহার করলে এটা বন্ধ রাখুন।)"
+
+msgid "Block AI training crawlers"
+msgstr "AI ট্রেনিং ক্রলার আটকান"
+
+msgid "GPTBot, ClaudeBot, CCBot, Google-Extended, Meta and Perplexity crawlers download whole shops for AI training. Normal Google search is not affected."
+msgstr "GPTBot, ClaudeBot, CCBot, Google-Extended, Meta আর Perplexity-র ক্রলার AI ট্রেনিংয়ের জন্য পুরো শপ নামিয়ে নেয়। সাধারণ Google সার্চে কোনো প্রভাব নেই।"

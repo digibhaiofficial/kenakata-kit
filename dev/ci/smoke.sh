@@ -217,6 +217,19 @@ get "$URL/wp-admin/admin.php?page=kenakata-kit&tab=speed" >/dev/null
 check "Speed & health tab shows the checkups" 'grep -q "kk-health" /tmp/body && clean /tmp/body'
 wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["turnstile_enable"] = 0; kk_update_settings( $s );'
 
+echo "== Bots"
+wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["speed_robots_shop"] = 1; $s["speed_bot_block"] = 1; $s["speed_ai_block"] = 1; kk_update_settings( $s );'
+check "robots.txt keeps crawlers off search/sort/filter pages and names the blocked bots" 'curl -s "$URL/?robots=1" | grep -q "orderby" && curl -s "$URL/?robots=1" | grep -q "User-agent: AhrefsBot"'
+code=$(curl -s -o /dev/null -w "%{http_code}" -A "Mozilla/5.0 (compatible; AhrefsBot/7.0; +http://ahrefs.com/robot/)" "$URL/?p=$PID")
+check "SEO-tool bot gets 403 ($code)" '[ "$code" = 403 ]'
+code=$(curl -s -o /dev/null -w "%{http_code}" -A "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; GPTBot/1.2; +https://openai.com/gptbot)" "$URL/")
+check "AI crawler gets 403 ($code)" '[ "$code" = 403 ]'
+code=$(curl -sL -o /dev/null -w "%{http_code}" -A "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)" "$URL/?p=$PID")
+check "Googlebot still gets the page ($code)" '[ "$code" = 200 ]'
+code=$(curl -s -o /dev/null -w "%{http_code}" -A "Mozilla/5.0 (compatible; AhrefsBot/7.0)" "$URL/?robots=1")
+check "blocked bots can still read robots.txt ($code)" '[ "$code" = 200 ]'
+wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["speed_bot_block"] = 0; $s["speed_ai_block"] = 0; kk_update_settings( $s );'
+
 echo "== Deactivate / activate / uninstall"
 wpc plugin deactivate kenakata-kit >/dev/null
 check "crons cleared on deactivation" '! wpc cron event list --fields=hook --format=csv | grep -q "^kk_"'

@@ -88,6 +88,72 @@ if ( kk_opt( 'speed_wc_assets' ) ) {
 }
 
 /* =========================================================================
+ * Bots: keep crawlers away from pages that cannot be cached, and stop bots that bring no customers
+ * ====================================================================== */
+
+/** User-agent parts of bots that only cost server time for a Bangladeshi shop. */
+function kk_bad_bots( $kind ) {
+	$list = array(
+		'seo' => array( 'AhrefsBot', 'SemrushBot', 'MJ12bot', 'DotBot', 'BLEXBot', 'DataForSeoBot', 'serpstatbot', 'Barkrowler', 'SeekportBot', 'MegaIndex', 'PetalBot', 'Bytespider', 'ImagesiftBot', 'Amazonbot', 'Baiduspider', 'YandexBot', 'Sogou', 'ZoominfoBot', 'trendictionbot', 'AwarioBot', 'Linguee' ),
+		'ai'  => array( 'GPTBot', 'ClaudeBot', 'anthropic-ai', 'CCBot', 'Google-Extended', 'meta-externalagent', 'PerplexityBot', 'Diffbot', 'omgili', 'cohere-ai', 'YouBot', 'Timpibot' ),
+	);
+	return (array) apply_filters( 'kk_bad_bots', isset( $list[ $kind ] ) ? $list[ $kind ] : array(), $kind );
+}
+
+/** The bots switched off in the settings. */
+function kk_blocked_bots() {
+	$bots = array();
+	if ( kk_opt( 'speed_bot_block' ) ) {
+		$bots = array_merge( $bots, kk_bad_bots( 'seo' ) );
+	}
+	if ( kk_opt( 'speed_ai_block' ) ) {
+		$bots = array_merge( $bots, kk_bad_bots( 'ai' ) );
+	}
+	return $bots;
+}
+
+// Answer blocked bots with a tiny 403 before WordPress builds a page (some, like Bytespider, ignore robots.txt).
+if ( kk_opt( 'speed_bot_block' ) || kk_opt( 'speed_ai_block' ) ) {
+	$kk_ua = isset( $_SERVER['HTTP_USER_AGENT'] ) ? (string) $_SERVER['HTTP_USER_AGENT'] : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+	if ( '' !== $kk_ua && ! is_admin() && ! ( defined( 'WP_CLI' ) && WP_CLI ) ) {
+		foreach ( kk_blocked_bots() as $kk_bot ) {
+			if ( false !== stripos( $kk_ua, $kk_bot ) && ! preg_match( '#robots\.txt|[?&]robots=1#', (string) ( $_SERVER['REQUEST_URI'] ?? '' ) ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+				status_header( 403 );
+				header( 'Content-Type: text/plain; charset=utf-8' );
+				header( 'Cache-Control: no-store' ); // never let a cache keep this answer for a real visitor
+				header( 'X-LiteSpeed-Cache-Control: no-cache' );
+				echo 'Forbidden';
+				exit;
+			}
+		}
+	}
+	unset( $kk_ua, $kk_bot );
+}
+
+add_filter( 'robots_txt', function ( $out, $public ) {
+	if ( ! $public ) {
+		return $out;
+	}
+	$add = '';
+	if ( kk_opt( 'speed_robots_shop' ) ) {
+		// Search, sort and filter pages: endless combinations, never cached, no value in Google.
+		$add .= "\n# Kenakata Kit: search, sort and filter pages are for people, not crawlers\nUser-agent: *\n";
+		foreach ( array( '/?s=', '/*?s=', '/*&s=', '/*?orderby=', '/*&orderby=', '/*?filter_', '/*&filter_', '/*?min_price=', '/*&min_price=', '/*?max_price=', '/*?rating_filter=', '/*?add_to_wishlist=', '/*?per_page=', '/cart/', '/checkout/', '/my-account/' ) as $p ) {
+			$add .= 'Disallow: ' . $p . "\n";
+		}
+	}
+	$bots = kk_blocked_bots();
+	if ( $bots ) {
+		$add .= "\n# Kenakata Kit: bots that bring no customers\n";
+		foreach ( $bots as $b ) {
+			$add .= 'User-agent: ' . $b . "\n";
+		}
+		$add .= "Disallow: /\n";
+	}
+	return $out . $add;
+}, 20, 2 );
+
+/* =========================================================================
  * Cloudflare Turnstile (free, no puzzles for real people) on login, registration and checkout
  * ====================================================================== */
 

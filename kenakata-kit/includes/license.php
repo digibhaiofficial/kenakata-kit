@@ -208,7 +208,7 @@ function kk_license_message( $code ) {
 
 /** WhatsApp number that sells Pro keys (country code, digits only). Empty = no "buy" button. */
 if ( ! defined( 'KK_SALES_WHATSAPP' ) ) {
-	define( 'KK_SALES_WHATSAPP', '' );
+	define( 'KK_SALES_WHATSAPP', '8801728366779' );
 }
 
 /** wa.me link with a ready message (this site's address included), or '' when no sales number is set. */

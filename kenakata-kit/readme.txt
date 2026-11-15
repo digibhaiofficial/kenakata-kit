@@ -3,7 +3,8 @@ Contributors: DigiBhai.com
 Plugin URI: https://digibhai.com/
 Requires at least: 6.3
 Requires PHP: 7.4
-Stable tag: 3.13.0
+Tested up to: 7.1
+Stable tag: 3.13.1
 License: GPLv2 or later
 
 Everything a Bangladeshi WooCommerce store usually needs. Settings: left admin menu → Kenakata Kit.
@@ -29,6 +30,10 @@ Products Grid, Products Carousel, Brands, Categories, Buy Now Button, Live Searc
 Older [ss_…] shortcodes keep working. Options: see the guide or Kenakata Kit → Shortcodes.
 
 == Changelog ==
+= 3.13.1 =
+* License: "Order on WhatsApp" button (no key yet? one tap opens WhatsApp with a ready message that includes the site address). Also on Pro-only screens.
+* Updates screen: the plugin's logo and "Tested up to WordPress 7.1" are shown; right after updating, the same version is no longer offered again.
+
 = 3.13.0 =
 * Faster pages: the shop styles are split. Every page loads a smaller main file (103 KB → 59 KB, 17 KB → 11 KB zipped); account, cart/checkout, thank-you/tracking and product reviews/questions styles load only on the pages that show them (also inside Elementor widgets and block themes). Pages look exactly the same (checked screen by screen).
 * New (Order tracking, Pro, off by default): live courier status. When a customer tracks an order that was sent with Courier booking, the courier (Steadfast, Pathao, RedX, eCourier) is asked for the latest status right then; the answer is kept for 30 minutes. Nothing runs in the background.

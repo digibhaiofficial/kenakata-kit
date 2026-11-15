@@ -126,6 +126,8 @@ get "$URL/wp-admin/admin.php?page=kenakata-kit&tab=license" >/dev/null
 check "Kenakata Kit screens show 'new version is ready' with Update now + Download" 'grep -q "kk-update-notice" /tmp/body && grep -q "upgrade-plugin" /tmp/body && grep -q "kenakata-kit-99.0.0.zip" /tmp/body'
 get "$URL/wp-admin/index.php" >/dev/null
 check "…and the WordPress Dashboard too" 'grep -q "kk-update-notice" /tmp/body'
+up=$(wpc eval '$f = plugin_basename( KK_FILE ); $t = new stdClass(); $t->checked = array( $f => "3.0.0" ); $t->response = array(); $a = apply_filters( "pre_set_site_transient_update_plugins", $t ); $t2 = new stdClass(); $t2->checked = array( $f => "99.0.0" ); $t2->response = array( $f => (object) array( "new_version" => "99.0.0" ) ); $t2->no_update = array(); $b = apply_filters( "pre_set_site_transient_update_plugins", $t2 ); echo ( isset( $a->response[ $f ] ) && ! empty( $a->response[ $f ]->icons ) && $a->response[ $f ]->tested ? "offer" : "none" ), "|", isset( $b->response[ $f ] ) ? "stale" : "clean";')
+check "update offered with icon + tested version; not offered again once the new files are on disk ($up)" '[ "$up" = "offer|clean" ]'
 wpc eval 'delete_site_transient( "kk_update_latest" );'
 wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["courier_pathao_on"] = 1; $s["courier_pathao_store_id"] = "1"; kk_update_settings( $s ); foreach ( array( "client_id", "client_secret", "username", "password" ) as $k ) { kk_courier_save_secret( "courier_pathao_" . $k, "ci-" . $k ); }'
 RN=$(curl -s -b "$JAR" "$URL/wp-admin/admin-ajax.php?action=rest-nonce")
@@ -242,8 +244,10 @@ curl -sL -o /dev/null "$URL/?pagename=track&kk_phone=01712345678"
 check "the courier is asked only once (answer kept 30 minutes)" '[ "$(wpc option get kk_fake_calls)" = 1 ]'
 rm -f "$WP/wp-content/mu-plugins/kk-fake-courier.php"
 wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["tr_live_courier"] = 0; $s["tr_auto_complete"] = 0; kk_update_settings( $s );'
+KEYSAVE=$(wpc option get kk_license_key 2>/dev/null); wpc option delete kk_license_key >/dev/null 2>&1
 get "$URL/wp-admin/admin.php?page=kenakata-kit&tab=license" >/dev/null
-check "License tab: no WhatsApp buy button while no sales number is set" '! grep -q "kk-buy-pro" /tmp/body && clean /tmp/body'
+[ -n "$KEYSAVE" ] && wpc option update kk_license_key "$KEYSAVE" >/dev/null
+check "License tab (no key): 'Order on WhatsApp' button with this site's address" 'grep -q "kk-buy-pro" /tmp/body && grep -q "wa.me/8801728366779" /tmp/body && grep -q "localhost" /tmp/body && clean /tmp/body'
 
 echo "== Bots"
 wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["speed_robots_shop"] = 1; $s["speed_bot_block"] = 1; $s["speed_ai_block"] = 1; kk_update_settings( $s );'

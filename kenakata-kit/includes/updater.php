@@ -73,15 +73,32 @@ function kk_update_allowed() {
 	return ! $s['ok'] || $s['updates_ok'];
 }
 
+/** WordPress version the release was tested with (the CI runs every release on the newest WordPress). */
+if ( ! defined( 'KK_TESTED_WP' ) ) {
+	define( 'KK_TESTED_WP', '7.1' );
+}
+
+/** Plugin icons for the Updates screens. */
+function kk_update_icons() {
+	return array(
+		'1x'      => KK_URL . 'assets/img/logo-128.png',
+		'default' => KK_URL . 'assets/img/logo-128.png',
+	);
+}
+
 add_filter( 'pre_set_site_transient_update_plugins', function ( $transient ) {
 	if ( ! is_object( $transient ) ) {
 		return $transient;
 	}
 	$file   = plugin_basename( KK_FILE );
 	$latest = kk_update_latest();
-	if ( ! $latest || ! version_compare( $latest['v'], KK_VERSION, '>' ) ) {
+	// The version on disk (WordPress lists it in ->checked). Right after an update the old code is still loaded,
+	// so KK_VERSION would be the old number and the update would be offered again.
+	$installed = isset( $transient->checked[ $file ] ) ? (string) $transient->checked[ $file ] : KK_VERSION;
+	if ( ! $latest || ! version_compare( $latest['v'], $installed, '>' ) ) {
+		unset( $transient->response[ $file ] );
 		if ( isset( $transient->no_update ) && is_array( $transient->no_update ) ) {
-			$transient->no_update[ $file ] = (object) array( 'id' => $file, 'slug' => 'kenakata-kit', 'plugin' => $file, 'new_version' => KK_VERSION, 'url' => $latest ? $latest['url'] : '', 'package' => '' );
+			$transient->no_update[ $file ] = (object) array( 'id' => $file, 'slug' => 'kenakata-kit', 'plugin' => $file, 'new_version' => $installed, 'url' => $latest ? $latest['url'] : '', 'package' => '', 'icons' => kk_update_icons(), 'tested' => KK_TESTED_WP, 'requires' => '6.3' );
 		}
 		return $transient;
 	}
@@ -93,7 +110,9 @@ add_filter( 'pre_set_site_transient_update_plugins', function ( $transient ) {
 		'url'          => $latest['url'],
 		'package'      => kk_update_allowed() ? $latest['zip'] : '',
 		'requires_php' => '7.4',
-		'icons'        => array(),
+		'requires'     => '6.3',
+		'tested'       => KK_TESTED_WP,
+		'icons'        => kk_update_icons(),
 	);
 	$transient->response[ $file ] = $item;
 	return $transient;
@@ -115,6 +134,9 @@ add_filter( 'plugins_api', function ( $result, $action, $args ) {
 		'author'        => '<a href="https://digibhai.com/">DigiBhai.com</a>',
 		'homepage'      => $latest['url'],
 		'requires_php'  => '7.4',
+		'requires'      => '6.3',
+		'tested'        => KK_TESTED_WP,
+		'icons'         => kk_update_icons(),
 		'last_updated'  => $latest['published'],
 		'download_link' => kk_update_allowed() ? $latest['zip'] : '',
 		'sections'      => array( 'changelog' => wpautop( esc_html( $latest['notes'] ) ) ),

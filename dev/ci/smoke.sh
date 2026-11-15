@@ -318,6 +318,48 @@ curl -sL -o /tmp/body "$URL/?post_type=product"
 check "side cart in the page uses WooCommerce markup, not the builder's" 'grep -q "kk-drawer__content" /tmp/body && ! grep -q "kk-drawer__content\"><div class=\"fake-builder-mc" /tmp/body && clean /tmp/body'
 rm -rf "$WP/wp-content/mu-plugins/kk-fake-builder.php" "$WP/wp-content/kk-fake"
 
+echo "== 3.16: bKash / Nagad / Rocket by hand"
+wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["mp_enable"] = 1; $s["mp_bkash_number"] = "01728366779"; $s["mp_nagad_number"] = "01812345678"; $s["mp_nagad_type"] = "merchant"; $s["mp_amount"] = "delivery"; $s["mp_screenshot"] = "optional"; kk_update_settings( $s );'
+rm -f /tmp/c3
+curl -s -o /dev/null -b /tmp/c3 -c /tmp/c3 -X POST -d "product_id=$PID&quantity=1" "$URL/?wc-ajax=kk_add"
+curl -sL -o /tmp/body -b /tmp/c3 -c /tmp/c3 "$URL/?page_id=$(wpc option get woocommerce_checkout_page_id)"
+CN=$(grep -oP 'name="woocommerce-process-checkout-nonce" value="\K[^"]+' /tmp/body | head -1)
+check "checkout shows bKash / Nagad with numbers, Send Money / Payment, advance amount" 'grep -q "payment_method_kk_mobile_pay" /tmp/body && grep -q "01728366779" /tmp/body && grep -q "Send Money" /tmp/body && grep -q "&quot;Payment&quot;\|\"Payment\"" /tmp/body && grep -q "kk-mp__amount" /tmp/body && grep -q "manual-pay" /tmp/body && clean /tmp/body'
+curl -s -o /tmp/body -b /tmp/c3 -F "shot=@$REPO/dev/ci/shot.png;type=image/png" "$URL/?wc-ajax=kk_mp_upload"
+TOK=$(grep -oP '"token":"\K[A-Za-z0-9]+' /tmp/body)
+check "screenshot upload gives a token" '[ ${#TOK} = 32 ]'
+printf '<?php echo 1;' > /tmp/evil.png
+curl -s -o /tmp/body -b /tmp/c3 -F "shot=@/tmp/evil.png;type=image/png" "$URL/?wc-ajax=kk_mp_upload"
+check "a file that is not a picture is refused" 'grep -q "error" /tmp/body && ! grep -q token /tmp/body'
+check "uploaded pictures cannot be opened from the web" '[ "$(ls $WP/wp-content/uploads/kk-private/ | grep -c tmp-)" -ge 1 ] && [ -f $WP/wp-content/uploads/kk-private/.htaccess ]'
+SM=$(wpc eval 'foreach ( WC_Shipping_Zones::get_zone( 0 )->get_shipping_methods( true ) as $m ) { echo $m->get_rate_id(); break; }')
+CO="billing_first_name=Mim&billing_last_name=Akter&billing_phone=01712000111&billing_email=&billing_address_1=House+9+Road+3+Uttara&billing_city=Dhaka&billing_state=BD-13&billing_country=BD&shipping_method%5B0%5D=$SM&billing_delivery_area=$SM&payment_method=kk_mobile_pay&kk_mp_wallet=bkash&kk_mp_sender=01812000222&kk_mp_shot=$TOK&terms=1&woocommerce-process-checkout-nonce=$CN"
+curl -s -o /tmp/body -b /tmp/c3 -c /tmp/c3 -X POST -d "$CO&kk_mp_trx=bad" "$URL/?wc-ajax=checkout"
+check "wrong TrxID is refused at checkout" 'grep -q "\"result\":\"failure\"" /tmp/body && grep -q "Transaction ID" /tmp/body'
+curl -s -o /tmp/body -b /tmp/c3 -c /tmp/c3 -X POST -d "$CO&kk_mp_trx=bk7x-9qw2lm" "$URL/?wc-ajax=checkout"
+check "order placed with bKash TrxID" 'grep -q "\"result\":\"success\"" /tmp/body'
+MPO=$(wpc eval '$o = wc_get_orders( array( "limit" => 1, "payment_method" => "kk_mobile_pay", "orderby" => "date", "order" => "DESC", "return" => "ids" ) ); echo $o ? $o[0] : 0;')
+minfo=$(wpc eval '$o = wc_get_order( '"$MPO"' ); echo $o->get_status(), "|", $o->get_meta( "_kk_mp_trx" ), "|", $o->get_meta( "_kk_mp_sender" ), "|", (float) $o->get_meta( "_kk_mp_amount" ), "|", $o->get_meta( "_kk_mp_shot" ) ? "shot" : "noshot", "|", kk_mp_to_collect( $o ) == $o->get_total() ? "full" : "less";')
+check "order waits On hold with TrxID, sender, delivery charge, screenshot; nothing deducted yet ($minfo)" '[ "$minfo" = "on-hold|BK79QW2LM|01812000222|60|shot|full" ] || [ "$minfo" = "on-hold|BK7X9QW2LM|01812000222|60|shot|full" ]'
+rm -f /tmp/c4; curl -s -o /dev/null -b /tmp/c4 -c /tmp/c4 -X POST -d "product_id=$PID&quantity=1" "$URL/?wc-ajax=kk_add"; curl -sL -o /tmp/body -b /tmp/c4 -c /tmp/c4 "$URL/?page_id=$(wpc option get woocommerce_checkout_page_id)"
+CN2=$(grep -oP 'name="woocommerce-process-checkout-nonce" value="\K[^"]+' /tmp/body | head -1)
+curl -s -o /tmp/body -b /tmp/c4 -c /tmp/c4 -X POST -d "${CO%%woocommerce-process*}woocommerce-process-checkout-nonce=$CN2&kk_mp_trx=BK7X9QW2LM" "$URL/?wc-ajax=checkout"
+check "the same TrxID cannot be used for a second order" 'grep -q "\"result\":\"failure\"" /tmp/body && grep -q "already used" /tmp/body'
+SHOT=$(wpc eval 'echo kk_mp_details( wc_get_order( '"$MPO"' ) )["shot"] ? "y" : "n";')
+code=$(curl -s -o /tmp/body -w "%{http_code}" "$URL/wp-admin/admin-post.php?action=kk_mp_shot&order=$MPO")
+check "visitors cannot see the screenshot ($code)" '! grep -q PNG /tmp/body'
+curl -s -o /tmp/body -b "$JAR" -H "X-WP-Nonce: $RN" "$URL/?rest_route=/kenakata/v1/sd/orders/$MPO"
+check "store dashboard shows the payment to check" 'grep -q "\"mpay\":{" /tmp/body && grep -q "BK7X9QW2LM" /tmp/body'
+SURL=$(grep -oP '"shot":"\K[^"]+' /tmp/body | sed 's#\\/#/#g; s#\\u0026#\&#g; s#&amp;#\&#g')
+code=$(curl -s -o /tmp/shot.out -w "%{http_code}" -b "$JAR" "$SURL")
+check "staff can open the screenshot ($code)" '[ "$code" = 200 ] && file /tmp/shot.out | grep -q PNG'
+curl -s -o /tmp/body -b "$JAR" -H "X-WP-Nonce: $RN" -H "Content-Type: application/json" -X POST -d '{"decision":"yes"}' "$URL/?rest_route=/kenakata/v1/sd/orders/$MPO/mpay"
+dinfo=$(wpc eval '$o = wc_get_order( '"$MPO"' ); echo $o->get_status(), "|", (float) kk_mp_to_collect( $o ), "|", (float) $o->get_total(), "|", function_exists( "kk_courier_defaults" ) || ( function_exists( "kk_courier_load" ) && ( kk_courier_load() || true ) ) ? kk_courier_defaults( $o )["cod_amount"] : "x";')
+check "Payment received → Processing, courier collects the rest ($dinfo)" 'IFS="|" read st col tot cod <<< "$dinfo"; [ "$st" = processing ] && [ "$(php -r "echo $tot - 60 == $col && $col == $cod ? 1 : 0;")" = 1 ]'
+wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["mp_enable"] = 0; kk_update_settings( $s );'
+curl -s -o /dev/null -b /tmp/c4 -c /tmp/c4 -X POST -d "product_id=$PID&quantity=1" "$URL/?wc-ajax=kk_add"; curl -sL -o /tmp/body -b /tmp/c4 "$URL/?page_id=$(wpc option get woocommerce_checkout_page_id)"
+check "switched off → not offered at checkout" '! grep -q "payment_method_kk_mobile_pay" /tmp/body && clean /tmp/body'
+
 echo "== Bots"
 wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["speed_robots_shop"] = 1; $s["speed_bot_block"] = 1; $s["speed_ai_block"] = 1; kk_update_settings( $s );'
 check "robots.txt keeps crawlers off search/sort/filter pages and names the blocked bots" 'curl -s "$URL/?robots=1" | grep -q "orderby" && curl -s "$URL/?robots=1" | grep -q "User-agent: AhrefsBot"'

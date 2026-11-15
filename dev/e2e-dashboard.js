@@ -239,6 +239,17 @@ function check(name, ok, info) { if (ok) { pass++; console.log('  ✓ ' + name);
   await ev(`window.__opened=[];window.open=function(u){window.__opened.push(u);return null;};document.querySelector('.sd-tools .sd-btn').click();return 1`);
   check('order screen prints its invoice', /kind=invoice&ids=902$/.test(await ev(`return window.__opened[0]||''`)));
 
+  console.log('Mobile payment check');
+  await hash('#/orders?status=on-hold');
+  await waitFor(`return document.querySelector('.sd-badge--mp')`);
+  check('orders waiting for a payment check are marked', (await ev(`return document.querySelector('.sd-badge--mp').textContent`)) === 'Check payment');
+  await hash('#/orders/904');
+  await waitFor(`return [...document.querySelectorAll('.sd-card h2, .sd-card h3')].some(x=>/bKash/.test(x.textContent))`);
+  check('payment card shows the TrxID', (await ev(`return document.body.textContent.includes('BK7X9QW2LM')`)) === true);
+  await ev(`[...document.querySelectorAll('.sd-btn')].find(b=>b.textContent==='Payment received').click();return 1`);
+  await waitFor(`return [...document.querySelectorAll('.sd-card h2, .sd-card h3')].some(x=>/bKash · received/.test(x.textContent))`);
+  check('payment received → order moves on', (await ev(`return document.querySelector('.sd-badge').textContent`)) === 'Processing');
+
   console.log('Sales report periods');
   await hash('#/');
   await waitFor(`return document.querySelector('.sd-insight, .sd-insights, [class*=insight]')`);

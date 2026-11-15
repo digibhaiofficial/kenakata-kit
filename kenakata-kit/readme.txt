@@ -4,7 +4,7 @@ Plugin URI: https://digibhai.com/
 Requires at least: 6.3
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 3.15.1
+Stable tag: 3.16.0
 License: GPLv2 or later
 
 Everything a Bangladeshi WooCommerce store usually needs. Settings: left admin menu → Kenakata Kit.
@@ -30,6 +30,11 @@ Products Grid, Products Carousel, Brands, Categories, Buy Now Button, Live Searc
 Older [ss_…] shortcodes keep working. Options: see the guide or Kenakata Kit → Shortcodes.
 
 == Changelog ==
+= 3.16.0 =
+* New (off until turned on): bKash / Nagad / Rocket / Upay by hand (Kenakata Kit → Mobile payment). The customer sends money to your number, then types the number they sent from and the Transaction ID, and may add a screenshot (kept privately, only staff can open it). No API and no fees. A TrxID can be used only once. The order waits On hold until you press "Payment received" (order screen or store dashboard) or "Not received".
+* Ask for the whole amount or only the delivery charge (or a fixed amount) in advance, the rest cash on delivery: courier booking and labels then collect only what is left.
+* Store dashboard: "Check payment" badge in the orders list and a payment card on the order.
+
 = 3.15.1 =
 * Fix: with the Side cart on, a page builder's own cart panel (Elementor Pro "Menu Cart" with its mini-cart template) showed unstyled after Add to cart (bullets, "View cartCheckout"). The side cart now has its own cart fragment and only it uses WooCommerce's mini-cart markup; the builder's cart keeps its own template and styles.
 

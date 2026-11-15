@@ -134,7 +134,28 @@ function kk_sd_order_brief( WC_Order $order ) {
 		'payment'      => $order->get_payment_method_title(),
 		'courier'      => isset( $couriers[ $courier ] ) ? $couriers[ $courier ] : '',
 		'tracking_id'  => (string) kk_order_meta( $order, 'tracking_id' ),
+		'mp_wait'      => 'kk_mobile_pay' === $order->get_payment_method() && ! in_array( $order->get_meta( '_kk_mp_verified' ), array( 'yes', 'no' ), true ),
 	);
+}
+
+/** Money to collect at the door, as text ('' when nothing). */
+function kk_sd_to_collect( WC_Order $order ) {
+	$mp = function_exists( 'kk_mp_to_collect' ) ? kk_mp_to_collect( $order ) : null;
+	if ( null !== $mp ) {
+		return $mp > 0 ? kk_sd_money( $mp ) : '';
+	}
+	return 'cod' === $order->get_payment_method() && ! $order->get_date_paid() ? kk_sd_money( (float) $order->get_total() - (float) $order->get_total_refunded() ) : '';
+}
+
+/** bKash / Nagad / Rocket details for the order screen, or null. */
+function kk_sd_order_mpay( WC_Order $order ) {
+	$d = function_exists( 'kk_mp_details' ) ? kk_mp_details( $order ) : null;
+	if ( ! $d ) {
+		return null;
+	}
+	$d['amount_text'] = kk_sd_money( $d['amount'] );
+	unset( $d['collect'] );
+	return $d;
 }
 
 function kk_sd_order_full( WC_Order $order ) {
@@ -183,8 +204,8 @@ function kk_sd_order_full( WC_Order $order ) {
 			'discount' => $discount > 0 ? kk_sd_money( $discount ) : '',
 			'refunded' => (float) $order->get_total_refunded() > 0 ? kk_sd_money( $order->get_total_refunded() ) : '',
 			'total'    => kk_sd_money( $order->get_total() ),
-			'to_collect' => 'cod' === $order->get_payment_method() && ! $order->get_date_paid() ? kk_sd_money( (float) $order->get_total() - (float) $order->get_total_refunded() ) : '',
-			'cod'      => 'cod' === $order->get_payment_method(),
+			'to_collect' => kk_sd_to_collect( $order ),
+			'cod'      => 'cod' === $order->get_payment_method() || 'kk_mobile_pay' === $order->get_payment_method(),
 		),
 		'address'       => kk_sd_order_address( $order ),
 		'email'         => $order->get_billing_email(),
@@ -195,6 +216,7 @@ function kk_sd_order_full( WC_Order $order ) {
 		'tracking_url'  => (string) kk_order_meta( $order, 'tracking_url' ),
 		'edit_url'      => current_user_can( 'manage_woocommerce' ) ? $order->get_edit_order_url() : '',
 	) );
+	$out['mpay'] = kk_sd_order_mpay( $order );
 	// One-tap courier booking: what was booked, or what the confirmation box starts with (courier code loads only here).
 	$out['booking']  = null;
 	$out['dispatch'] = null;
@@ -1498,6 +1520,17 @@ add_action( 'rest_api_init', function () {
 		return is_wp_error( $order ) ? $order : kk_sd_order_full( $order );
 	} );
 	$route( 'orders/' . $id, 'POST', 'edit_shop_orders', 'kk_sd_order_update' );
+	$route( 'orders/' . $id . '/mpay', 'POST', 'edit_shop_orders', function ( WP_REST_Request $req ) {
+		$order = kk_sd_get_order( $req['id'] );
+		if ( is_wp_error( $order ) ) {
+			return $order;
+		}
+		if ( ! function_exists( 'kk_mp_decide' ) ) {
+			return new WP_Error( 'kk_sd_no_mp', 'Mobile payment is not available.', array( 'status' => 400 ) );
+		}
+		$res = kk_mp_decide( $order, sanitize_key( (string) $req->get_param( 'decision' ) ) );
+		return is_wp_error( $res ) ? $res : kk_sd_order_full( wc_get_order( $order->get_id() ) );
+	} );
 
 	$route( 'products', 'GET', 'edit_products', 'kk_sd_products_list' );
 	$route( 'products', 'POST', 'edit_products', 'kk_sd_product_save' );

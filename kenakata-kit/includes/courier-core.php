@@ -480,6 +480,8 @@ function kk_courier_defaults( WC_Order $order ) {
 	// Cash on delivery orders sit in "Processing" until the parcel is delivered, so Woo's is_paid() is not usable here:
 	// the money is still to be collected until a payment date has been recorded.
 	$cod = 'cod' === $order->get_payment_method() && ! $order->get_date_paid() ? max( 0, (float) $order->get_total() - (float) $order->get_total_refunded() ) : 0;
+	$mp  = function_exists( 'kk_mp_to_collect' ) ? kk_mp_to_collect( $order ) : null; // bKash / Nagad / Rocket: what is left after the advance
+	$cod = null !== $mp ? $mp : $cod;
 	return array(
 		'name'       => trim( $order->get_formatted_billing_full_name() ),
 		'phone'      => (string) $order->get_billing_phone(),

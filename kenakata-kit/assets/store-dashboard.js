@@ -666,6 +666,7 @@
 			h('div', { class: 'sd-order__top' },
 				h('a', { class: 'sd-order__link', href: '#/orders/' + o.id, text: '#' + o.number }),
 				badge(o.status, o.status_label),
+				o.mp_wait ? h('span', { class: 'sd-badge sd-badge--mp', text: t('mpCheck') }) : null,
 				h('span', { class: 'sd-muted sd-order__time', text: o.date ? ago(o.date.ts) : '' })),
 			h('div', { class: 'sd-order__who' }, h('span', { class: 'sd-order__name', text: o.name || '—' }), o.area ? h('span', { class: 'sd-muted', text: ' · ' + o.area }) : null),
 			h('div', { class: 'sd-order__items sd-muted', text: o.items.join(', ') }),
@@ -964,6 +965,35 @@
 		go.focus();
 	}
 
+	/** bKash / Nagad / Rocket by hand: what the customer typed, and the two decisions. */
+	function mpayCard(o) {
+		var m = o.mpay;
+		var mrow = function (label, value) { return h('div', { class: 'sd-totals__row' }, h('dt', { text: label }), h('dd', { text: value || '—' })); };
+		var states = { wait: t('mpWait'), yes: t('mpYes'), no: t('mpNo') };
+		var decide = function (btn, decision) {
+			if (decision === 'no' && !window.confirm(t('mpNoConfirm'))) { return; }
+			busy(btn, true, t('saving'));
+			api('orders/' + o.id + '/mpay', { method: 'POST', body: { decision: decision } }).then(function () {
+				summaryCache = null; toast(t('saved'), 'ok'); route();
+			}, function (e) { busy(btn, false); toast(e.message, 'error'); });
+		};
+		var yes = m.state !== 'yes' ? button(t('mpReceived'), { class: 'sd-btn sd-btn--primary' }) : null;
+		var no = m.state !== 'no' ? button(t('mpNotReceived'), { class: 'sd-btn sd-btn--ghost' }) : null;
+		if (yes) { yes.addEventListener('click', function () { decide(yes, 'yes'); }); }
+		if (no) { no.addEventListener('click', function () { decide(no, 'no'); }); }
+		return card(m.wallet + ' · ' + states[m.state], [
+			h('dl', { class: 'sd-totals' },
+				mrow(t('mpAmount') + (m.advance ? ' (' + t('mpAdvance') + ')' : ''), m.amount_text),
+				mrow(t('mpFrom'), m.sender),
+				mrow(t('mpTo'), m.to)),
+			h('div', { class: 'sd-line' }, h('span', { class: 'sd-mono sd-big', text: m.trx }),
+				button(t('copy'), { class: 'sd-btn sd-btn--sm sd-btn--ghost', onclick: function () { copyText(m.trx); } }, 'copy')),
+			m.shot ? h('p', null, h('a', { href: escUrl(m.shot), target: '_blank', rel: 'noopener', text: t('mpShot') })) : null,
+			h('p', { class: 'sd-muted', text: t('mpHelp') }),
+			yes || no ? h('div', { class: 'sd-tools' }, yes, no) : null
+		]);
+	}
+
 	function renderOrder(o) {
 		var root = h('div', { class: 'sd-view' });
 		root.appendChild(pageHead(t('order') + ' #' + o.number, { back: '#/orders', sub: o.date ? o.date.text : '' }));
@@ -1012,6 +1042,7 @@
 				tot.to_collect ? row(t('toCollect'), tot.to_collect, 'sd-totals__cod') : null),
 			h('p', { class: 'sd-muted', text: t('payment') + ': ' + (o.payment || '—') })
 		]));
+		if (o.mpay) { root.appendChild(mpayCard(o)); }
 
 		// Status.
 		var statusSel = select(Object.keys(C.statuses).map(function (k) { return [k, C.statuses[k]]; }), o.status, { 'aria-label': t('status') });

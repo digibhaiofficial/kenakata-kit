@@ -111,6 +111,10 @@ function kk_print_address( WC_Order $order ) {
 
 /** Money still to collect from the customer (cash on delivery and not paid yet), as a number. */
 function kk_print_to_collect( WC_Order $order ) {
+	$mp = function_exists( 'kk_mp_to_collect' ) ? kk_mp_to_collect( $order ) : null;
+	if ( null !== $mp ) {
+		return (float) $mp;
+	}
 	if ( 'cod' !== $order->get_payment_method() || $order->get_date_paid() ) {
 		return 0.0;
 	}

@@ -8471,3 +8471,246 @@ msgstr "প্রেরক"
 
 msgid "Receiver"
 msgstr "প্রাপক"
+
+msgid "Cash Out"
+msgstr "ক্যাশ আউট"
+
+msgid "Send Money"
+msgstr "সেন্ড মানি"
+
+msgid "Personal"
+msgstr "পার্সোনাল"
+
+msgid "Agent"
+msgstr "এজেন্ট"
+
+msgid "Merchant"
+msgstr "মার্চেন্ট"
+
+msgid "Screenshots are not accepted."
+msgstr "স্ক্রিনশট নেওয়া হয় না।"
+
+msgid "The picture is too big (4 MB at most)."
+msgstr "ছবিটা খুব বড় (সর্বোচ্চ ৪ MB)।"
+
+msgid "Please choose a JPG, PNG or WebP picture."
+msgstr "JPG, PNG বা WebP ছবি বাছুন।"
+
+msgid "No screenshot."
+msgstr "কোনো স্ক্রিনশট নেই।"
+
+msgid "bKash / Nagad / Rocket (manual)"
+msgstr "bKash / Nagad / Rocket (ম্যানুয়াল)"
+
+msgid "The customer sends money to your number and types the Transaction ID. Settings: Kenakata Kit → Mobile payment."
+msgstr "কাস্টমার আপনার নম্বরে টাকা পাঠিয়ে Transaction ID লেখে। সেটিংস: Kenakata Kit → মোবাইল পেমেন্ট।"
+
+msgid "Open the settings"
+msgstr "সেটিংস খুলুন"
+
+msgid "Pay %1$s now (delivery charge). The rest, %2$s, is paid in cash on delivery."
+msgstr "এখন %1$s দিন (ডেলিভারি চার্জ)। বাকি %2$s পণ্য হাতে পেয়ে ক্যাশে দেবেন।"
+
+msgid "Pay %s now."
+msgstr "এখন %s দিন।"
+
+msgid "Pay with"
+msgstr "যেভাবে দেবেন"
+
+msgid "Open your %1$s app and choose \"%2$s\"."
+msgstr "আপনার %1$s অ্যাপ খুলে \"%2$s\" বাছুন।"
+
+msgid "Number: %1$s (%2$s)"
+msgstr "নম্বর: %1$s (%2$s)"
+
+msgid "Amount: %s"
+msgstr "টাকার পরিমাণ: %s"
+
+msgid "Then type below the number you sent from and the Transaction ID (TrxID) from the confirmation message."
+msgstr "তারপর নিচে যে নম্বর থেকে পাঠিয়েছেন সেটা আর কনফার্মেশন মেসেজের Transaction ID (TrxID) লিখুন।"
+
+msgid "Number you sent from"
+msgstr "যে নম্বর থেকে পাঠিয়েছেন"
+
+msgid "Transaction ID (TrxID)"
+msgstr "Transaction ID (TrxID)"
+
+msgid "Screenshot of the payment"
+msgstr "পেমেন্টের স্ক্রিনশট"
+
+msgid "Please choose bKash, Nagad or Rocket."
+msgstr "bKash, Nagad বা Rocket বাছুন।"
+
+msgid "Please enter the mobile number you sent the money from (11 digits)."
+msgstr "যে মোবাইল নম্বর থেকে টাকা পাঠিয়েছেন সেটা লিখুন (১১ ডিজিট)।"
+
+msgid "Please enter the Transaction ID (TrxID) from the payment message: 8 to 20 letters and numbers."
+msgstr "পেমেন্ট মেসেজের Transaction ID (TrxID) লিখুন: ৮ থেকে ২০টা অক্ষর ও সংখ্যা।"
+
+msgid "This Transaction ID was already used for another order. Please check it, or contact us."
+msgstr "এই Transaction ID আগেই অন্য অর্ডারে ব্যবহার হয়েছে। মিলিয়ে দেখুন, বা আমাদের সাথে যোগাযোগ করুন।"
+
+msgid "Please add a screenshot of the payment."
+msgstr "পেমেন্টের স্ক্রিনশট দিন।"
+
+msgid "Customer says they paid by %1$s: %2$s from %3$s, TrxID %4$s. Check your %1$s app, then press \"Payment received\" or \"Not received\"."
+msgstr "কাস্টমার বলছেন %1$s দিয়ে পেমেন্ট করেছেন: %2$s, %3$s থেকে, TrxID %4$s। আপনার %1$s অ্যাপে মিলিয়ে \"পেমেন্ট পেয়েছি\" বা \"পাইনি\" চাপুন।"
+
+msgid "This order was not paid by bKash / Nagad / Rocket."
+msgstr "এই অর্ডারের পেমেন্ট bKash / Nagad / Rocket দিয়ে হয়নি।"
+
+msgid "Payment of %1$s checked and received (by %2$s)."
+msgstr "%1$s পেমেন্ট মিলিয়ে পাওয়া গেছে (%2$s)।"
+
+msgid "Payment not found in our account (checked by %s). Ask the customer to check the TrxID."
+msgstr "আমাদের অ্যাকাউন্টে পেমেন্ট পাওয়া যায়নি (চেক করেছেন %s)। কাস্টমারকে TrxID মিলিয়ে দেখতে বলুন।"
+
+msgid "Not checked yet"
+msgstr "এখনো চেক হয়নি"
+
+msgid "Not received"
+msgstr "পাইনি"
+
+msgid "Amount"
+msgstr "পরিমাণ"
+
+msgid "delivery charge in advance"
+msgstr "অগ্রিম ডেলিভারি চার্জ"
+
+msgid "See the screenshot"
+msgstr "স্ক্রিনশট দেখুন"
+
+msgid "Payment received"
+msgstr "পেমেন্ট পেয়েছি"
+
+msgid "Picture added ✓"
+msgstr "ছবি যোগ হয়েছে ✓"
+
+msgid "This link has expired. Go back and open it again."
+msgstr "লিংকের মেয়াদ শেষ। ফিরে গিয়ে আবার খুলুন।"
+
+msgid "We received your %1$s payment details (TrxID %2$s). We will check the payment and confirm your order soon."
+msgstr "আপনার %1$s পেমেন্টের তথ্য পেয়েছি (TrxID %2$s)। পেমেন্ট মিলিয়ে শিগগিরই অর্ডার কনফার্ম করব।"
+
+msgid "Mobile payment"
+msgstr "মোবাইল পেমেন্ট"
+
+msgid "bKash, Nagad, Rocket and Upay by hand: the customer sends money to your number and types the Transaction ID (and may add a screenshot). No API, no extra fees. The order waits in \"On hold\" until you check your app and press \"Payment received\". Ask for the whole amount, or only the delivery charge in advance to stop fake orders."
+msgstr "bKash, Nagad, Rocket আর Upay ম্যানুয়ালি: কাস্টমার আপনার নম্বরে টাকা পাঠিয়ে Transaction ID লেখে (চাইলে স্ক্রিনশটও দেয়)। কোনো API বা বাড়তি ফি নেই। আপনি অ্যাপে মিলিয়ে \"পেমেন্ট পেয়েছি\" না চাপা পর্যন্ত অর্ডার \"On hold\" থাকে। পুরো টাকা নিন, অথবা ফেক অর্ডার ঠেকাতে শুধু ডেলিভারি চার্জ অগ্রিম নিন।"
+
+msgid "Accept bKash / Nagad / Rocket by hand"
+msgstr "bKash / Nagad / Rocket ম্যানুয়ালি নিন"
+
+msgid "Adds a payment choice at checkout. It appears only when at least one number is filled in below. Works with the Kenakata Kit checkout and other classic checkouts (not the block checkout)."
+msgstr "চেকআউটে একটা পেমেন্ট অপশন যোগ হয়। নিচে অন্তত একটা নম্বর দিলে তবেই দেখায়। Kenakata Kit চেকআউট আর অন্যান্য ক্লাসিক চেকআউটে কাজ করে (ব্লক চেকআউটে নয়)।"
+
+msgid "Name at checkout"
+msgstr "চেকআউটে নাম"
+
+msgid "How much to pay now"
+msgstr "এখন কত দিতে হবে"
+
+msgid "\"Only the delivery charge\" stops most fake orders: the customer pays the delivery charge now and the rest in cash on delivery. The courier collect amount and labels use what is left, after you press \"Payment received\"."
+msgstr "\"শুধু ডেলিভারি চার্জ\" দিলে বেশিরভাগ ফেক অর্ডার বন্ধ হয়: কাস্টমার এখন ডেলিভারি চার্জ দেয়, বাকিটা ক্যাশ অন ডেলিভারি। \"পেমেন্ট পেয়েছি\" চাপার পর কুরিয়ারের কালেক্ট অ্যামাউন্ট আর লেবেলে বাকি টাকাটাই যায়।"
+
+msgid "The whole order"
+msgstr "পুরো অর্ডার"
+
+msgid "Only the delivery charge (rest cash on delivery)"
+msgstr "শুধু ডেলিভারি চার্জ (বাকি ক্যাশ অন ডেলিভারি)"
+
+msgid "Fixed advance instead of the delivery charge"
+msgstr "ডেলিভারি চার্জের বদলে নির্দিষ্ট অগ্রিম"
+
+msgid "With \"Only the delivery charge\": a fixed amount to pay now, e.g. 100. 0 = the delivery charge of the order."
+msgstr "\"শুধু ডেলিভারি চার্জ\" বাছলে: এখন দিতে হবে এমন নির্দিষ্ট টাকা, যেমন ১০০। ০ = অর্ডারের ডেলিভারি চার্জ।"
+
+msgid "bKash number"
+msgstr "bKash নম্বর"
+
+msgid "Empty = bKash is not offered."
+msgstr "খালি = bKash দেখাবে না।"
+
+msgid "bKash account type"
+msgstr "bKash অ্যাকাউন্টের ধরন"
+
+msgid "Personal = \"Send Money\", Agent = \"Cash Out\", Merchant = \"Payment\". The customer is told which one to use."
+msgstr "পার্সোনাল = \"সেন্ড মানি\", এজেন্ট = \"ক্যাশ আউট\", মার্চেন্ট = \"পেমেন্ট\"। কাস্টমারকে কোনটা করতে হবে বলে দেওয়া হয়।"
+
+msgid "Nagad number"
+msgstr "Nagad নম্বর"
+
+msgid "Empty = Nagad is not offered."
+msgstr "খালি = Nagad দেখাবে না।"
+
+msgid "Nagad account type"
+msgstr "Nagad অ্যাকাউন্টের ধরন"
+
+msgid "Rocket number"
+msgstr "Rocket নম্বর"
+
+msgid "12 digits (your mobile number + 1 digit). Empty = Rocket is not offered."
+msgstr "১২ ডিজিট (মোবাইল নম্বর + ১ ডিজিট)। খালি = Rocket দেখাবে না।"
+
+msgid "Rocket account type"
+msgstr "Rocket অ্যাকাউন্টের ধরন"
+
+msgid "Upay number"
+msgstr "Upay নম্বর"
+
+msgid "Empty = Upay is not offered."
+msgstr "খালি = Upay দেখাবে না।"
+
+msgid "Upay account type"
+msgstr "Upay অ্যাকাউন্টের ধরন"
+
+msgid "Payment screenshot"
+msgstr "পেমেন্টের স্ক্রিনশট"
+
+msgid "Pictures are kept privately on your site (not in the Media Library) and only your team can open them from the order."
+msgstr "ছবিগুলো আপনার সাইটে গোপনে থাকে (Media Library-তে নয়), শুধু আপনার টিম অর্ডার থেকে খুলতে পারে।"
+
+msgid "Do not ask"
+msgstr "চাইবে না"
+
+msgid "Optional"
+msgstr "ঐচ্ছিক"
+
+msgid "Required"
+msgstr "বাধ্যতামূলক"
+
+msgid "Extra note for the customer"
+msgstr "কাস্টমারের জন্য বাড়তি নোট"
+
+msgid "For example: \"Add the 1.85% cash-out charge\" or \"Questions? Call 01XXXXXXXXX\"."
+msgstr "যেমন: \"১.৮৫% ক্যাশ-আউট চার্জ যোগ করে পাঠাবেন\" বা \"প্রশ্ন থাকলে কল করুন 01XXXXXXXXX\"।"
+
+msgid "bKash / Nagad / Rocket"
+msgstr "bKash / Nagad / Rocket"
+
+msgid "Payment by hand with Transaction ID."
+msgstr "Transaction ID দিয়ে ম্যানুয়াল পেমেন্ট।"
+
+msgid "Check payment"
+msgstr "পেমেন্ট চেক"
+
+msgid "not checked yet"
+msgstr "এখনো চেক হয়নি"
+
+msgid "received"
+msgstr "পেয়েছি"
+
+msgid "not received"
+msgstr "পাইনি"
+
+msgid "Mark the payment as not received? The order goes to Pending payment."
+msgstr "পেমেন্ট পাননি হিসেবে চিহ্নিত করবেন? অর্ডার Pending payment-এ যাবে।"
+
+msgid "Sent from"
+msgstr "যে নম্বর থেকে"
+
+msgid "To your number"
+msgstr "আপনার নম্বরে"
+
+msgid "Open your bKash / Nagad / Rocket app, find this Transaction ID and check the amount, then press a button."
+msgstr "আপনার bKash / Nagad / Rocket অ্যাপ খুলে এই Transaction ID খুঁজে টাকার পরিমাণ মিলিয়ে নিন, তারপর একটা বোতাম চাপুন।"

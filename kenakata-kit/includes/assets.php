@@ -1,0 +1,182 @@
+<?php
+/**
+ * Front-end assets. Settings become CSS variables (--kk-*); Elementor widgets override them per section.
+ */
+
+defined( 'ABSPATH' ) || exit;
+
+function kk_css_vars( $selector = ':root' ) {
+	$el  = (bool) kk_opt( 'use_elementor_colors' );
+	$var = function ( $elementor, $key ) use ( $el ) {
+		$hex = kk_opt( $key );
+		return $el && $elementor ? "var(--e-global-color-{$elementor}, {$hex})" : $hex;
+	};
+	$font = trim( (string) kk_opt( 'font_family' ) );
+	$vars = array(
+		'--kk-primary'         => $var( 'primary', 'color_primary' ),
+		'--kk-primary-hover'   => kk_opt( 'color_primary_hover' ),
+		'--kk-accent'          => $var( 'accent', 'color_accent' ),
+		'--kk-accent-hover'    => kk_opt( 'color_accent_hover' ),
+		'--kk-text'            => $var( 'text', 'color_text' ),
+		'--kk-muted'           => kk_opt( 'color_muted' ),
+		'--kk-border'          => kk_opt( 'color_border' ),
+		'--kk-soft'            => kk_opt( 'color_surface_soft' ),
+		'--kk-soft-primary'    => kk_opt( 'color_surface_brand' ),
+		'--kk-soft-accent'     => kk_opt( 'color_surface_accent' ),
+		'--kk-badge'           => kk_opt( 'color_badge' ),
+		'--kk-price'           => kk_opt( 'color_price' ),
+		'--kk-radius'          => absint( kk_opt( 'radius' ) ) . 'px',
+		'--kk-font'            => '' === $font ? 'inherit' : $font,
+		'--kk-font-size'       => absint( kk_opt( 'font_size_base' ) ) . 'px',
+		'--kk-btn-height'      => absint( kk_opt( 'btn_height' ) ) . 'px',
+		'--kk-btn-radius'      => absint( kk_opt( 'btn_radius' ) ) . 'px',
+		'--kk-btn-font-size'   => absint( kk_opt( 'btn_font_size' ) ) . 'px',
+		'--kk-btn-weight'      => absint( kk_opt( 'btn_font_weight' ) ),
+		'--kk-btn-transform'   => kk_opt( 'btn_uppercase' ) ? 'uppercase' : 'none',
+		'--kk-input-height'    => absint( kk_opt( 'input_height' ) ) . 'px',
+		'--kk-input-radius'    => absint( kk_opt( 'input_radius' ) ) . 'px',
+		// Product cards.
+		'--kk-card-ratio'      => preg_match( '#^\d+/\d+$#', (string) kk_opt( 'card_image_ratio' ) ) ? kk_opt( 'card_image_ratio' ) : '1/1',
+		'--kk-card-fit'        => 'cover' === kk_opt( 'card_image_fit' ) ? 'cover' : 'contain',
+		'--kk-card-lines'      => max( 1, absint( kk_opt( 'card_title_lines' ) ) ),
+		'--kk-card-title-size' => absint( kk_opt( 'card_title_size' ) ) . 'px',
+		'--kk-card-price-size' => absint( kk_opt( 'card_price_size' ) ) . 'px',
+		'--kk-card-align'      => 'center' === kk_opt( 'card_align' ) ? 'center' : 'left',
+		'--kk-cols'            => max( 1, absint( kk_opt( 'archive_columns' ) ) ),
+		'--kk-cols-t'          => max( 1, absint( kk_opt( 'archive_columns_tablet' ) ) ),
+		'--kk-cols-m'          => max( 1, absint( kk_opt( 'archive_columns_mobile' ) ) ),
+		// Brand / category cards.
+		'--kk-term-img'        => absint( kk_opt( 'cards_image_size' ) ) . 'px',
+		'--kk-pv'              => max( 1, absint( kk_opt( 'cards_per_view' ) ) ),
+		'--kk-pv-t'            => max( 1, absint( kk_opt( 'cards_per_view_tablet' ) ) ),
+		'--kk-pv-m'            => max( 1, absint( kk_opt( 'cards_per_view_mobile' ) ) ),
+		// Floating buttons / mobile bar.
+		'--kk-wa'              => kk_opt( 'wa_float_color' ),
+		'--kk-float-offset'    => absint( kk_opt( 'wa_float_offset' ) ) . 'px',
+		'--kk-call'            => kk_opt( 'call_float_color' ) ? kk_opt( 'call_float_color' ) : 'var(--kk-primary)',
+		'--kk-float-ico'       => kk_opt( 'float_icon_color' ),
+		'--kk-float-size'      => absint( kk_opt( 'float_size' ) ) . 'px',
+		// Text on coloured buttons, stars, badges.
+		'--kk-btn-text'        => kk_opt( 'btn_text_color' ),
+		'--kk-star-c'          => kk_opt( 'color_star' ),
+		'--kk-badge-text'      => kk_opt( 'color_badge_text' ),
+		// Product page.
+		'--kk-wa-btn'          => kk_opt( 'pp_wa_color' ),
+		'--kk-call-btn'        => kk_opt( 'pp_call_color' ) ? kk_opt( 'pp_call_color' ) : 'var(--kk-primary)',
+		'--kk-contact-text'    => kk_opt( 'pp_btn_text_color' ),
+		'--kk-di-bg'           => kk_opt( 'di_bg' ) ? kk_opt( 'di_bg' ) : 'var(--kk-soft)',
+		'--kk-di-ico'          => kk_opt( 'di_icon_color' ) ? kk_opt( 'di_icon_color' ) : 'var(--kk-primary)',
+		'--kk-sticky-bg'       => kk_opt( 'sticky_bg' ),
+		'--kk-sw-h'            => absint( kk_opt( 'swatches_height' ) ) . 'px',
+		'--kk-sw-radius'       => absint( kk_opt( 'swatches_radius' ) ) . 'px',
+		'--kk-drawer-w'        => absint( kk_opt( 'cart_drawer_width' ) ) . 'px',
+		'--kk-rm-color'        => kk_opt( 'rm_color' ) ? kk_opt( 'rm_color' ) : 'var(--kk-primary)',
+		'--kk-wl-color'        => kk_opt( 'wl_color' ) ? kk_opt( 'wl_color' ) : '#E11D48',
+	);
+	$css = $selector . '{';
+	foreach ( $vars as $k => $v ) {
+		$css .= $k . ':' . str_replace( array( '{', '}', ';', '<' ), '', wp_strip_all_tags( (string) $v ) ) . ';';
+	}
+	return $css . '}';
+}
+
+/** Body classes describing layout choices (used by the CSS). */
+function kk_body_classes( $classes ) {
+	if ( kk_opt( 'card_enable' ) ) {
+		$classes[] = 'kk-cards';
+	}
+	// The side cart opens by itself after "Add to cart": WooCommerce's extra "View cart" link next to the button is then not needed.
+	if ( kk_opt( 'cart_drawer_enable' ) && kk_opt( 'cart_drawer_auto_open' ) && ! ( function_exists( 'is_cart' ) && ( is_cart() || is_checkout() ) ) ) {
+		$classes[] = 'kk-drawer-auto';
+	}
+	return $classes;
+}
+
+add_action( 'wp_enqueue_scripts', function () {
+	wp_enqueue_style( 'kenakata-kit', KK_URL . 'assets/kenakata-kit.css', array(), KK_VERSION );
+	wp_add_inline_style( 'kenakata-kit', kk_css_vars() );
+	if ( kk_opt( 'compat_strong' ) ) {
+		wp_enqueue_style( 'kenakata-kit-compat', KK_URL . 'assets/kenakata-kit-compat.css', array( 'kenakata-kit' ), KK_VERSION );
+	}
+	add_filter( 'body_class', 'kk_body_classes' );
+
+	wp_register_script( 'kenakata-kit', KK_URL . 'assets/kenakata-kit.js', array(), KK_VERSION, array( 'in_footer' => true, 'strategy' => 'defer' ) );
+	wp_localize_script( 'kenakata-kit', 'kkData', array(
+		'searchUrl'  => esc_url_raw( rest_url( 'kenakata/v1/search' ) ),
+		'minChars'   => max( 1, absint( kk_opt( 'search_min_chars' ) ) ),
+		'ajax'       => admin_url( 'admin-ajax.php' ),
+		'account'    => wc_get_page_permalink( 'myaccount' ),
+		'cartUrl'    => wc_get_cart_url(),
+		'varAdd'     => 'yes' === get_option( 'woocommerce_enable_ajax_add_to_cart' ) ? WC_AJAX::get_endpoint( 'kk_add_variation' ) : '',
+		'cartRedirect' => 'yes' === get_option( 'woocommerce_cart_redirect_after_add' ) ? 1 : 0,
+		'restUrl'    => esc_url_raw( rest_url( 'kenakata/v1/' ) ),
+		'shopSearch' => add_query_arg( array( 'post_type' => 'product', 's' => '' ), home_url( '/' ) ),
+		'popup'      => kk_opt( 'popup_enable' ) && ! is_user_logged_in() ? 1 : 0,
+		'drawer'     => kk_opt( 'cart_drawer_enable' ) ? 1 : 0,
+		'drawerAuto' => kk_opt( 'cart_drawer_enable' ) && kk_opt( 'cart_drawer_auto_open' ) ? 1 : 0,
+		'ajaxSingle' => kk_opt( 'cart_drawer_enable' ) && kk_opt( 'cart_drawer_ajax' ) ? 1 : 0,
+		'wcAjax'     => class_exists( 'WC_AJAX' ) ? WC_AJAX::get_endpoint( '%%endpoint%%' ) : '',
+		'slider'     => array(
+			'autoplay' => kk_opt( 'cards_autoplay' ) ? 1 : 0,
+			'speed'    => max( 2, absint( kk_opt( 'cards_autoplay_speed' ) ) ) * 1000,
+			'loop'     => kk_opt( 'cards_loop' ) ? 1 : 0,
+		),
+		'wishlist'   => kk_opt( 'wl_enable' ) ? array(
+			'user'  => is_user_logged_in() ? 1 : 0,
+			'nonce' => is_user_logged_in() ? wp_create_nonce( 'wp_rest' ) : '',
+			'page'  => function_exists( 'kk_wl_page_url' ) ? kk_wl_page_url() : '',
+			'add'   => kk_opt( 'wl_text_add' ) ? kk_opt( 'wl_text_add' ) : __( 'Add to wishlist', 'kenakata-kit' ),
+			'added' => kk_opt( 'wl_text_added' ) ? kk_opt( 'wl_text_added' ) : __( 'In wishlist', 'kenakata-kit' ),
+			/* translators: %d: number of products */
+			'count' => __( '%d saved products', 'kenakata-kit' ),
+			'one'   => __( '1 saved product', 'kenakata-kit' ),
+			'saved' => __( 'Saved to your wishlist', 'kenakata-kit' ),
+			'gone'  => __( 'Removed from your wishlist', 'kenakata-kit' ),
+			'share' => __( 'My wishlist at %s:', 'kenakata-kit' ),
+			'site'  => wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES ),
+			'remove' => __( 'Remove', 'kenakata-kit' ),
+		) : 0,
+		'readMore'   => kk_opt( 'rm_enable' ) ? array(
+			'h'    => max( 120, absint( kk_opt( 'rm_height' ) ) ),
+			'hm'   => max( 120, absint( kk_opt( 'rm_height_mobile' ) ) ),
+			'more' => esc_html( kk_opt( 'rm_more_text' ) ? kk_opt( 'rm_more_text' ) : __( 'Read more', 'kenakata-kit' ) ),
+			'less' => esc_html( kk_opt( 'rm_less_text' ) ? kk_opt( 'rm_less_text' ) : __( 'Show less', 'kenakata-kit' ) ),
+		) : 0,
+		'i18n'       => array(
+			'typeMore'   => __( 'Type at least %d letters…', 'kenakata-kit' ),
+			'searching'  => __( 'Searching…', 'kenakata-kit' ),
+			'none'       => __( 'No products found for "%s".', 'kenakata-kit' ),
+			'found'      => __( '%d products found', 'kenakata-kit' ),
+			'foundOne'   => __( '1 product found', 'kenakata-kit' ),
+			'seeAll'     => __( 'See all %d results →', 'kenakata-kit' ),
+			'outOfStock' => __( 'out of stock', 'kenakata-kit' ),
+			'error'      => __( 'Search is not available right now. Press Enter to search.', 'kenakata-kit' ),
+			'success'    => __( 'Success! Please wait…', 'kenakata-kit' ),
+			'failed'     => __( 'Something went wrong. Please try again.', 'kenakata-kit' ),
+			'network'    => __( 'Network error. Please try again.', 'kenakata-kit' ),
+			'phone11'    => kk_opt( 'co_phone_error' ),
+			'slide'      => __( 'Go to slide %d', 'kenakata-kit' ),
+			/* translators: %d: number of photos */
+			'photoMax'   => __( 'Only the first %d photos will be added.', 'kenakata-kit' ),
+			/* translators: %d: megabytes */
+			'photoBad'   => __( 'Some files were left out: only JPG, PNG or WebP photos up to %d MB.', 'kenakata-kit' ),
+			'photo'      => __( 'Photo', 'kenakata-kit' ),
+			'close'      => __( 'Close', 'kenakata-kit' ),
+			'prev'       => __( 'Previous', 'kenakata-kit' ),
+			'next'       => __( 'Next', 'kenakata-kit' ),
+		),
+	) );
+
+	// Checkout needs the delivery-area script; product pages remember "recently viewed" and run the variation buttons.
+	if ( ( function_exists( 'is_checkout' ) && is_checkout() && ! is_wc_endpoint_url() ) || ( function_exists( 'is_product' ) && is_product() ) ) {
+		wp_enqueue_script( 'kenakata-kit' );
+	}
+}, 20 );
+
+/** Load the front-end JS (+ WooCommerce AJAX add-to-cart) for components that need it. */
+function kk_need_js( $add_to_cart = false ) {
+	wp_enqueue_script( 'kenakata-kit' );
+	if ( $add_to_cart && 'yes' === get_option( 'woocommerce_enable_ajax_add_to_cart' ) ) {
+		wp_enqueue_script( 'wc-add-to-cart' );
+	}
+}

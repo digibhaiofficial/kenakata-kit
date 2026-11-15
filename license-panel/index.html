@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Kenakata Kit · লাইসেন্স প্যানেল</title>
+<style>
+:root{--p:#038348;--p-d:#025c33;--bg:#f6f5f2;--card:#fff;--line:#e3e1da;--t:#1d1b20;--m:#5f5e5a;--err:#a32d2d;--ok-bg:#e8f5ee;--err-bg:#fcebeb;--accent:#f59e0b}
+*{box-sizing:border-box}body{margin:0;font:15px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Bengali",sans-serif;background:var(--bg);color:var(--t)}
+header{background:var(--p);color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+header h1{font-size:18px;margin:0;font-weight:600}header small{opacity:.85}
+main{max-width:920px;margin:0 auto;padding:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin:0 0 16px}
+.card h2{font-size:17px;margin:0 0 12px}
+label{display:block;font-weight:600;margin:10px 0 4px}
+input,select,textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff;color:var(--t)}
+textarea{min-height:70px;font-family:ui-monospace,Consolas,monospace;font-size:13px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:640px){.row{grid-template-columns:1fr}}
+button{font:inherit;font-weight:600;border-radius:8px;padding:9px 16px;border:1px solid var(--p);background:var(--p);color:#fff;cursor:pointer;margin:12px 8px 0 0}
+button.sec{background:#fff;color:var(--p)}button.danger{border-color:var(--err);background:#fff;color:var(--err)}
+button:disabled{opacity:.5;cursor:default}
+.msg{padding:10px 14px;border-radius:8px;margin:12px 0 0;display:none}.msg.ok{display:block;background:var(--ok-bg);color:var(--p-d)}.msg.err{display:block;background:var(--err-bg);color:var(--err)}
+.help{color:var(--m);font-size:13px;margin:4px 0 0}
+.key{word-break:break-all;font-family:ui-monospace,Consolas,monospace;font-size:13px;background:#f1efe8;border-radius:8px;padding:12px}
+.recovery{font-family:ui-monospace,Consolas,monospace;font-size:16px;letter-spacing:.06em;background:#fff8e6;border:2px dashed var(--accent);border-radius:8px;padding:14px;word-break:break-all}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+.tag{display:inline-block;padding:1px 7px;border-radius:5px;font-size:12px;background:#eaf3de;color:#27500a}.tag.rev{background:var(--err-bg);color:var(--err)}
+.hidden{display:none}nav button{margin:0 4px 0 0;padding:6px 12px;background:transparent;border-color:rgba(255,255,255,.6)}nav button.on{background:#fff;color:var(--p)}
+</style>
+</head>
+<body>
+<header><div><h1>Kenakata Kit · লাইসেন্স প্যানেল</h1><small>শুধু আপনার জন্য · গোপন চাবি এই ব্রাউজারের বাইরে কখনো যায় না</small></div>
+<nav id="nav" class="hidden"><button data-v="gen" class="on">নতুন কী</button><button data-v="ledger">খাতা</button><button data-v="check">কী যাচাই</button><button data-v="settings">ব্যাকআপ</button><button data-v="lock">লক</button></nav></header>
+<main>
+
+<div id="v-nosupport" class="card hidden"><h2>এই ব্রাউজারে চলবে না</h2><p>এই প্যানেলের জন্য Ed25519 সমর্থন করে এমন নতুন ব্রাউজার লাগবে: Chrome / Edge 137+, Firefox 129+ বা Safari 17+। ব্রাউজার আপডেট করে আবার খুলুন।</p></div>
+
+<div id="v-setup" class="card hidden">
+  <h2>প্রথমবার: নতুন গোপন চাবি তৈরি</h2>
+  <p>একটা শক্ত পাসওয়ার্ড দিন, অন্তত ১৬ অক্ষর। এই পাসওয়ার্ড দিয়েই প্যানেল খুলবেন। পাসওয়ার্ড হারালে রিকভারি কোড ছাড়া আর কোনো উপায় থাকবে না।</p>
+  <label for="s-pw">পাসওয়ার্ড</label><input id="s-pw" type="password" autocomplete="new-password">
+  <label for="s-pw2">আবার পাসওয়ার্ড</label><input id="s-pw2" type="password" autocomplete="new-password">
+  <button id="s-create">চাবি তৈরি করুন</button>
+  <button id="s-showimport" class="sec">আগের চাবি আছে (ফাইল / রিকভারি কোড)</button>
+  <div id="s-msg" class="msg"></div>
+  <div id="s-import" class="hidden">
+    <label for="s-file">চাবির ফাইল (kk-vault.json)</label><input id="s-file" type="file" accept=".json,application/json">
+    <p class="help">অথবা রিকভারি কোড দিয়ে চাবি ফেরত আনুন (তখন উপরের ঘরে নতুন পাসওয়ার্ড দিন):</p>
+    <label for="s-rec">রিকভারি কোড</label><input id="s-rec" autocomplete="off" spellcheck="false">
+    <button id="s-restore" class="sec">রিকভারি কোড দিয়ে ফেরত আনুন</button>
+  </div>
+</div>
+
+<div id="v-recovery" class="card hidden">
+  <h2>রিকভারি কোড: এখনই কাগজে লিখে রাখুন</h2>
+  <p>এই কোডটা দিয়েই আপনার গোপন চাবি। পাসওয়ার্ড বা ফাইল সব হারালেও এটা দিয়ে চাবি ফেরত আনা যাবে। <strong>কাউকে দেবেন না, অনলাইনে কোথাও রাখবেন না।</strong> এটা আর কখনো দেখানো হবে না।</p>
+  <div id="r-code" class="recovery"></div>
+  <label><input type="checkbox" id="r-done" style="width:auto"> আমি কোডটা কাগজে লিখে নিরাপদ জায়গায় রেখেছি</label>
+  <button id="r-next" disabled>এগিয়ে যান</button>
+</div>
+
+<div id="v-unlock" class="card hidden">
+  <h2>প্যানেল খুলুন</h2>
+  <label for="u-pw">পাসওয়ার্ড</label><input id="u-pw" type="password" autocomplete="current-password">
+  <button id="u-go">খুলুন</button>
+  <div id="u-msg" class="msg"></div>
+  <p class="help">পাবলিক কী: <code id="u-pub"></code></p>
+</div>
+
+<div id="v-gen" class="card hidden">
+  <h2>নতুন লাইসেন্স কী</h2>
+  <div class="row">
+    <div><label for="g-name">কাস্টমারের নাম</label><input id="g-name"></div>
+    <div><label for="g-phone">ফোন</label><input id="g-phone" inputmode="tel"></div>
+  </div>
+  <label for="g-plan">প্ল্যান</label>
+  <select id="g-plan"></select>
+  <p class="help" id="g-planhelp"></p>
+  <label for="g-domains">ওয়েবসাইট (এক লাইনে একটা, যেমন shop.com)</label>
+  <textarea id="g-domains" placeholder="shop.com"></textarea>
+  <p class="help">www আর সাব-ডোমেইন (staging.shop.com) নিজে থেকেই চলবে।</p>
+  <div class="row">
+    <div><label for="g-exp">আপডেট চলবে যতদিন</label><input id="g-exp" type="date"><p class="help">ফাঁকা = লাইফটাইম</p></div>
+    <div><label for="g-paid">টাকা (৳)</label><input id="g-paid" inputmode="numeric"></div>
+  </div>
+  <label for="g-note">নোট (শুধু খাতায় থাকবে)</label><input id="g-note">
+  <button id="g-go">কী তৈরি করুন</button>
+  <div id="g-msg" class="msg"></div>
+  <div id="g-out" class="hidden">
+    <label>লাইসেন্স কী</label><div id="g-key" class="key"></div>
+    <button id="g-copy" class="sec">কী কপি</button><button id="g-copymsg" class="sec">WhatsApp-এর বার্তা কপি</button>
+  </div>
+</div>
+
+<div id="v-ledger" class="card hidden">
+  <h2>কাস্টমারের খাতা</h2>
+  <p class="help">খাতা এই ব্রাউজারে থাকে। প্রতি বিক্রির পর "খাতা ডাউনলোড" করে private রিপোর customers.json-এ রাখুন (বা আমাকে বলুন)।</p>
+  <button id="l-export" class="sec">খাতা ডাউনলোড (JSON)</button><button id="l-csv" class="sec">CSV ডাউনলোড</button>
+  <label for="l-import">খাতা আমদানি (customers.json)</label><input id="l-import" type="file" accept=".json">
+  <div style="overflow-x:auto;margin-top:12px"><table><thead><tr><th>তারিখ</th><th>কী নম্বর</th><th>কাস্টমার</th><th>ওয়েবসাইট</th><th>প্ল্যান</th><th>মেয়াদ</th><th></th></tr></thead><tbody id="l-rows"></tbody></table></div>
+  <label>revoked.json (বাতিল কী-এর তালিকা, public রিপোতে রাখতে হবে)</label><div id="l-revoked" class="key"></div>
+</div>
+
+<div id="v-check" class="card hidden">
+  <h2>কী যাচাই</h2>
+  <label for="c-key">লাইসেন্স কী</label><textarea id="c-key"></textarea>
+  <button id="c-go">যাচাই করুন</button>
+  <div id="c-msg" class="msg"></div>
+</div>
+
+<div id="v-settings" class="card hidden">
+  <h2>ব্যাকআপ আর প্ল্যান</h2>
+  <p>তালাবদ্ধ চাবির ফাইল (kk-vault.json): পাসওয়ার্ড ছাড়া কেউ খুলতে পারবে না। এটা private GitHub রিপো, Google Drive আর পেনড্রাইভে রাখুন।</p>
+  <button id="b-vault" class="sec">kk-vault.json ডাউনলোড</button>
+  <label>পাবলিক কী (প্লাগিনে বসানো থাকে, গোপন নয়)</label><div id="b-pub" class="key"></div>
+  <label for="b-plans">প্ল্যানের তালিকা (JSON: নাম, কয় মাস (0 = লাইফটাইম), কয়টা সাইট)</label>
+  <textarea id="b-plans" style="min-height:120px"></textarea>
+  <button id="b-saveplans" class="sec">প্ল্যান সেভ</button>
+  <div id="b-msg" class="msg"></div>
+</div>
+</main>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var VAULT = 'kk_vault', LEDGER = 'kk_ledger', PLANS = 'kk_plans';
+  var PKCS8_PREFIX = new Uint8Array([0x30,0x2e,0x02,0x01,0x00,0x30,0x05,0x06,0x03,0x2b,0x65,0x70,0x04,0x22,0x04,0x20]);
+  var ITER = 600000;
+  var DEFAULT_PLANS = [
+    { key: 'pro', name: 'Pro · ১ সাইট · ১ বছর', months: 12, sites: 1 },
+    { key: 'agency', name: 'এজেন্সি · ৫ সাইট · ১ বছর', months: 12, sites: 5 },
+    { key: 'lifetime', name: 'লাইফটাইম · ১ সাইট', months: 0, sites: 1 }
+  ];
+  var signKey = null, pubB64 = '', last = null;
+
+  function store(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(k) || 'null'); localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } }
+  function b64(u8) { var s = ''; u8 = new Uint8Array(u8); for (var i = 0; i < u8.length; i++) s += String.fromCharCode(u8[i]); return btoa(s); }
+  function unb64(s) { var b = atob(s), u = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
+  function b64url(u8) { return b64(u8).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+  function unb64url(s) { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return unb64(s); }
+  function hex(u8) { return Array.prototype.map.call(u8, function (x) { return ('0' + x.toString(16)).slice(-2); }).join(''); }
+  function unhex(h) { h = h.replace(/[^0-9a-f]/gi, ''); if (h.length !== 64) return null; var u = new Uint8Array(32); for (var i = 0; i < 32; i++) u[i] = parseInt(h.substr(i * 2, 2), 16); return u; }
+  function msg(id, text, ok) { var m = $(id); m.textContent = text; m.className = 'msg ' + (ok ? 'ok' : 'err'); }
+  function download(name, text, type) { var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: type || 'application/json' })); a.download = name; document.body.appendChild(a); a.click(); a.remove(); }
+  function today() { return new Date().toISOString().slice(0, 10); }
+  function plans() { var p = store(PLANS); return Array.isArray(p) && p.length ? p : DEFAULT_PLANS; }
+  function ledger() { var l = store(LEDGER); return Array.isArray(l) ? l : []; }
+
+  var views = ['nosupport', 'setup', 'recovery', 'unlock', 'gen', 'ledger', 'check', 'settings'];
+  function show(v) {
+    views.forEach(function (x) { $('v-' + x).classList.toggle('hidden', x !== v); });
+    $('nav').classList.toggle('hidden', !signKey);
+    Array.prototype.forEach.call(document.querySelectorAll('#nav button'), function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); });
+    if (v === 'ledger') renderLedger();
+    if (v === 'settings') { $('b-pub').textContent = pubB64; $('b-plans').value = JSON.stringify(plans(), null, 2); }
+  }
+
+  async function deriveAES(pw, salt) {
+    var base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey({ name: 'PBKDF2', hash: 'SHA-256', salt: salt, iterations: ITER }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+  }
+  async function pubFromSeed(seed) {
+    var pkcs8 = new Uint8Array(48); pkcs8.set(PKCS8_PREFIX); pkcs8.set(seed, 16);
+    var k = await crypto.subtle.importKey('pkcs8', pkcs8, { name: 'Ed25519' }, true, ['sign']);
+    var jwk = await crypto.subtle.exportKey('jwk', k);
+    return unb64url(jwk.x);
+  }
+  async function lockSeed(seed, pw) {
+    var salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+    var aes = await deriveAES(pw, salt);
+    var ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, aes, seed));
+    var pub = await pubFromSeed(seed);
+    return { kind: 'kenakata-kit-license-vault', v: 1, kdf: 'PBKDF2-SHA256', iter: ITER, salt: b64(salt), iv: b64(iv), ct: b64(ct), pub: b64(pub), created: today() };
+  }
+  async function useSeed(seed) {
+    var pkcs8 = new Uint8Array(48); pkcs8.set(PKCS8_PREFIX); pkcs8.set(seed, 16);
+    signKey = await crypto.subtle.importKey('pkcs8', pkcs8, { name: 'Ed25519' }, false, ['sign']);
+  }
+  async function supported() {
+    try { await crypto.subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']); return true; } catch (e) { return false; }
+  }
+
+  async function setupWith(seed, fromRecovery) {
+    var pw = $('s-pw').value, pw2 = $('s-pw2').value;
+    if (pw.length < 16) return msg('s-msg', 'পাসওয়ার্ড অন্তত ১৬ অক্ষরের দিন।');
+    if (pw !== pw2) return msg('s-msg', 'দুই ঘরের পাসওয়ার্ড মেলেনি।');
+    msg('s-msg', 'একটু অপেক্ষা করুন…', true);
+    var vault = await lockSeed(seed, pw);
+    store(VAULT, vault); pubB64 = vault.pub;
+    await useSeed(seed);
+    $('s-pw').value = $('s-pw2').value = '';
+    if (fromRecovery) { show('gen'); return; }
+    $('r-code').textContent = hex(seed).toUpperCase().match(/.{1,8}/g).join(' ');
+    show('recovery');
+  }
+
+  $('s-create').onclick = function () { setupWith(crypto.getRandomValues(new Uint8Array(32)), false).catch(function (e) { msg('s-msg', 'সমস্যা: ' + e.message); }); };
+  $('s-showimport').onclick = function () { $('s-import').classList.toggle('hidden'); };
+  $('s-restore').onclick = function () { var s = unhex($('s-rec').value); if (!s) return msg('s-msg', 'রিকভারি কোডটা ঠিক নেই (৬৪টা অক্ষর হওয়ার কথা)।'); setupWith(s, true).catch(function (e) { msg('s-msg', 'সমস্যা: ' + e.message); }); };
+  $('s-file').onchange = function () {
+    var f = this.files[0]; if (!f) return;
+    f.text().then(function (t) { var v = JSON.parse(t); if (!v || v.kind !== 'kenakata-kit-license-vault') throw new Error('এটা চাবির ফাইল নয়'); store(VAULT, v); boot(); }).catch(function (e) { msg('s-msg', 'ফাইলটা পড়া গেল না: ' + e.message); });
+  };
+  $('r-done').onchange = function () { $('r-next').disabled = !this.checked; };
+  $('r-next').onclick = function () { $('r-code').textContent = ''; show('settings'); msg('b-msg', 'চাবি তৈরি হয়েছে। এখন kk-vault.json ডাউনলোড করে ব্যাকআপ রাখুন।', true); };
+
+  $('u-go').onclick = async function () {
+    var v = store(VAULT);
+    try {
+      var aes = await deriveAES($('u-pw').value, unb64(v.salt));
+      var seed = new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(v.iv) }, aes, unb64(v.ct)));
+      await useSeed(seed); pubB64 = v.pub; $('u-pw').value = ''; show('gen');
+    } catch (e) { msg('u-msg', 'পাসওয়ার্ড ভুল।'); }
+  };
+  $('u-pw').onkeydown = function (e) { if (e.key === 'Enter') $('u-go').click(); };
+
+  function fillPlans() {
+    var sel = $('g-plan'); sel.innerHTML = '';
+    plans().forEach(function (p, i) { var o = document.createElement('option'); o.value = i; o.textContent = p.name; sel.appendChild(o); });
+    applyPlan();
+  }
+  function applyPlan() {
+    var p = plans()[+$('g-plan').value] || plans()[0];
+    if (p.months > 0) { var d = new Date(); d.setMonth(d.getMonth() + p.months); $('g-exp').value = d.toISOString().slice(0, 10); } else { $('g-exp').value = ''; }
+    $('g-planhelp').textContent = 'সর্বোচ্চ ' + p.sites + 'টা ওয়েবসাইট · ' + (p.months > 0 ? p.months + ' মাস আপডেট' : 'লাইফটাইম আপডেট');
+  }
+  $('g-plan').onchange = applyPlan;
+
+  function cleanDomain(d) { d = d.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '').replace(/:\d+$/, '').replace(/^www\./, ''); return /^[a-z0-9.-]+\.[a-z]{2,}$/.test(d) ? d : null; }
+
+  $('g-go').onclick = async function () {
+    var p = plans()[+$('g-plan').value] || plans()[0];
+    var raw = $('g-domains').value.split(/[\s,]+/).filter(Boolean), ds = [], bad = [];
+    raw.forEach(function (d) { var c = cleanDomain(d); if (c) { if (ds.indexOf(c) < 0) ds.push(c); } else bad.push(d); });
+    if (bad.length) return msg('g-msg', 'এই ঠিকানাগুলো ঠিক নেই: ' + bad.join(', '));
+    if (!ds.length) return msg('g-msg', 'অন্তত একটা ওয়েবসাইট লিখুন।');
+    if (ds.length > p.sites) return msg('g-msg', 'এই প্ল্যানে সর্বোচ্চ ' + p.sites + 'টা ওয়েবসাইট।');
+    var exp = $('g-exp').value;
+    var id = 'K' + today().replace(/-/g, '') + '-' + hex(crypto.getRandomValues(new Uint8Array(3))).toUpperCase();
+    var payload = { v: 1, id: id, d: ds, p: p.key || 'pro', e: exp || '', i: today() };
+    var body = b64url(new TextEncoder().encode(JSON.stringify(payload)));
+    var sig = new Uint8Array(await crypto.subtle.sign({ name: 'Ed25519' }, signKey, new TextEncoder().encode(body)));
+    var key = 'KK1.' + body + '.' + b64url(sig);
+    var row = { date: today(), id: id, name: $('g-name').value.trim(), phone: $('g-phone').value.trim(), domains: ds, plan: p.name, exp: exp || '', paid: $('g-paid').value.trim(), note: $('g-note').value.trim(), key: key, revoked: false };
+    var l = ledger(); l.unshift(row); store(LEDGER, l);
+    last = row;
+    $('g-key').textContent = key; $('g-out').classList.remove('hidden');
+    msg('g-msg', 'কী তৈরি হয়েছে আর খাতায় উঠেছে (' + id + ')। খাতা ডাউনলোড করে রাখতে ভুলবেন না।', true);
+  };
+  function copy(t, okId) { (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { msg(okId, 'কপি হয়েছে।', true); }, function () { msg(okId, 'কপি হলো না, হাত দিয়ে সিলেক্ট করে কপি করুন।'); }); }
+  $('g-copy').onclick = function () { copy(last.key, 'g-msg'); };
+  $('g-copymsg').onclick = function () {
+    copy('আসসালামু আলাইকুম' + (last.name ? ' ' + last.name : '') + ',\nআপনার Kenakata Kit Pro লাইসেন্স কী নিচে দিলাম।\nওয়েবসাইট: ' + last.domains.join(', ') + '\nআপডেট: ' + (last.exp ? last.exp + ' পর্যন্ত' : 'লাইফটাইম') + '\n\nবসানোর নিয়ম: WordPress → Kenakata Kit → License → কী পেস্ট করে "Save key"।\n\n' + last.key, 'g-msg');
+  };
+
+  function revokedJson() { return JSON.stringify({ revoked: ledger().filter(function (r) { return r.revoked; }).map(function (r) { return r.id; }) }, null, 2); }
+  function renderLedger() {
+    var tb = $('l-rows'); tb.innerHTML = '';
+    ledger().forEach(function (r, i) {
+      var tr = document.createElement('tr');
+      [r.date, r.id, r.name + (r.phone ? ' · ' + r.phone : ''), r.domains.join(', '), r.plan, r.exp || 'লাইফটাইম'].forEach(function (t) { var td = document.createElement('td'); td.textContent = t; tr.appendChild(td); });
+      var td = document.createElement('td');
+      if (r.revoked) { var s = document.createElement('span'); s.className = 'tag rev'; s.textContent = 'বাতিল'; td.appendChild(s); }
+      else { var b = document.createElement('button'); b.className = 'danger'; b.style.margin = '0'; b.textContent = 'বাতিল'; b.onclick = function () { if (confirm(r.id + ' কী বাতিল করবেন? revoked.json আপডেট করতে হবে।')) { var l = ledger(); l[i].revoked = true; store(LEDGER, l); renderLedger(); } }; td.appendChild(b); }
+      tr.appendChild(td); tb.appendChild(tr);
+    });
+    $('l-revoked').textContent = revokedJson();
+  }
+  $('l-export').onclick = function () { download('customers.json', JSON.stringify(ledger(), null, 2)); };
+  $('l-csv').onclick = function () {
+    var q = function (s) { return '"' + String(s == null ? '' : s).replace(/"/g, '""') + '"'; };
+    var lines = [['date', 'id', 'name', 'phone', 'domains', 'plan', 'updates_until', 'paid', 'note', 'revoked'].join(',')].concat(ledger().map(function (r) { return [r.date, r.id, r.name, r.phone, r.domains.join(' '), r.plan, r.exp, r.paid, r.note, r.revoked ? 'yes' : ''].map(q).join(','); }));
+    download('customers.csv', '﻿' + lines.join('\n'), 'text/csv');
+  };
+  $('l-import').onchange = function () {
+    var f = this.files[0]; if (!f) return;
+    f.text().then(function (t) { var a = JSON.parse(t); if (!Array.isArray(a)) throw 0; var have = {}; var l = ledger(); l.forEach(function (r) { have[r.id] = 1; }); a.forEach(function (r) { if (r && r.id && !have[r.id]) l.push(r); }); l.sort(function (x, y) { return x.date < y.date ? 1 : -1; }); store(LEDGER, l); renderLedger(); }).catch(function () { alert('ফাইলটা পড়া গেল না।'); });
+  };
+
+  $('c-go').onclick = async function () {
+    try {
+      var parts = $('c-key').value.replace(/\s+/g, '').split('.');
+      if (parts.length !== 3 || parts[0] !== 'KK1') throw new Error('ফরম্যাট ঠিক নেই');
+      var pub = await crypto.subtle.importKey('raw', unb64(pubB64), { name: 'Ed25519' }, false, ['verify']);
+      var ok = await crypto.subtle.verify({ name: 'Ed25519' }, pub, unb64url(parts[2]), new TextEncoder().encode(parts[1]));
+      var data = JSON.parse(new TextDecoder().decode(unb64url(parts[1])));
+      msg('c-msg', (ok ? '✓ আসল কী। ' : '✗ সই মেলেনি, কী আসল নয়। ') + 'নম্বর ' + data.id + ' · ' + data.d.join(', ') + ' · আপডেট: ' + (data.e || 'লাইফটাইম'), ok);
+    } catch (e) { msg('c-msg', 'যাচাই করা গেল না: ' + e.message); }
+  };
+
+  $('b-vault').onclick = function () { download('kk-vault.json', JSON.stringify(store(VAULT), null, 2)); };
+  $('b-saveplans').onclick = function () {
+    try { var p = JSON.parse($('b-plans').value); if (!Array.isArray(p) || !p.every(function (x) { return x.name && x.sites >= 1 && x.months >= 0; })) throw 0; store(PLANS, p); fillPlans(); msg('b-msg', 'প্ল্যান সেভ হয়েছে।', true); }
+    catch (e) { msg('b-msg', 'JSON ঠিক নেই। প্রতিটায় name, months, sites লাগবে।'); }
+  };
+
+  Array.prototype.forEach.call(document.querySelectorAll('#nav button'), function (b) {
+    b.onclick = function () { var v = b.getAttribute('data-v'); if (v === 'lock') { signKey = null; show('unlock'); return; } show(v); };
+  });
+
+  async function boot() {
+    if (!window.crypto || !crypto.subtle || !(await supported())) { show('nosupport'); return; }
+    fillPlans();
+    var v = store(VAULT);
+    if (v && v.ct) { pubB64 = v.pub; $('u-pub').textContent = v.pub; show('unlock'); } else { show('setup'); }
+  }
+  boot();
+}());
+</script>
+</body>
+</html>

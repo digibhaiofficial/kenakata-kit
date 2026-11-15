@@ -1,0 +1,448 @@
+<?php
+/**
+ * Settings schema: every tab and field of the admin page is described here once.
+ * Field keys = keys of kk_defaults(). Labels and help texts are Bengali for non-technical store owners.
+ */
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Tabs, grouped for the left-hand menu.
+ * Each tab: label, dashicon, short intro, and (optional) "where to see it" text.
+ */
+function kk_tabs() {
+	return array(
+		'dashboard'  => array( 'group' => __( 'Start', 'kenakata-kit' ), 'label' => __( 'Dashboard', 'kenakata-kit' ), 'icon' => 'dashboard', 'intro' => __( 'See at a glance which features are on. Click a switch to turn a feature on or off – no separate saving needed.', 'kenakata-kit' ) ),
+		'license'    => array( 'group' => __( 'Start', 'kenakata-kit' ), 'label' => __( 'License', 'kenakata-kit' ), 'icon' => 'admin-network', 'intro' => __( 'Free or Pro: add your license key here to turn on the Pro features on this website.', 'kenakata-kit' ) ),
+		'design'     => array( 'group' => __( 'Design', 'kenakata-kit' ), 'label' => __( 'Colours & design', 'kenakata-kit' ), 'icon' => 'art', 'intro' => __( 'Colours, font, button and form field sizes for the whole plugin. Changes here apply everywhere at once: product cards, checkout, search, popup.', 'kenakata-kit' ), 'preview' => true ),
+		'cards'      => array( 'group' => __( 'Design', 'kenakata-kit' ), 'label' => __( 'Product cards', 'kenakata-kit' ), 'icon' => 'grid-view', 'intro' => __( 'Every product list on the site (shop, categories, brands, search results, related products) uses this card. Each section can also be styled separately with the Elementor "Products Grid" widget.', 'kenakata-kit' ), 'preview' => true ),
+		'terms'      => array( 'group' => __( 'Design', 'kenakata-kit' ), 'label' => __( 'Brands & categories', 'kenakata-kit' ), 'icon' => 'tag', 'intro' => __( 'Default settings for brand and category cards and carousels. Each section can be changed separately in the Elementor "Brands" or "Categories" widget.', 'kenakata-kit' ) ),
+		'buynow'     => array( 'group' => __( 'Sales', 'kenakata-kit' ), 'label' => __( 'Buy Now Button', 'kenakata-kit' ), 'icon' => 'cart', 'intro' => __( 'Takes the customer straight to checkout in one click. Shown on product cards and product pages.', 'kenakata-kit' ) ),
+		'checkout'   => array( 'group' => __( 'Sales', 'kenakata-kit' ), 'label' => __( 'Checkout', 'kenakata-kit' ), 'icon' => 'forms', 'intro' => __( 'A simple checkout for Bangladeshi customers: name, phone, address, delivery area and optional email.', 'kenakata-kit' ) ),
+		'guard'      => array( 'group' => __( 'Sales', 'kenakata-kit' ), 'label' => __( 'Fake-order protection', 'kenakata-kit' ), 'icon' => 'shield', 'intro' => __( 'Blocks wrong phone numbers and repeat orders from the same number.', 'kenakata-kit' ) ),
+		'thankyou'   => array( 'group' => __( 'Sales', 'kenakata-kit' ), 'label' => __( 'Thank-you page', 'kenakata-kit' ), 'icon' => 'smiley', 'intro' => __( 'The page customers see after ordering.', 'kenakata-kit' ) ),
+		'storedash'  => array( 'group' => __( 'Sales', 'kenakata-kit' ), 'label' => __( 'Store dashboard', 'kenakata-kit' ), 'icon' => 'store', 'intro' => __( 'A simple screen for running the shop without WordPress admin: today\'s orders, call or WhatsApp the customer, courier and tracking, products, prices, stock and blog posts. Works well on phones.', 'kenakata-kit' ) , 'pro' => true),
+		'incomplete' => array( 'group' => __( 'Sales', 'kenakata-kit' ), 'label' => __( 'Incomplete orders', 'kenakata-kit' ), 'icon' => 'forms', 'intro' => __( 'See the customers who reached your checkout and typed their phone number but did not place the order. Call them: many only needed a nudge, and you can turn their cart into an order in one tap.', 'kenakata-kit' ) , 'pro' => true),
+		'courier'    => array( 'group' => __( 'Sales', 'kenakata-kit' ), 'label' => __( 'Courier booking', 'kenakata-kit' ), 'icon' => 'location', 'intro' => __( 'Choose your courier and add its API keys once. Then every order gets a "Send to courier" button in the store dashboard and on the order screen: one tap books the parcel, saves the tracking and marks the order Shipped.', 'kenakata-kit' ) , 'pro' => true),
+		'tracking'   => array( 'group' => __( 'Sales', 'kenakata-kit' ), 'label' => __( 'Order tracking & courier', 'kenakata-kit' ), 'icon' => 'location', 'intro' => __( 'Customers check their order status with their phone number. A courier tracking link added to the order is shown too.', 'kenakata-kit' ) ),
+		'search'     => array( 'group' => __( 'Customers', 'kenakata-kit' ), 'label' => __( 'Live Search', 'kenakata-kit' ), 'icon' => 'search', 'intro' => __( 'Shows products while typing (with image and price).', 'kenakata-kit' ) ),
+		'account'    => array( 'group' => __( 'Customers', 'kenakata-kit' ), 'label' => __( 'Login popup', 'kenakata-kit' ), 'icon' => 'admin-users', 'intro' => __( 'Login and registration with phone or email, in a popup without leaving the page.', 'kenakata-kit' ) ),
+		'whatsapp'   => array( 'group' => __( 'Customers', 'kenakata-kit' ), 'label' => __( 'WhatsApp & call', 'kenakata-kit' ), 'icon' => 'whatsapp', 'intro' => __( 'Floating WhatsApp/call buttons in the corner of the site.', 'kenakata-kit' ) ),
+		'product'    => array( 'group' => __( 'Customers', 'kenakata-kit' ), 'label' => __( 'Product page', 'kenakata-kit' ), 'icon' => 'products', 'intro' => __( 'Variation buttons, "Order on WhatsApp" button, delivery information and a sticky Buy Now bar on mobile for product pages.', 'kenakata-kit' ) ),
+		'wishlist'   => array( 'group' => __( 'Customers', 'kenakata-kit' ), 'label' => __( 'Wishlist', 'kenakata-kit' ), 'icon' => 'heart', 'intro' => __( 'A ♡ button on product cards and product pages. Works without an account; after login the list is kept on the account. Put the "Wishlist Page" widget (or [kk_wishlist]) on a page with the slug "wishlist".', 'kenakata-kit' ) ),
+		'qa'         => array( 'group' => __( 'Customers', 'kenakata-kit' ), 'label' => __( 'Questions & answers', 'kenakata-kit' ), 'icon' => 'editor-help', 'intro' => __( 'A "Questions" tab on product pages. Customers ask with their name and phone number; a question appears on the site only after your team answers it (Kenakata Kit → Questions).', 'kenakata-kit' ) ),
+		'reviews'    => array( 'group' => __( 'Customers', 'kenakata-kit' ), 'label' => __( 'Reviews', 'kenakata-kit' ), 'icon' => 'star-filled', 'intro' => __( 'A tidy reviews section for product pages: rating summary, review cards and photos from customers.', 'kenakata-kit' ) ),
+		'cart'       => array( 'group' => __( 'Customers', 'kenakata-kit' ), 'label' => __( 'Side cart', 'kenakata-kit' ), 'icon' => 'cart', 'intro' => __( 'The cart slides in from the side when the cart icon is clicked or a product is added – no page change.', 'kenakata-kit' ) ),
+		'mobile'     => array( 'group' => __( 'Customers', 'kenakata-kit' ), 'label' => __( 'Bottom Bar', 'kenakata-kit' ), 'icon' => 'smartphone', 'intro' => __( 'An app-like menu fixed to the bottom of the screen on phones: Home, Shop, Cart, Account, Orders and more. Hidden on computers.', 'kenakata-kit' ), 'preview' => true ),
+		'security'   => array( 'group' => __( 'Site', 'kenakata-kit' ), 'label' => __( 'Security', 'kenakata-kit' ), 'icon' => 'lock', 'intro' => __( 'Basic security protections, one click each.', 'kenakata-kit' ) ),
+		'tools'      => array( 'group' => __( 'Site', 'kenakata-kit' ), 'label' => __( 'Tools (Export / Import)', 'kenakata-kit' ), 'icon' => 'admin-tools', 'intro' => __( 'Move all settings to another site with one file, or reset everything.', 'kenakata-kit' ) ),
+		'widgets'    => array( 'group' => __( 'Help', 'kenakata-kit' ), 'label' => __( 'Elementor widgets', 'kenakata-kit' ), 'icon' => 'welcome-widgets-menus', 'intro' => __( 'Find these widgets in the "Kenakata Kit" category of the Elementor panel. Drag one onto the page, then choose what it shows in the Content tab and how it looks in the Style tab.', 'kenakata-kit' ) ),
+		'shortcodes' => array( 'group' => __( 'Help', 'kenakata-kit' ), 'label' => __( 'Shortcodes', 'kenakata-kit' ), 'icon' => 'shortcode', 'intro' => __( 'To use the features without Elementor (block editor, other page builders), copy these shortcodes.', 'kenakata-kit' ) ),
+		'help'       => array( 'group' => __( 'Help', 'kenakata-kit' ), 'label' => __( 'Full guide', 'kenakata-kit' ), 'icon' => 'book', 'intro' => __( 'The complete user guide (in Bengali).', 'kenakata-kit' ) ),
+	);
+}
+
+/** Shorthand to describe one field. */
+function kk_f( $tab, $type, $label, $desc = '', $extra = array() ) {
+	return array_merge( array( 'tab' => $tab, 'type' => $type, 'label' => $label, 'desc' => $desc ), $extra );
+}
+
+/** Field schema (order = display order). */
+function kk_fields() {
+	static $fields = null;
+	if ( null !== $fields ) {
+		return $fields;
+	}
+	$pages = array( 0 => __( '— Page with the default slug —', 'kenakata-kit' ) );
+	foreach ( get_pages( array( 'post_status' => 'publish' ) ) as $p ) {
+		$pages[ $p->ID ] = $p->post_title;
+	}
+	$countries = function_exists( 'WC' ) && WC()->countries ? WC()->countries->get_countries() : array( 'BD' => 'Bangladesh' );
+	$ratios    = array( '1/1' => __( 'Square (1:1)', 'kenakata-kit' ), '4/5' => __( 'Portrait (4:5)', 'kenakata-kit' ), '3/4' => __( 'Tall (3:4)', 'kenakata-kit' ), '4/3' => __( 'Landscape (4:3)', 'kenakata-kit' ) );
+
+	$fields = array(
+		/* ---------------- Design ---------------- */
+		'h_colors'             => kk_f( 'design', 'heading', __( 'Colour', 'kenakata-kit' ), __( 'Buttons, links, badges, checkout, search and popup all use these colours.', 'kenakata-kit' ) ),
+		'use_elementor_colors' => kk_f( 'design', 'toggle', __( 'Use Elementor Global Colors', 'kenakata-kit' ), __( 'When on, the Primary, Accent and Text colours from Elementor Site Settings are used instead of the colours below, so the whole site stays consistent.', 'kenakata-kit' ) ),
+		'color_primary'        => kk_f( 'design', 'color', __( 'Primary colour', 'kenakata-kit' ), __( 'Add to cart button, links, selected delivery area.', 'kenakata-kit' ) ),
+		'color_primary_hover'  => kk_f( 'design', 'color', __( 'Primary colour: hover', 'kenakata-kit' ) ),
+		'color_accent'         => kk_f( 'design', 'color', __( 'Accent colour', 'kenakata-kit' ), __( 'Buy Now button. Use a dark enough colour for white text.', 'kenakata-kit' ) ),
+		'color_accent_hover'   => kk_f( 'design', 'color', __( 'Accent colour: hover', 'kenakata-kit' ) ),
+		'color_badge'          => kk_f( 'design', 'color', __( 'Discount badge colour', 'kenakata-kit' ), __( 'The "-10%" badge on product images.', 'kenakata-kit' ) ),
+		'color_badge_text'     => kk_f( 'design', 'color', __( 'Discount badge text colour', 'kenakata-kit' ) ),
+		'color_price'          => kk_f( 'design', 'color', __( 'Price colour', 'kenakata-kit' ) ),
+		'color_star'           => kk_f( 'design', 'color', __( 'Rating star colour', 'kenakata-kit' ), __( 'Stars on product cards and in reviews.', 'kenakata-kit' ) ),
+		'color_text'           => kk_f( 'design', 'color', __( 'Text colour', 'kenakata-kit' ) ),
+		'color_muted'          => kk_f( 'design', 'color', __( 'Muted text colour', 'kenakata-kit' ), __( 'Old prices, product counts, etc.', 'kenakata-kit' ) ),
+		'color_border'         => kk_f( 'design', 'color', __( 'Border colour', 'kenakata-kit' ) ),
+		'color_surface_soft'   => kk_f( 'design', 'color', __( 'Soft background', 'kenakata-kit' ), __( 'Behind product images, search button, etc.', 'kenakata-kit' ) ),
+		'color_surface_brand'  => kk_f( 'design', 'color', __( 'Light primary tint', 'kenakata-kit' ) ),
+		'color_surface_accent' => kk_f( 'design', 'color', __( 'Light accent tint', 'kenakata-kit' ) ),
+		'h_type'               => kk_f( 'design', 'heading', __( 'Text & corners', 'kenakata-kit' ) ),
+		'font_family'          => kk_f( 'design', 'text', __( 'Font', 'kenakata-kit' ), __( '"inherit" uses the theme font (recommended). For another font type its name, e.g. Hind Siliguri, sans-serif', 'kenakata-kit' ), array( 'placeholder' => 'inherit' ) ),
+		'font_size_base'       => kk_f( 'design', 'number', __( 'Text size', 'kenakata-kit' ), '', array( 'min' => 12, 'max' => 20, 'unit' => 'px' ) ),
+		'radius'               => kk_f( 'design', 'number', __( 'Box corner radius', 'kenakata-kit' ), __( 'Cards, boxes, popup. 0 = square.', 'kenakata-kit' ), array( 'min' => 0, 'max' => 32, 'unit' => 'px' ) ),
+		'h_buttons'            => kk_f( 'design', 'heading', __( 'Button', 'kenakata-kit' ), __( 'Buy Now, Add to cart, checkout, tracking, popup and thank-you page buttons.', 'kenakata-kit' ) ),
+		'btn_height'           => kk_f( 'design', 'number', __( 'Button height', 'kenakata-kit' ), __( 'Keep 44 or more so it is easy to tap on phones.', 'kenakata-kit' ), array( 'min' => 32, 'max' => 72, 'unit' => 'px' ) ),
+		'btn_radius'           => kk_f( 'design', 'number', __( 'Button corner radius', 'kenakata-kit' ), __( '0 = square, 40 = fully round (pill).', 'kenakata-kit' ), array( 'min' => 0, 'max' => 40, 'unit' => 'px' ) ),
+		'btn_font_size'        => kk_f( 'design', 'number', __( 'Button text size', 'kenakata-kit' ), '', array( 'min' => 11, 'max' => 22, 'unit' => 'px' ) ),
+		'btn_font_weight'      => kk_f( 'design', 'select', __( 'Button text weight', 'kenakata-kit' ), '', array( 'options' => array( '400' => __( 'Normal', 'kenakata-kit' ), '500' => __( 'Medium', 'kenakata-kit' ), '600' => __( 'Semi-bold', 'kenakata-kit' ), '700' => __( 'Bold', 'kenakata-kit' ) ) ) ),
+		'btn_uppercase'        => kk_f( 'design', 'toggle', __( 'Uppercase button text', 'kenakata-kit' ) ),
+		'btn_text_color'       => kk_f( 'design', 'color', __( 'Button text colour', 'kenakata-kit' ), __( 'Text on Add to cart, Buy Now and checkout buttons. White suits dark button colours.', 'kenakata-kit' ) ),
+		'h_inputs'             => kk_f( 'design', 'heading', __( 'Form fields (checkout, tracking, popup)', 'kenakata-kit' ) ),
+		'input_height'         => kk_f( 'design', 'number', __( 'Field height', 'kenakata-kit' ), '', array( 'min' => 36, 'max' => 64, 'unit' => 'px' ) ),
+		'input_radius'         => kk_f( 'design', 'number', __( 'Field corner radius', 'kenakata-kit' ), '', array( 'min' => 0, 'max' => 24, 'unit' => 'px' ) ),
+		'h_compat'             => kk_f( 'design', 'heading', __( 'Theme compatibility', 'kenakata-kit' ) ),
+		'compat_strong'        => kk_f( 'design', 'toggle', __( 'Strong styles (recommended)', 'kenakata-kit' ), __( 'Some themes (Hello, Astra, Kadence, Flatsome…) restyle buttons and forms. Keep this on so Kenakata Kit keeps its design.', 'kenakata-kit' ) ),
+
+		/* ---------------- Product cards ---------------- */
+		'card_enable'          => kk_f( 'cards', 'toggle', __( 'Use this card for every product list on the site', 'kenakata-kit' ), __( 'When off, shop/category pages use the theme\'s or WooCommerce\'s own card (the Elementor "Products Grid" widget always uses this card).', 'kenakata-kit' ) ),
+		'h_card_look'          => kk_f( 'cards', 'heading', __( 'Card look', 'kenakata-kit' ) ),
+		'card_style'           => kk_f( 'cards', 'choice', __( 'Card style', 'kenakata-kit' ), '', array( 'options' => array( 'bordered' => __( 'Bordered', 'kenakata-kit' ), 'shadow' => __( 'Shadow', 'kenakata-kit' ), 'flat' => __( 'Flat', 'kenakata-kit' ) ) ) ),
+		'card_align'           => kk_f( 'cards', 'choice', __( 'Text alignment', 'kenakata-kit' ), '', array( 'options' => array( 'left' => __( 'Left', 'kenakata-kit' ), 'center' => __( 'Center', 'kenakata-kit' ) ) ) ),
+		'card_image_ratio'     => kk_f( 'cards', 'select', __( 'Image shape', 'kenakata-kit' ), __( 'All product images are shown at the same size.', 'kenakata-kit' ), array( 'options' => $ratios ) ),
+		'card_image_fit'       => kk_f( 'cards', 'choice', __( 'Image fit', 'kenakata-kit' ), __( '"Whole image" never crops (recommended). "Fill the box" fills the space but may crop the edges.', 'kenakata-kit' ), array( 'options' => array( 'contain' => __( 'Whole image', 'kenakata-kit' ), 'cover' => __( 'Fill the box', 'kenakata-kit' ) ) ) ),
+		'card_title_lines'     => kk_f( 'cards', 'number', __( 'Product name lines', 'kenakata-kit' ), __( 'Longer names are cut with "…". All cards keep the same height.', 'kenakata-kit' ), array( 'min' => 1, 'max' => 4, 'unit' => __( 'Lines', 'kenakata-kit' ) ) ),
+		'card_title_size'      => kk_f( 'cards', 'number', __( 'Name text size', 'kenakata-kit' ), '', array( 'min' => 12, 'max' => 22, 'unit' => 'px' ) ),
+		'card_price_size'      => kk_f( 'cards', 'number', __( 'Price text size', 'kenakata-kit' ), '', array( 'min' => 12, 'max' => 26, 'unit' => 'px' ) ),
+		'h_card_show'          => kk_f( 'cards', 'heading', __( 'What the card shows', 'kenakata-kit' ) ),
+		'card_show_brand'      => kk_f( 'cards', 'toggle', __( 'Brand name', 'kenakata-kit' ) ),
+		'card_show_rating'     => kk_f( 'cards', 'toggle', __( 'Rating stars (when there are reviews)', 'kenakata-kit' ) ),
+		'card_show_badge'      => kk_f( 'cards', 'toggle', __( 'Discount badge', 'kenakata-kit' ) ),
+		'card_badge_text'      => kk_f( 'cards', 'text', __( 'Badge text', 'kenakata-kit' ), __( '{percent} = discount percent, {amount} = amount saved. Examples: -{percent}% or Save {amount}৳ or Sale', 'kenakata-kit' ), array( 'show_if' => 'card_show_badge' ) ),
+		'card_show_stock'      => kk_f( 'cards', 'toggle', __( '"Out of stock" badge', 'kenakata-kit' ) ),
+		'card_stock_text'      => kk_f( 'cards', 'text', __( 'Out-of-stock badge text', 'kenakata-kit' ), '', array( 'show_if' => 'card_show_stock' ) ),
+		'h_card_buttons'       => kk_f( 'cards', 'heading', __( 'Card buttons', 'kenakata-kit' ) ),
+		'card_actions_layout'  => kk_f( 'cards', 'select', __( 'Buttons to show', 'kenakata-kit' ), '', array( 'options' => array( 'side' => __( 'Add to cart + Buy Now side by side', 'kenakata-kit' ), 'stack' => __( 'Add to cart + Buy Now stacked', 'kenakata-kit' ), 'buynow_only' => __( 'Buy Now only', 'kenakata-kit' ), 'cart_only' => __( 'Add to cart only', 'kenakata-kit' ), 'none' => __( 'No buttons', 'kenakata-kit' ) ) ) ),
+		'card_actions_mobile'  => kk_f( 'cards', 'choice', __( 'Buttons on mobile', 'kenakata-kit' ), __( '"Cart icon + Buy Now" fits both buttons in one row even on small screens.', 'kenakata-kit' ), array( 'options' => array( 'stack' => __( 'Stacked', 'kenakata-kit' ), 'icon' => __( 'Cart icon + Buy Now', 'kenakata-kit' ), 'same' => __( 'Same as desktop', 'kenakata-kit' ) ) ) ),
+		'card_cart_text'       => kk_f( 'cards', 'text', __( 'Add to cart button text', 'kenakata-kit' ) ),
+		'h_card_archive'       => kk_f( 'cards', 'heading', __( 'Shop, category and brand pages', 'kenakata-kit' ) ),
+		'archive_per_page'     => kk_f( 'cards', 'number', __( 'Products per page', 'kenakata-kit' ), __( 'With more products, page numbers (1, 2, 3…) appear below.', 'kenakata-kit' ), array( 'min' => 4, 'max' => 96, 'unit' => __( 'items', 'kenakata-kit' ) ) ),
+		'archive_columns'      => kk_f( 'cards', 'number', __( 'Columns: desktop', 'kenakata-kit' ), '', array( 'min' => 2, 'max' => 6, 'unit' => __( 'items', 'kenakata-kit' ) ) ),
+		'archive_columns_tablet'=> kk_f( 'cards', 'number', __( 'Columns: tablet', 'kenakata-kit' ), '', array( 'min' => 2, 'max' => 4, 'unit' => __( 'items', 'kenakata-kit' ) ) ),
+		'archive_columns_mobile'=> kk_f( 'cards', 'number', __( 'Columns: mobile', 'kenakata-kit' ), '', array( 'min' => 1, 'max' => 3, 'unit' => __( 'items', 'kenakata-kit' ) ) ),
+
+		/* ---------------- Brand & category ---------------- */
+		'cards_style'          => kk_f( 'terms', 'choice', __( 'Card style', 'kenakata-kit' ), __( '"Logo only" is best for brand logos (when logos are uploaded).', 'kenakata-kit' ), array( 'options' => array( 'card' => __( 'Card with border', 'kenakata-kit' ), 'minimal' => __( 'No border', 'kenakata-kit' ), 'circle' => __( 'Round image + name', 'kenakata-kit' ), 'logo' => __( 'Logo only', 'kenakata-kit' ) ) ) ),
+		'cards_show_count'     => kk_f( 'terms', 'toggle', __( 'Show product count', 'kenakata-kit' ), __( 'For example "124 products".', 'kenakata-kit' ) ),
+		'cards_image_size'     => kk_f( 'terms', 'number', __( 'Image/logo size', 'kenakata-kit' ), __( 'Without an image the first letter of the name is shown.', 'kenakata-kit' ), array( 'min' => 32, 'max' => 160, 'unit' => 'px' ) ),
+		'h_terms_carousel'     => kk_f( 'terms', 'heading', __( 'Carousel (slider)', 'kenakata-kit' ) ),
+		'cards_per_view'       => kk_f( 'terms', 'number', __( 'Visible at once: desktop', 'kenakata-kit' ), '', array( 'min' => 2, 'max' => 10, 'unit' => __( 'items', 'kenakata-kit' ) ) ),
+		'cards_per_view_tablet'=> kk_f( 'terms', 'number', __( 'Visible at once: tablet', 'kenakata-kit' ), '', array( 'min' => 2, 'max' => 6, 'unit' => __( 'items', 'kenakata-kit' ) ) ),
+		'cards_per_view_mobile'=> kk_f( 'terms', 'number', __( 'Visible at once: mobile', 'kenakata-kit' ), '', array( 'min' => 1, 'max' => 4, 'unit' => __( 'items', 'kenakata-kit' ) ) ),
+		'cards_autoplay'       => kk_f( 'terms', 'toggle', __( 'Autoplay', 'kenakata-kit' ), __( 'Pauses on hover or touch.', 'kenakata-kit' ) ),
+		'cards_autoplay_speed' => kk_f( 'terms', 'number', __( 'Seconds between slides', 'kenakata-kit' ), '', array( 'min' => 2, 'max' => 15, 'unit' => __( 'seconds', 'kenakata-kit' ), 'show_if' => 'cards_autoplay' ) ),
+		'cards_loop'           => kk_f( 'terms', 'toggle', __( 'Loop', 'kenakata-kit' ) ),
+		'cards_arrows'         => kk_f( 'terms', 'toggle', __( 'Previous/next arrows (desktop)', 'kenakata-kit' ) ),
+		'cards_dots'           => kk_f( 'terms', 'toggle', __( 'Dots', 'kenakata-kit' ) ),
+
+		/* ---------------- Buy Now ---------------- */
+		'buynow_enable'        => kk_f( 'buynow', 'toggle', __( 'Enable Buy Now', 'kenakata-kit' ), __( 'Adds the product to the cart and opens the checkout page.', 'kenakata-kit' ) ),
+		'buynow_text'          => kk_f( 'buynow', 'text', __( 'Button text', 'kenakata-kit' ), __( 'For example: Buy Now / Order now', 'kenakata-kit' ) ),
+		'buynow_loop'          => kk_f( 'buynow', 'toggle', __( 'Show on product cards', 'kenakata-kit' ), __( 'Choose which buttons show, and how, in the "Product cards" tab.', 'kenakata-kit' ) ),
+		'buynow_single'        => kk_f( 'buynow', 'toggle', __( 'Show on product pages', 'kenakata-kit' ), __( 'Next to Add to cart. Works with quantity and variations.', 'kenakata-kit' ) ),
+		'buynow_clear_cart'    => kk_f( 'buynow', 'toggle', __( 'Buy only this product', 'kenakata-kit' ), __( 'When on, Buy Now empties the cart first.', 'kenakata-kit' ) ),
+
+		/* ---------------- Checkout ---------------- */
+		'co_enable'            => kk_f( 'checkout', 'toggle', __( 'Enable simple checkout', 'kenakata-kit' ), __( 'Shows the fields below instead of the long WooCommerce form. Turn off to get the original WooCommerce form back.', 'kenakata-kit' ) ),
+		'co_country'           => kk_f( 'checkout', 'select', __( 'Country', 'kenakata-kit' ), __( 'Every order uses this country (the country field is hidden).', 'kenakata-kit' ), array( 'options' => $countries ) ),
+		'co_heading'           => kk_f( 'checkout', 'text', __( 'Form heading', 'kenakata-kit' ) ),
+		'co_button_text'       => kk_f( 'checkout', 'text', __( 'Order button text', 'kenakata-kit' ) ),
+		'h_co_fields'          => kk_f( 'checkout', 'heading', __( 'Name & phone', 'kenakata-kit' ) ),
+		'co_name_label'        => kk_f( 'checkout', 'text', __( 'Name label', 'kenakata-kit' ) ),
+		'co_name_placeholder'  => kk_f( 'checkout', 'text', __( 'Name placeholder', 'kenakata-kit' ) ),
+		'co_phone_label'       => kk_f( 'checkout', 'text', __( 'Phone label', 'kenakata-kit' ) ),
+		'co_phone_placeholder' => kk_f( 'checkout', 'text', __( 'Phone placeholder', 'kenakata-kit' ) ),
+		'h_co_address'         => kk_f( 'checkout', 'heading', __( 'Address & email', 'kenakata-kit' ) ),
+		'co_address_label'     => kk_f( 'checkout', 'text', __( 'Address label', 'kenakata-kit' ) ),
+		'co_address_placeholder'=> kk_f( 'checkout', 'text', __( 'Address placeholder', 'kenakata-kit' ) ),
+		'co_address_textarea'  => kk_f( 'checkout', 'toggle', __( 'Multi-line address box', 'kenakata-kit' ) ),
+		'co_email_show'        => kk_f( 'checkout', 'toggle', __( 'Show email field', 'kenakata-kit' ) ),
+		'co_email_required'    => kk_f( 'checkout', 'toggle', __( 'Email is required', 'kenakata-kit' ), '', array( 'show_if' => 'co_email_show' ) ),
+		'co_email_label'       => kk_f( 'checkout', 'text', __( 'Email label', 'kenakata-kit' ), '', array( 'show_if' => 'co_email_show' ) ),
+		'co_email_placeholder' => kk_f( 'checkout', 'text', __( 'Email placeholder', 'kenakata-kit' ), '', array( 'show_if' => 'co_email_show' ) ),
+		'h_co_area'            => kk_f( 'checkout', 'heading', __( 'Delivery area', 'kenakata-kit' ), __( 'The shipping methods enabled in WooCommerce → Settings → Shipping (e.g. "Inside Dhaka ৳100") are shown as big buttons. The customer must choose one.', 'kenakata-kit' ) ),
+		'co_area_enable'       => kk_f( 'checkout', 'toggle', __( 'Delivery area buttons', 'kenakata-kit' ) ),
+		'co_area_label'        => kk_f( 'checkout', 'text', __( 'Area label', 'kenakata-kit' ), '', array( 'show_if' => 'co_area_enable' ) ),
+		'co_area_prompt'       => kk_f( 'checkout', 'text', __( 'Message before an area is chosen', 'kenakata-kit' ), '', array( 'show_if' => 'co_area_enable' ) ),
+		'co_area_list'         => kk_f( 'checkout', 'areas', __( 'Areas shown now', 'kenakata-kit' ) ),
+		'h_co_more'            => kk_f( 'checkout', 'heading', __( 'Other', 'kenakata-kit' ) ),
+		'co_hide_notes'        => kk_f( 'checkout', 'toggle', __( 'Hide order notes', 'kenakata-kit' ) ),
+		'co_coupon'            => kk_f( 'checkout', 'select', __( 'Promo code (coupon) field', 'kenakata-kit' ), __( 'Hide the field when you are not running any offer. Coupons stay switched on in WooCommerce, so you can show the field again at any time.', 'kenakata-kit' ), array( 'options' => array( 'both' => __( 'Show on cart and checkout', 'kenakata-kit' ), 'checkout' => __( 'Checkout only', 'kenakata-kit' ), 'cart' => __( 'Cart page only', 'kenakata-kit' ), 'none' => __( 'Hide everywhere', 'kenakata-kit' ) ) ) ),
+		'co_cart_hide_shipping'=> kk_f( 'checkout', 'toggle', __( 'Cart page: show delivery charges as information only', 'kenakata-kit' ), __( 'The customer chooses the area at checkout.', 'kenakata-kit' ) ),
+		'co_cart_note'         => kk_f( 'checkout', 'text', __( 'Cart page note', 'kenakata-kit' ), '', array( 'show_if' => 'co_cart_hide_shipping' ) ),
+
+		/* ---------------- Fake-order protection ---------------- */
+		'h_guard_phone'        => kk_f( 'guard', 'heading', __( 'Phone number check', 'kenakata-kit' ), __( 'Applies to checkout, order tracking and registration.', 'kenakata-kit' ) ),
+		'co_phone_mode'        => kk_f( 'guard', 'select', __( 'Accepted numbers', 'kenakata-kit' ), __( '"Exactly 11 digits" blocks most fake numbers. Customers cannot even type more than 11 digits.', 'kenakata-kit' ), array( 'options' => array( 'bd11' => __( 'Exactly 11 digits (01XXXXXXXXX) — recommended', 'kenakata-kit' ), 'bd' => __( 'Bangladeshi mobile, +880 also accepted', 'kenakata-kit' ), 'any' => __( 'Any number (6+ digits)', 'kenakata-kit' ) ) ) ),
+		'co_phone_error'       => kk_f( 'guard', 'text', __( 'Invalid number message', 'kenakata-kit' ) ),
+		'h_guard_throttle'     => kk_f( 'guard', 'heading', __( 'Repeat-order block', 'kenakata-kit' ) ),
+		'co_throttle_enable'   => kk_f( 'guard', 'toggle', __( 'Block repeat orders from the same number', 'kenakata-kit' ), __( 'A second order from the same phone number is refused within the time below. Cancelled and failed orders do not count.', 'kenakata-kit' ) ),
+		'co_throttle_minutes'  => kk_f( 'guard', 'number', __( 'Wait time', 'kenakata-kit' ), '', array( 'min' => 1, 'max' => 1440, 'unit' => __( 'minutes', 'kenakata-kit' ), 'show_if' => 'co_throttle_enable' ) ),
+		'co_throttle_ip'       => kk_f( 'guard', 'toggle', __( 'Also block the same internet connection (IP)', 'kenakata-kit' ), __( 'Stops one device ordering with many numbers. Customers in the same office or on the same mobile operator can share an IP, so use with care.', 'kenakata-kit' ), array( 'show_if' => 'co_throttle_enable' ) ),
+		'co_throttle_skip_admin'=> kk_f( 'guard', 'toggle', __( 'Never block admins / shop managers', 'kenakata-kit' ), __( 'So you can enter phone orders yourself.', 'kenakata-kit' ), array( 'show_if' => 'co_throttle_enable' ) ),
+		'co_throttle_message'  => kk_f( 'guard', 'textarea', __( 'Blocked message', 'kenakata-kit' ), __( '{minutes} = minutes left, {order} = previous order number.', 'kenakata-kit' ), array( 'show_if' => 'co_throttle_enable' ) ),
+
+		/* ---------------- Thank-you ---------------- */
+		'ty_enable'            => kk_f( 'thankyou', 'toggle', __( 'Use a custom thank-you page', 'kenakata-kit' ), __( 'After ordering, customers go to the page below. It needs the "Order Confirmation" widget or the [kk_thank_you] shortcode.', 'kenakata-kit' ) ),
+		'ty_page'              => kk_f( 'thankyou', 'select', __( 'Thank-you page', 'kenakata-kit' ), __( 'Default: the page with the slug "thank-you".', 'kenakata-kit' ), array( 'options' => $pages, 'show_if' => 'ty_enable' ) ),
+		'ty_title'             => kk_f( 'thankyou', 'text', __( 'Title', 'kenakata-kit' ), __( '{name} = customer name.', 'kenakata-kit' ) ),
+		'ty_message'           => kk_f( 'thankyou', 'textarea', __( 'Message', 'kenakata-kit' ) ),
+		'ty_track_text'        => kk_f( 'thankyou', 'text', __( 'Tracking button text', 'kenakata-kit' ) ),
+		'ty_shop_text'         => kk_f( 'thankyou', 'text', __( '"Continue shopping" button text', 'kenakata-kit' ) ),
+
+		/* ---------------- Tracking ---------------- */
+		'tr_page'              => kk_f( 'tracking', 'select', __( 'Tracking page', 'kenakata-kit' ), __( 'This page needs the "Order Tracking" widget or the [kk_order_tracking] shortcode. Default: the page with the slug "track-order".', 'kenakata-kit' ), array( 'options' => $pages ) ),
+		'tr_form_label'        => kk_f( 'tracking', 'text', __( 'Phone field label', 'kenakata-kit' ) ),
+		'tr_button_text'       => kk_f( 'tracking', 'text', __( 'Button text', 'kenakata-kit' ) ),
+		'tr_rate_limit'        => kk_f( 'tracking', 'number', __( 'Lookups per visitor per 10 minutes', 'kenakata-kit' ), __( 'Stops people trying many numbers.', 'kenakata-kit' ), array( 'min' => 1, 'max' => 500, 'unit' => __( 'times', 'kenakata-kit' ) ) ),
+		'h_tr_texts'           => kk_f( 'tracking', 'heading', __( 'Text for each order step', 'kenakata-kit' ) ),
+		'tr_text_received'     => kk_f( 'tracking', 'text', __( 'Order received', 'kenakata-kit' ) ),
+		'tr_text_processing'   => kk_f( 'tracking', 'text', __( 'Processing', 'kenakata-kit' ) ),
+		'tr_text_shipped'      => kk_f( 'tracking', 'text', __( 'With courier (Shipped)', 'kenakata-kit' ) ),
+		'tr_text_completed'    => kk_f( 'tracking', 'text', __( 'Delivered (Completed)', 'kenakata-kit' ) ),
+		'h_tr_courier'         => kk_f( 'tracking', 'heading', __( 'Courier', 'kenakata-kit' ), __( 'Enter the courier, tracking ID and link in the "Courier & tracking" box on the order edit screen. The customer gets a "Track parcel" button on the tracking page.', 'kenakata-kit' ) ),
+		'tr_shipped_status'    => kk_f( 'tracking', 'toggle', __( 'Add a "Shipped" order status', 'kenakata-kit' ) ),
+		'tr_auto_shipped'      => kk_f( 'tracking', 'toggle', __( 'Mark as Shipped when a tracking link is saved', 'kenakata-kit' ), __( 'The customer also gets a note with the link.', 'kenakata-kit' ) ),
+		'tr_couriers'          => kk_f( 'tracking', 'textarea', __( 'Couriers', 'kenakata-kit' ), __( 'One per line: key|Name (e.g. steadfast|Steadfast Courier). The key is lowercase English without spaces.', 'kenakata-kit' ) ),
+
+		/* ---------------- Search ---------------- */
+		'search_enable'        => kk_f( 'search', 'toggle', __( 'Enable live search', 'kenakata-kit' ) ),
+		'search_placeholder'   => kk_f( 'search', 'text', __( 'Search placeholder', 'kenakata-kit' ) ),
+		'search_min_chars'     => kk_f( 'search', 'number', __( 'Start searching after', 'kenakata-kit' ), '', array( 'min' => 1, 'max' => 5, 'unit' => __( 'letters', 'kenakata-kit' ) ) ),
+		'search_limit'         => kk_f( 'search', 'number', __( 'Results shown', 'kenakata-kit' ), __( 'With more results a "See all" link appears below.', 'kenakata-kit' ), array( 'min' => 3, 'max' => 20, 'unit' => __( 'items', 'kenakata-kit' ) ) ),
+
+		/* ---------------- Account ---------------- */
+		'popup_enable'         => kk_f( 'account', 'toggle', __( 'Enable login popup', 'kenakata-kit' ), __( 'Visitors who click a "My account" link get a popup instead of a new page. Phone-number login always works.', 'kenakata-kit' ) ),
+		'popup_register'       => kk_f( 'account', 'toggle', __( 'Allow registration in the popup', 'kenakata-kit' ) ),
+		'popup_email_required' => kk_f( 'account', 'toggle', __( 'Email required for registration', 'kenakata-kit' ), '', array( 'show_if' => 'popup_register' ) ),
+		'popup_login_tab'      => kk_f( 'account', 'text', __( 'Login tab text', 'kenakata-kit' ) ),
+		'popup_register_tab'   => kk_f( 'account', 'text', __( 'Registration tab text', 'kenakata-kit' ), '', array( 'show_if' => 'popup_register' ) ),
+
+		/* ---------------- WhatsApp & call ---------------- */
+		'wa_number'            => kk_f( 'whatsapp', 'text', __( 'WhatsApp number', 'kenakata-kit' ), __( 'For example 01811263223. Every WhatsApp button on the site uses this number.', 'kenakata-kit' ), array( 'placeholder' => '01XXXXXXXXX' ) ),
+		'call_number'          => kk_f( 'whatsapp', 'text', __( 'Call number', 'kenakata-kit' ), __( 'Leave empty to use the WhatsApp number.', 'kenakata-kit' ), array( 'placeholder' => '01XXXXXXXXX' ) ),
+		'h_wa_float'           => kk_f( 'whatsapp', 'heading', __( 'Floating buttons (in the corner of every page)', 'kenakata-kit' ) ),
+		'wa_float_enable'      => kk_f( 'whatsapp', 'toggle', __( 'Floating WhatsApp button', 'kenakata-kit' ) ),
+		'call_float_enable'    => kk_f( 'whatsapp', 'toggle', __( 'Floating call button', 'kenakata-kit' ), __( 'Shown above the WhatsApp button.', 'kenakata-kit' ) ),
+		'wa_float_text'        => kk_f( 'whatsapp', 'text', __( 'Text next to the button', 'kenakata-kit' ), __( 'Leave empty for icon only. Phones always show the icon only.', 'kenakata-kit' ) ),
+		'wa_float_message'     => kk_f( 'whatsapp', 'textarea', __( 'Pre-filled WhatsApp message', 'kenakata-kit' ), __( 'The customer can edit it before sending.', 'kenakata-kit' ) ),
+		'wa_float_position'    => kk_f( 'whatsapp', 'choice', __( 'Position', 'kenakata-kit' ), '', array( 'options' => array( 'right' => __( 'Right', 'kenakata-kit' ), 'left' => __( 'Left', 'kenakata-kit' ) ) ) ),
+		'wa_float_offset'      => kk_f( 'whatsapp', 'number', __( 'Distance from bottom', 'kenakata-kit' ), __( 'Moves up automatically when the mobile bottom bar is on.', 'kenakata-kit' ), array( 'min' => 8, 'max' => 160, 'unit' => 'px' ) ),
+		'wa_float_color'       => kk_f( 'whatsapp', 'color', __( 'WhatsApp button colour', 'kenakata-kit' ) ),
+		'call_float_color'     => kk_f( 'whatsapp', 'color', __( 'Call button colour', 'kenakata-kit' ), __( 'Empty = primary colour.', 'kenakata-kit' ), array( 'empty' => true ) ),
+		'float_icon_color'     => kk_f( 'whatsapp', 'color', __( 'Icon and text colour', 'kenakata-kit' ) ),
+		'float_size'           => kk_f( 'whatsapp', 'number', __( 'Button size', 'kenakata-kit' ), __( 'The call button is a little smaller.', 'kenakata-kit' ), array( 'min' => 40, 'max' => 72, 'unit' => 'px' ) ),
+		'wa_float_mobile'      => kk_f( 'whatsapp', 'toggle', __( 'Show on mobile', 'kenakata-kit' ) ),
+		'wa_float_desktop'     => kk_f( 'whatsapp', 'toggle', __( 'Show on desktop', 'kenakata-kit' ) ),
+
+		/* ---------------- Product page ---------------- */
+		'h_pp_wa'              => kk_f( 'product', 'heading', __( 'Order by WhatsApp / call', 'kenakata-kit' ), __( 'Shown below the Add to cart and Buy Now buttons. Set the number in the "WhatsApp & call" tab.', 'kenakata-kit' ) ),
+		'pp_wa_enable'         => kk_f( 'product', 'toggle', __( '"Order on WhatsApp" button', 'kenakata-kit' ) ),
+		'pp_wa_text'           => kk_f( 'product', 'text', __( 'Button text', 'kenakata-kit' ), '', array( 'show_if' => 'pp_wa_enable' ) ),
+		'pp_wa_message'        => kk_f( 'product', 'textarea', __( 'Pre-filled message', 'kenakata-kit' ), __( '{product} = product name, {price} = price, {url} = product link.', 'kenakata-kit' ), array( 'show_if' => 'pp_wa_enable' ) ),
+		'pp_call_enable'       => kk_f( 'product', 'toggle', __( '"Call to order" button', 'kenakata-kit' ) ),
+		'pp_call_text'         => kk_f( 'product', 'text', __( 'Call button text', 'kenakata-kit' ), '', array( 'show_if' => 'pp_call_enable' ) ),
+		'pp_wa_color'          => kk_f( 'product', 'color', __( 'WhatsApp button colour', 'kenakata-kit' ) ),
+		'pp_call_color'        => kk_f( 'product', 'color', __( 'Call button colour', 'kenakata-kit' ), __( 'Empty = primary colour.', 'kenakata-kit' ), array( 'empty' => true ) ),
+		'pp_btn_text_color'    => kk_f( 'product', 'color', __( 'Text colour of these buttons', 'kenakata-kit' ) ),
+		'h_pp_desc'            => kk_f( 'product', 'heading', __( 'Product description', 'kenakata-kit' ) ),
+		'desc_fallback'        => kk_f( 'product', 'toggle', __( 'Long short descriptions go to the Description tab', 'kenakata-kit' ), __( 'For products whose full text was saved as the short description (common after an import) and whose Description is empty: the Description tab shows the full text, and next to the price only the first lines appear with a "Read more" link. Products are not changed.', 'kenakata-kit' ) ),
+		'stock_always'         => kk_f( 'product', 'toggle', __( 'Always show the stock status', 'kenakata-kit' ), __( 'WooCommerce shows nothing for an in-stock product when "Manage stock?" is off, so the Elementor "Product Stock" widget stays empty. With this on, those products show the text below. Products that track stock keep WooCommerce\'s own text (e.g. "12 in stock", "Out of stock").', 'kenakata-kit' ) ),
+		'stock_in_text'        => kk_f( 'product', 'text', __( '"In stock" text', 'kenakata-kit' ), __( 'For example: স্টকে আছে', 'kenakata-kit' ), array( 'show_if' => 'stock_always' ) ),
+		'rm_enable'            => kk_f( 'product', 'toggle', __( 'Fold long descriptions ("Read more")', 'kenakata-kit' ), __( 'Shows the first part of a long description with a "Read more" button that opens the full text. The whole text stays on the page, so search engines still read it. Short descriptions are not folded.', 'kenakata-kit' ) ),
+		'rm_height'            => kk_f( 'product', 'number', __( 'Visible height (computer and tablet)', 'kenakata-kit' ), '', array( 'min' => 120, 'max' => 1200, 'unit' => 'px', 'show_if' => 'rm_enable' ) ),
+		'rm_height_mobile'     => kk_f( 'product', 'number', __( 'Visible height (phone)', 'kenakata-kit' ), '', array( 'min' => 120, 'max' => 1200, 'unit' => 'px', 'show_if' => 'rm_enable' ) ),
+		'rm_more_text'         => kk_f( 'product', 'text', __( '"Read more" button text', 'kenakata-kit' ), __( 'For example: আরও পড়ুন', 'kenakata-kit' ), array( 'show_if' => 'rm_enable' ) ),
+		'rm_less_text'         => kk_f( 'product', 'text', __( '"Show less" button text', 'kenakata-kit' ), __( 'For example: কম দেখুন', 'kenakata-kit' ), array( 'show_if' => 'rm_enable' ) ),
+		'rm_color'             => kk_f( 'product', 'color', __( 'Button colour', 'kenakata-kit' ), __( 'Empty = primary colour.', 'kenakata-kit' ), array( 'empty' => true, 'show_if' => 'rm_enable' ) ),
+		/* ---------------- Wishlist ---------------- */
+		'wl_enable'            => kk_f( 'wishlist', 'toggle', __( 'Wishlist', 'kenakata-kit' ) ),
+		'wl_card'              => kk_f( 'wishlist', 'toggle', __( '♡ on product cards', 'kenakata-kit' ), __( 'Top-right corner of the product picture.', 'kenakata-kit' ), array( 'show_if' => 'wl_enable' ) ),
+		'wl_single'            => kk_f( 'wishlist', 'toggle', __( '"Add to wishlist" on product pages', 'kenakata-kit' ), __( 'Next to the Add to cart button.', 'kenakata-kit' ), array( 'show_if' => 'wl_enable' ) ),
+		'wl_page'              => kk_f( 'wishlist', 'select', __( 'Wishlist page', 'kenakata-kit' ), __( 'This page needs the "Wishlist Page" widget or the [kk_wishlist] shortcode. Default: the page with the slug "wishlist". It also appears in My account.', 'kenakata-kit' ), array( 'options' => $pages, 'show_if' => 'wl_enable' ) ),
+		'wl_text_add'          => kk_f( 'wishlist', 'text', __( 'Button text', 'kenakata-kit' ), '', array( 'show_if' => 'wl_enable' ) ),
+		'wl_text_added'        => kk_f( 'wishlist', 'text', __( 'Button text when saved', 'kenakata-kit' ), '', array( 'show_if' => 'wl_enable' ) ),
+		'wl_empty_text'        => kk_f( 'wishlist', 'text', __( 'Text when the list is empty', 'kenakata-kit' ), '', array( 'show_if' => 'wl_enable' ) ),
+		'wl_share'             => kk_f( 'wishlist', 'toggle', __( '"Share on WhatsApp" button on the wishlist page', 'kenakata-kit' ), __( 'Sends a link that opens the same list, e.g. to family who will pay.', 'kenakata-kit' ), array( 'show_if' => 'wl_enable' ) ),
+		'wl_color'             => kk_f( 'wishlist', 'color', __( 'Heart colour when saved', 'kenakata-kit' ), '', array( 'show_if' => 'wl_enable' ) ),
+
+		/* ---------------- Questions & answers ---------------- */
+		'qa_enable'            => kk_f( 'qa', 'toggle', __( 'Questions & answers on product pages', 'kenakata-kit' ) ),
+		'qa_tab_title'         => kk_f( 'qa', 'text', __( 'Tab title', 'kenakata-kit' ), __( 'The number of answered questions is added, e.g. "Questions (3)".', 'kenakata-kit' ), array( 'show_if' => 'qa_enable' ) ),
+		'qa_require_phone'     => kk_f( 'qa', 'toggle', __( 'Phone number is required', 'kenakata-kit' ), __( 'Fewer spam questions, and your team can call back. The number is never shown on the site.', 'kenakata-kit' ), array( 'show_if' => 'qa_enable' ) ),
+		'qa_notify'            => kk_f( 'qa', 'toggle', __( 'Email me about new questions', 'kenakata-kit' ), __( 'Sent to the site admin email (Settings → General).', 'kenakata-kit' ), array( 'show_if' => 'qa_enable' ) ),
+		'qa_team_name'         => kk_f( 'qa', 'text', __( 'Name shown on answers', 'kenakata-kit' ), '', array( 'show_if' => 'qa_enable' ) ),
+		'qa_intro'             => kk_f( 'qa', 'textarea', __( 'Text above the question form', 'kenakata-kit' ), '', array( 'show_if' => 'qa_enable' ) ),
+		'qa_thanks'            => kk_f( 'qa', 'text', __( 'Message after sending a question', 'kenakata-kit' ), '', array( 'show_if' => 'qa_enable' ) ),
+
+		'h_pp_swatches'        => kk_f( 'product', 'heading', __( 'Variation options (size, colour…)', 'kenakata-kit' ), __( 'Shows each option as a button instead of a dropdown. Out-of-stock combinations are greyed out. The look follows the primary colour; the "Add to Cart Form" Elementor widget can style it further.', 'kenakata-kit' ) ),
+		'swatches_enable'      => kk_f( 'product', 'toggle', __( 'Show options as buttons', 'kenakata-kit' ) ),
+		'swatches_height'      => kk_f( 'product', 'number', __( 'Button height', 'kenakata-kit' ), '', array( 'min' => 28, 'max' => 64, 'unit' => 'px', 'show_if' => 'swatches_enable' ) ),
+		'swatches_radius'      => kk_f( 'product', 'number', __( 'Button corner radius', 'kenakata-kit' ), '', array( 'min' => 0, 'max' => 32, 'unit' => 'px', 'show_if' => 'swatches_enable' ) ),
+		'swatches_clear'       => kk_f( 'product', 'toggle', __( 'Show the "Clear" link', 'kenakata-kit' ), '', array( 'show_if' => 'swatches_enable' ) ),
+		'h_fd'                 => kk_f( 'checkout', 'heading', __( 'Free delivery', 'kenakata-kit' ), __( 'Delivery becomes free when the products in the cart reach this amount. A progress bar shows how much more to buy.', 'kenakata-kit' ) ),
+		'fd_enable'            => kk_f( 'checkout', 'toggle', __( 'Free delivery above an amount', 'kenakata-kit' ) ),
+		'fd_amount'            => kk_f( 'checkout', 'number', __( 'Amount for free delivery', 'kenakata-kit' ), __( 'Cart total of products (after coupons).', 'kenakata-kit' ), array( 'min' => 0, 'max' => 1000000, 'unit' => '৳', 'show_if' => 'fd_enable' ) ),
+		'fd_text'              => kk_f( 'checkout', 'text', __( 'Message before the amount is reached', 'kenakata-kit' ), __( '{remaining} = amount still needed, {amount} = free delivery amount.', 'kenakata-kit' ), array( 'show_if' => 'fd_enable' ) ),
+		'fd_done'              => kk_f( 'checkout', 'text', __( 'Message when free delivery is unlocked', 'kenakata-kit' ), '', array( 'show_if' => 'fd_enable' ) ),
+		'fd_product'           => kk_f( 'checkout', 'toggle', __( 'Show on product pages', 'kenakata-kit' ), __( 'Elementor product templates: use the "Free Delivery Bar" widget instead.', 'kenakata-kit' ), array( 'show_if' => 'fd_enable' ) ),
+		'fd_cart'              => kk_f( 'checkout', 'toggle', __( 'Show on the cart page', 'kenakata-kit' ), '', array( 'show_if' => 'fd_enable' ) ),
+		'fd_checkout'          => kk_f( 'checkout', 'toggle', __( 'Show on the checkout page', 'kenakata-kit' ), '', array( 'show_if' => 'fd_enable' ) ),
+		'fd_drawer'            => kk_f( 'checkout', 'toggle', __( 'Show in the side cart', 'kenakata-kit' ), '', array( 'show_if' => 'fd_enable' ) ),
+		'h_pp_delivery'        => kk_f( 'product', 'heading', __( 'Delivery information box', 'kenakata-kit' ), __( 'Delivery charges (taken from the shipping settings), delivery time and cash-on-delivery information.', 'kenakata-kit' ) ),
+		'pp_delivery_enable'   => kk_f( 'product', 'toggle', __( 'Show delivery information on product pages', 'kenakata-kit' ) ),
+		'di_title'             => kk_f( 'product', 'text', __( 'Box title', 'kenakata-kit' ) ),
+		'di_show_charges'      => kk_f( 'product', 'toggle', __( 'Show delivery charges', 'kenakata-kit' ) ),
+		'di_lines'             => kk_f( 'product', 'textarea', __( 'Extra lines', 'kenakata-kit' ), __( 'One line each.', 'kenakata-kit' ) ),
+		'di_bg'                => kk_f( 'product', 'color', __( 'Box background', 'kenakata-kit' ), __( 'Empty = soft background colour.', 'kenakata-kit' ), array( 'empty' => true ) ),
+		'di_icon_color'        => kk_f( 'product', 'color', __( 'Icon colour', 'kenakata-kit' ), __( 'Empty = primary colour.', 'kenakata-kit' ), array( 'empty' => true ) ),
+		'h_pp_sticky'          => kk_f( 'product', 'heading', __( 'Sticky bar on mobile', 'kenakata-kit' ), __( 'When the customer scrolls down, the image, price and Buy Now button stay at the bottom of the screen.', 'kenakata-kit' ) ),
+		'sticky_enable'        => kk_f( 'product', 'toggle', __( 'Sticky Buy Now bar', 'kenakata-kit' ) ),
+		'sticky_show_cart'     => kk_f( 'product', 'toggle', __( 'Also show Add to cart in the sticky bar', 'kenakata-kit' ), '', array( 'show_if' => 'sticky_enable' ) ),
+		'sticky_bg'            => kk_f( 'product', 'color', __( 'Sticky bar background', 'kenakata-kit' ), '', array( 'show_if' => 'sticky_enable' ) ),
+
+		/* ---------------- Reviews ---------------- */
+		'rv_enable'            => kk_f( 'reviews', 'toggle', __( 'Use the Kenakata Kit reviews section', 'kenakata-kit' ), __( 'A rating summary with bars, review cards with photos and a tidy review form. Works inside the product tabs and with the "Product Reviews" Elementor widget. Turn off to get the theme/WooCommerce reviews back.', 'kenakata-kit' ) ),
+		'rv_title'             => kk_f( 'reviews', 'text', __( 'Section title', 'kenakata-kit' ), '', array( 'show_if' => 'rv_enable' ) ),
+		'rv_summary'           => kk_f( 'reviews', 'toggle', __( 'Rating summary (average + 5-to-1 star bars)', 'kenakata-kit' ), '', array( 'show_if' => 'rv_enable' ) ),
+		'rv_gallery'           => kk_f( 'reviews', 'toggle', __( 'Customer photos strip above the reviews', 'kenakata-kit' ), '', array( 'show_if' => 'rv_enable' ) ),
+		'rv_button_text'       => kk_f( 'reviews', 'text', __( '"Write a review" button text', 'kenakata-kit' ), '', array( 'show_if' => 'rv_enable' ) ),
+		'rv_tab'               => kk_f( 'reviews', 'toggle', __( 'Show reviews in the product tabs', 'kenakata-kit' ), __( 'Turn off when you place the "Product Reviews" widget on the product template, so reviews are not shown twice.', 'kenakata-kit' ) ),
+		'rv_open_all'          => kk_f( 'reviews', 'toggle', __( 'Allow reviews on every product', 'kenakata-kit' ), __( 'Imported products often have "Enable reviews" switched off, so they show no Reviews tab. When on, every product accepts reviews, without changing the products.', 'kenakata-kit' ) ),
+		'h_rv_photos'          => kk_f( 'reviews', 'heading', __( 'Photos in reviews', 'kenakata-kit' ), __( 'Customers can attach photos to their review. Photos are checked (JPG, PNG or WebP only), resized and saved in the Media Library.', 'kenakata-kit' ) ),
+		'rv_photos'            => kk_f( 'reviews', 'toggle', __( 'Allow photos in reviews', 'kenakata-kit' ), '', array( 'show_if' => 'rv_enable' ) ),
+		'rv_photos_max'        => kk_f( 'reviews', 'number', __( 'Photos per review', 'kenakata-kit' ), '', array( 'min' => 1, 'max' => 5, 'unit' => __( 'photos', 'kenakata-kit' ), 'show_if' => 'rv_photos' ) ),
+		'rv_photos_size'       => kk_f( 'reviews', 'number', __( 'Largest photo size', 'kenakata-kit' ), '', array( 'min' => 1, 'max' => 10, 'unit' => 'MB', 'show_if' => 'rv_photos' ) ),
+		'rv_photos_who'        => kk_f( 'reviews', 'select', __( 'Who can add photos', 'kenakata-kit' ), __( '"Customers who bought it" checks the email address against past orders.', 'kenakata-kit' ), array( 'show_if' => 'rv_photos', 'options' => array( 'everyone' => __( 'Everyone who can review', 'kenakata-kit' ), 'buyers' => __( 'Customers who bought the product', 'kenakata-kit' ), 'logged_in' => __( 'Logged-in customers', 'kenakata-kit' ) ) ) ),
+		'rv_photos_hold'       => kk_f( 'reviews', 'toggle', __( 'Approve reviews with photos before they appear', 'kenakata-kit' ), __( 'Recommended. Approve them in Products → Reviews.', 'kenakata-kit' ), array( 'show_if' => 'rv_photos' ) ),
+		'rv_photo_label'       => kk_f( 'reviews', 'text', __( 'Photo field label', 'kenakata-kit' ), '', array( 'show_if' => 'rv_photos' ) ),
+
+		/* ---------------- Side cart ---------------- */
+		'cart_drawer_enable'   => kk_f( 'cart', 'toggle', __( 'Enable side cart', 'kenakata-kit' ), __( 'Clicking the "Cart Icon" widget or the [kk_cart_icon] shortcode opens the cart from the side.', 'kenakata-kit' ) ),
+		'cart_drawer_auto_open'=> kk_f( 'cart', 'toggle', __( 'Open the side cart after Add to cart', 'kenakata-kit' ), '', array( 'show_if' => 'cart_drawer_enable' ) ),
+		'cart_drawer_title'    => kk_f( 'cart', 'text', __( 'Side cart title', 'kenakata-kit' ), '', array( 'show_if' => 'cart_drawer_enable' ) ),
+		'cart_drawer_width'    => kk_f( 'cart', 'number', __( 'Side cart width', 'kenakata-kit' ), __( 'Phones always use almost the full width.', 'kenakata-kit' ), array( 'min' => 300, 'max' => 640, 'unit' => 'px', 'show_if' => 'cart_drawer_enable' ) ),
+		'cart_drawer_ajax'     => kk_f( 'cart', 'toggle', __( 'Product pages: add to cart without reloading', 'kenakata-kit' ), __( 'Add to cart on the product page adds the product in the background and opens the side cart. Buy Now still goes straight to checkout.', 'kenakata-kit' ), array( 'show_if' => 'cart_drawer_enable' ) ),
+		'cart_drawer_thumbs'   => kk_f( 'cart', 'toggle', __( 'Show product pictures', 'kenakata-kit' ), '', array( 'show_if' => 'cart_drawer_enable' ) ),
+		'cart_drawer_remove'   => kk_f( 'cart', 'toggle', __( 'Show the remove (×) button', 'kenakata-kit' ), __( 'Lets customers take a product out of the cart without leaving the page.', 'kenakata-kit' ), array( 'show_if' => 'cart_drawer_enable' ) ),
+		'cart_drawer_view'     => kk_f( 'cart', 'toggle', __( 'Show the "View cart" button', 'kenakata-kit' ), __( 'Off = only the Checkout button.', 'kenakata-kit' ), array( 'show_if' => 'cart_drawer_enable' ) ),
+		'cart_drawer_view_text'     => kk_f( 'cart', 'text', __( '"View cart" button text', 'kenakata-kit' ), '', array( 'show_if' => 'cart_drawer_enable' ) ),
+		'cart_drawer_checkout_text' => kk_f( 'cart', 'text', __( 'Checkout button text', 'kenakata-kit' ), '', array( 'show_if' => 'cart_drawer_enable' ) ),
+		'cart_drawer_empty_text'    => kk_f( 'cart', 'text', __( 'Text when the cart is empty', 'kenakata-kit' ), '', array( 'show_if' => 'cart_drawer_enable' ) ),
+
+		/* ---------------- Bottom bar ---------------- */
+		'h_bbar_main'          => kk_f( 'mobile', 'heading', __( 'Bottom Bar', 'kenakata-kit' ), __( 'Shown only on phones, fixed to the bottom of the screen. Page content is pushed up automatically so nothing is hidden behind it, and the iPhone home-indicator area is respected.', 'kenakata-kit' ) ),
+		'mnav_enable'          => kk_f( 'mobile', 'toggle', __( 'Enable the bottom bar', 'kenakata-kit' ) ),
+		'bbar_items'           => kk_f( 'mobile', 'bbar_items', __( 'Menu items', 'kenakata-kit' ), __( 'Drag to change the order. Switch items on or off and change the label, icon and link. 4–5 items work best on phones.', 'kenakata-kit' ) ),
+		'h_bbar_look'          => kk_f( 'mobile', 'heading', __( 'Look', 'kenakata-kit' ) ),
+		'bbar_style'           => kk_f( 'mobile', 'choice', __( 'Style', 'kenakata-kit' ), __( '"Pill" puts a soft coloured pill behind the active icon. "Floating" is a rounded bar with space around it.', 'kenakata-kit' ), array( 'options' => array( 'classic' => __( 'Classic', 'kenakata-kit' ), 'pill' => __( 'Pill', 'kenakata-kit' ), 'floating' => __( 'Floating', 'kenakata-kit' ) ) ) ),
+		'bbar_featured'        => kk_f( 'mobile', 'select', __( 'Highlighted item', 'kenakata-kit' ), __( 'Shows one item as a raised round button in the primary colour (for example Cart or Home). Put it in the middle of the list for the best look.', 'kenakata-kit' ), array( 'options' => kk_bbar_featured_options() ) ),
+		'bbar_labels'          => kk_f( 'mobile', 'toggle', __( 'Show labels under the icons', 'kenakata-kit' ), __( 'Recommended: labels make the menu easier to understand.', 'kenakata-kit' ) ),
+		'bbar_height'          => kk_f( 'mobile', 'number', __( 'Bar height', 'kenakata-kit' ), __( 'The iPhone home-indicator space is added on top of this.', 'kenakata-kit' ), array( 'min' => 48, 'max' => 90, 'unit' => 'px' ) ),
+		'bbar_icon_size'       => kk_f( 'mobile', 'number', __( 'Icon size', 'kenakata-kit' ), '', array( 'min' => 16, 'max' => 34, 'unit' => 'px' ) ),
+		'bbar_label_size'      => kk_f( 'mobile', 'number', __( 'Label size', 'kenakata-kit' ), '', array( 'min' => 9, 'max' => 16, 'unit' => 'px' ) ),
+		'h_bbar_colors'        => kk_f( 'mobile', 'heading', __( 'Colours', 'kenakata-kit' ) ),
+		'bbar_bg'              => kk_f( 'mobile', 'color', __( 'Background', 'kenakata-kit' ) ),
+		'bbar_border'          => kk_f( 'mobile', 'color', __( 'Top border', 'kenakata-kit' ) ),
+		'bbar_shadow'          => kk_f( 'mobile', 'choice', __( 'Shadow', 'kenakata-kit' ), '', array( 'options' => array( 'none' => __( 'None', 'kenakata-kit' ), 'soft' => __( 'Soft', 'kenakata-kit' ), 'strong' => __( 'Strong', 'kenakata-kit' ) ) ) ),
+		'bbar_icon_color'      => kk_f( 'mobile', 'color', __( 'Icon colour', 'kenakata-kit' ) ),
+		'bbar_text_color'      => kk_f( 'mobile', 'color', __( 'Label colour', 'kenakata-kit' ) ),
+		'bbar_active_color'    => kk_f( 'mobile', 'color', __( 'Active item colour', 'kenakata-kit' ), __( 'Icon and label of the page the customer is on, and the highlighted button.', 'kenakata-kit' ) ),
+		'bbar_active_bg'       => kk_f( 'mobile', 'color', __( 'Active pill colour', 'kenakata-kit' ), __( 'Used by the "Pill" style.', 'kenakata-kit' ) ),
+		'bbar_badge_bg'        => kk_f( 'mobile', 'color', __( 'Cart count badge', 'kenakata-kit' ) ),
+		'h_bbar_where'         => kk_f( 'mobile', 'heading', __( 'Where and when', 'kenakata-kit' ) ),
+		'bbar_breakpoint'      => kk_f( 'mobile', 'number', __( 'Show on screens narrower than', 'kenakata-kit' ), __( '767 = phones only (recommended). 1024 = phones and tablets.', 'kenakata-kit' ), array( 'min' => 360, 'max' => 1200, 'unit' => 'px' ) ),
+		'bbar_hide_checkout'   => kk_f( 'mobile', 'toggle', __( 'Hide on the checkout page', 'kenakata-kit' ), __( 'Keeps the customer focused on finishing the order.', 'kenakata-kit' ) ),
+		'bbar_hide_cart'       => kk_f( 'mobile', 'toggle', __( 'Hide on the cart page', 'kenakata-kit' ) ),
+		'bbar_hide_on_scroll'  => kk_f( 'mobile', 'toggle', __( 'Hide while scrolling down', 'kenakata-kit' ), __( 'The bar slides away while reading and comes back when scrolling up.', 'kenakata-kit' ) ),
+		'bbar_cats_url'        => kk_f( 'mobile', 'text', __( 'Categories page link', 'kenakata-kit' ), __( 'Used by items that link to "Categories page". Empty = the page with the slug "categories", or the Shop page.', 'kenakata-kit' ), array( 'placeholder' => 'https://' ) ),
+
+		/* ---------------- Store dashboard ---------------- */
+		'sd_enable'            => kk_f( 'storedash', 'toggle', __( 'Turn on the store dashboard', 'kenakata-kit' ), sprintf( /* translators: %s: dashboard address */ __( 'Opens at %s for administrators, shop managers and Store Managers.', 'kenakata-kit' ), function_exists( 'kk_sd_url' ) ? kk_sd_url() : home_url( '/dashboard/' ) ) ),
+		'sd_slug'              => kk_f( 'storedash', 'text', __( 'Address', 'kenakata-kit' ), __( 'The part after your domain, e.g. "dashboard" or "manage". Lowercase English letters, numbers and dashes. Do not use the address of an existing page.', 'kenakata-kit' ), array( 'show_if' => 'sd_enable' ) ),
+		'sd_title'             => kk_f( 'storedash', 'text', __( 'Dashboard title', 'kenakata-kit' ), __( 'Shown in the browser tab. Empty = "Store dashboard".', 'kenakata-kit' ), array( 'show_if' => 'sd_enable' ) ),
+		'sd_low_stock'         => kk_f( 'storedash', 'number', __( 'Warn about low stock at', 'kenakata-kit' ), __( 'Products with stock counting on and this many or fewer items left are listed as "Low stock". 0 = off.', 'kenakata-kit' ), array( 'min' => 0, 'max' => 1000, 'unit' => __( 'items', 'kenakata-kit' ), 'show_if' => 'sd_enable' ) ),
+		'sd_login_redirect'    => kk_f( 'storedash', 'choice', __( 'After login, go to', 'kenakata-kit' ), __( 'Where team members land right after they log in. Customers are never affected: they go where they went before.', 'kenakata-kit' ), array( 'options' => array( 'managers' => __( 'Dashboard for Store Managers only', 'kenakata-kit' ), 'staff' => __( 'Dashboard for the whole team (administrators too)', 'kenakata-kit' ) ), 'show_if' => 'sd_enable' ) ),
+		'sd_see_sales'         => kk_f( 'storedash', 'toggle', __( 'Show sales amounts to managers', 'kenakata-kit' ), __( 'Turn off to show shop managers and Store Managers only the number of orders, not the money. Administrators always see everything.', 'kenakata-kit' ), array( 'show_if' => 'sd_enable' ) ),
+		'h_sd_colours'         => kk_f( 'storedash', 'heading', __( 'Dashboard colours', 'kenakata-kit' ), __( 'Pick one set below. It colours the dashboard and these settings screens. White, black and the green/yellow/red status colours stay the same so everything stays easy to read. Shop colours for your customers are set in "Colours & design".', 'kenakata-kit' ) ),
+		'sd_theme'             => kk_f( 'storedash', 'theme', __( 'Colour set', 'kenakata-kit' ), '', array( 'options' => array_merge( array( 'auto' => __( 'Same as my shop (automatic)', 'kenakata-kit' ) ), function_exists( 'kk_sd_presets' ) ? array_map( function ( $p ) { return $p[0]; }, kk_sd_presets() ) : array(), array( 'custom' => __( 'My own two colours', 'kenakata-kit' ) ) ) ) ),
+		'sd_color_primary'     => kk_f( 'storedash', 'color', __( 'Main colour', 'kenakata-kit' ), __( 'Buttons, the active menu item and links. Choose a colour dark enough for white text.', 'kenakata-kit' ), array( 'show_if' => 'sd_theme=custom' ) ),
+		'sd_color_accent'      => kk_f( 'storedash', 'color', __( 'Second colour', 'kenakata-kit' ), __( 'Highlights: new-order alert, today\'s bar in the chart, the active menu marker.', 'kenakata-kit' ), array( 'show_if' => 'sd_theme=custom' ) ),
+		'incomplete_enable'    => kk_f( 'incomplete', 'toggle', __( 'Save incomplete orders', 'kenakata-kit' ), __( 'While a customer types on the checkout page, their name, phone, address and cart are saved on your site as soon as a valid phone number is entered. Nothing is sent to anyone else. Tell your customers in your privacy policy (a text is added to WordPress → Privacy automatically).', 'kenakata-kit' ) ),
+		'incomplete_wait'      => kk_f( 'incomplete', 'number', __( 'Count as left after (minutes)', 'kenakata-kit' ), __( 'A checkout shows in your list only after the customer has been quiet for this long, so people still typing are not bothered.', 'kenakata-kit' ), array( 'min' => 5, 'max' => 240, 'show_if' => 'incomplete_enable' ) ),
+		'incomplete_keep_days' => kk_f( 'incomplete', 'number', __( 'Keep for (days)', 'kenakata-kit' ), __( 'Older entries are deleted automatically. Finished or dismissed ones go after a week.', 'kenakata-kit' ), array( 'min' => 1, 'max' => 365, 'show_if' => 'incomplete_enable' ) ),
+		'h_courier_send'       => kk_f( 'courier', 'heading', __( 'Send parcels from here', 'kenakata-kit' ), __( 'Turn on each courier you use and add its details. Only turned-on couriers appear on orders: one courier = one button, two couriers = two buttons. The courier, tracking ID and tracking link are then filled in automatically when a parcel is sent.', 'kenakata-kit' ) ),
+		'courier_steadfast_on' => kk_f( 'courier', 'toggle', __( 'Steadfast', 'kenakata-kit' ), __( 'Send orders to Steadfast with one tap.', 'kenakata-kit' ) ),
+		'courier_steadfast_api_key'    => kk_f( 'courier', 'secret', __( 'API key', 'kenakata-kit' ), __( 'From your Steadfast merchant account (its API settings). It is kept private: only the last 4 characters are ever shown. Leave empty to keep the saved key.', 'kenakata-kit' ), array( 'show_if' => 'courier_steadfast_on' ) ),
+		'courier_steadfast_secret_key' => kk_f( 'courier', 'secret', __( 'Secret key', 'kenakata-kit' ), __( 'The second key from the same Steadfast page. Leave empty to keep the saved key.', 'kenakata-kit' ), array( 'show_if' => 'courier_steadfast_on' ) ),
+		'courier_steadfast_test' => kk_f( 'courier', 'courier_test', __( 'Test Steadfast', 'kenakata-kit' ), __( 'Save first, then test. It only asks Steadfast for your account balance: nothing is booked.', 'kenakata-kit' ), array( 'target' => 'steadfast', 'show_if' => 'courier_steadfast_on' ) ),
+		'courier_pathao_on'    => kk_f( 'courier', 'toggle', __( 'Pathao', 'kenakata-kit' ), __( 'Send orders to Pathao with one tap.', 'kenakata-kit' ) ),
+		'courier_pathao_client_id'     => kk_f( 'courier', 'secret', __( 'Client ID', 'kenakata-kit' ), __( 'From your Pathao Merchant account: Developers\' API → API Credentials. Leave empty to keep the saved value.', 'kenakata-kit' ), array( 'show_if' => 'courier_pathao_on' ) ),
+		'courier_pathao_client_secret' => kk_f( 'courier', 'secret', __( 'Client secret', 'kenakata-kit' ), __( 'From the same Pathao page. Leave empty to keep the saved value.', 'kenakata-kit' ), array( 'show_if' => 'courier_pathao_on' ) ),
+		'courier_pathao_username'      => kk_f( 'courier', 'secret', __( 'Pathao login email', 'kenakata-kit' ), __( 'The email you use to sign in to your Pathao Merchant account. Leave empty to keep the saved value.', 'kenakata-kit' ), array( 'show_if' => 'courier_pathao_on' ) ),
+		'courier_pathao_password'      => kk_f( 'courier', 'secret', __( 'Pathao password', 'kenakata-kit' ), __( 'Your Pathao account password. It is kept private and never shown again. Leave empty to keep the saved value.', 'kenakata-kit' ), array( 'show_if' => 'courier_pathao_on' ) ),
+		'courier_pathao_store_id'      => kk_f( 'courier', 'text', __( 'Store ID', 'kenakata-kit' ), __( 'The number of your pickup store in Pathao. Not sure? Save the details above, then press "Test connection": it lists your stores with their numbers.', 'kenakata-kit' ), array( 'show_if' => 'courier_pathao_on' ) ),
+		'courier_pathao_sandbox'       => kk_f( 'courier', 'toggle', __( 'Use Pathao\'s test server', 'kenakata-kit' ), __( 'Only for trying things out with test credentials: parcels are not real.', 'kenakata-kit' ), array( 'show_if' => 'courier_pathao_on' ) ),
+		'courier_default_weight'       => kk_f( 'courier', 'select', __( 'Parcel weight', 'kenakata-kit' ), __( 'Weight sent for every parcel to couriers that ask for it (kg).', 'kenakata-kit' ), array( 'options' => array( '0.5' => '0.5 kg', '1' => '1 kg', '2' => '2 kg', '3' => '3 kg', '5' => '5 kg' ), 'show_if' => 'courier_pathao_on' ) ),
+		'courier_pathao_test'  => kk_f( 'courier', 'courier_test', __( 'Test Pathao', 'kenakata-kit' ), __( 'Save first, then test. It lists your Pathao stores with their numbers: nothing is booked.', 'kenakata-kit' ), array( 'target' => 'pathao', 'show_if' => 'courier_pathao_on' ) ),
+		'h_courier_check'      => kk_f( 'courier', 'heading', __( 'Courier check', 'kenakata-kit' ), __( 'A "Courier check" button on every order shows how many parcels this phone number received, how many succeeded and how many were cancelled, with a simple traffic light. It appears only while this is turned on.', 'kenakata-kit' ) ),
+		'courier_check_enable' => kk_f( 'courier', 'toggle', __( 'Turn on Courier check', 'kenakata-kit' ), __( 'Shows the button on orders in the store dashboard. It first looks at your own shop\'s orders; add a BD Courier token below to include other shops and couriers.', 'kenakata-kit' ) ),
+		'courier_bdcourier_token' => kk_f( 'courier', 'secret', __( 'BD Courier API token', 'kenakata-kit' ), __( 'Optional. With it, Courier check also shows the customer\'s record across all couriers (Pathao, Steadfast, RedX, Paperfly and more), not only your own shop. Get a free token from your BD Courier account (API Settings). Note: the customer\'s phone number is sent to BD Courier when you tap Courier check. Leave empty to keep the saved token.', 'kenakata-kit' ), array( 'show_if' => 'courier_check_enable' ) ),
+		'courier_check_test'   => kk_f( 'courier', 'courier_test', __( 'Test BD Courier', 'kenakata-kit' ), __( 'Save first, then test. It checks the token and shows your plan and free look-ups left. It does not use a look-up.', 'kenakata-kit' ), array( 'target' => 'check', 'show_if' => 'courier_check_enable' ) ),
+		'courier_check_cache'  => kk_f( 'courier', 'number', __( 'Remember a look-up for (hours)', 'kenakata-kit' ), __( 'The same phone number is not looked up again for this long, which saves your BD Courier plan. You can still refresh any result by hand.', 'kenakata-kit' ), array( 'min' => 1, 'max' => 168, 'show_if' => 'courier_check_enable' ) ),
+		'courier_good_rate'    => kk_f( 'courier', 'number', __( 'Green from (% successful)', 'kenakata-kit' ), __( 'At or above this success rate: cash on delivery is fine.', 'kenakata-kit' ), array( 'min' => 1, 'max' => 100, 'show_if' => 'courier_check_enable' ) ),
+		'courier_bad_rate'     => kk_f( 'courier', 'number', __( 'Red below (% successful)', 'kenakata-kit' ), __( 'Below this success rate: ask for the delivery charge first. In between is yellow.', 'kenakata-kit' ), array( 'min' => 0, 'max' => 100, 'show_if' => 'courier_check_enable' ) ),
+		'h_sd_team'            => kk_f( 'storedash', 'heading', __( 'Your team', 'kenakata-kit' ), __( 'Give a team member access: Users → Add New User → Role "Store Manager (Kenakata)". They can manage orders, products, pictures and blog posts from the dashboard, and nothing else. Administrators keep full access.', 'kenakata-kit' ) ),
+		'sd_block_admin'       => kk_f( 'storedash', 'toggle', __( 'Keep Store Managers out of WordPress admin', 'kenakata-kit' ), __( 'Store Managers who open wp-admin are sent to the dashboard, and they do not see the admin bar.', 'kenakata-kit' ), array( 'show_if' => 'sd_enable' ) ),
+
+		/* ---------------- Security ---------------- */
+		'sec_force_https'      => kk_f( 'security', 'toggle', __( 'Always use https (secure connection)', 'kenakata-kit' ), __( 'Visitors arriving on http:// are sent to https://. Can only be turned on while you are in the admin over https.', 'kenakata-kit' ) ),
+		'sec_hide_users'       => kk_f( 'security', 'toggle', __( 'Hide admin user names', 'kenakata-kit' ), __( 'Outsiders cannot find your login name through /wp-json/wp/v2/users or ?author=1. Author archive pages are turned off.', 'kenakata-kit' ) ),
+		'sec_disable_xmlrpc'   => kk_f( 'security', 'toggle', __( 'Disable XML-RPC', 'kenakata-kit' ), __( 'Hackers use this old feature to guess passwords. Keep it off unless you use Jetpack or the mobile app.', 'kenakata-kit' ) ),
+		'h_sec_login'          => kk_f( 'security', 'heading', __( 'Login protection', 'kenakata-kit' ) ),
+		'sec_limit_login'      => kk_f( 'security', 'toggle', __( 'Pause login after too many wrong passwords', 'kenakata-kit' ), __( 'Applies to wp-login.php, My account, the login popup and XML-RPC. The connection that made the wrong attempts waits 15 minutes; everybody else can log in normally.', 'kenakata-kit' ) ),
+		'sec_login_attempts'   => kk_f( 'security', 'number', __( 'Wrong passwords allowed', 'kenakata-kit' ), '', array( 'min' => 3, 'max' => 20, 'unit' => __( 'times', 'kenakata-kit' ), 'show_if' => 'sec_limit_login' ) ),
+		'h_sec_more'           => kk_f( 'security', 'heading', __( 'More protection', 'kenakata-kit' ) ),
+		'sec_headers'          => kk_f( 'security', 'toggle', __( 'Browser security headers', 'kenakata-kit' ), __( 'Stops other sites from showing your shop inside a frame, blocks some file tricks and hides the PHP version. With "Always use https" on, browsers are also told to use https only.', 'kenakata-kit' ) ),
+		'sec_hide_version'     => kk_f( 'security', 'toggle', __( 'Hide the WordPress version', 'kenakata-kit' ), __( 'Removes the version number from the page source, so attackers cannot quickly look up known weaknesses.', 'kenakata-kit' ) ),
+		'sec_no_file_edit'     => kk_f( 'security', 'toggle', __( 'Turn off the theme/plugin code editor in the admin', 'kenakata-kit' ), __( 'If a password ever leaks, nobody can change your site\'s code from the admin. Updates still work.', 'kenakata-kit' ) ),
+		'sec_uploads_php'      => kk_f( 'security', 'toggle', __( 'Block PHP files in the uploads folder', 'kenakata-kit' ), __( 'Pictures and documents never need to run as code. Even if a harmful file is uploaded somehow, it cannot run. (Apache/LiteSpeed servers; written to wp-content/uploads/.htaccess.)', 'kenakata-kit' ) ),
+	);
+	return $fields;
+}
+
+/** Features shown as on/off cards on the dashboard: key => [label, tab, short text]. */
+function kk_modules() {
+	return array(
+		'card_enable'        => array( __( 'New product card', 'kenakata-kit' ), 'cards', __( 'A clean, mobile-friendly card for every product list.', 'kenakata-kit' ) ),
+		'buynow_enable'      => array( __( 'Buy Now Button', 'kenakata-kit' ), 'buynow', __( 'Straight to checkout in one click.', 'kenakata-kit' ) ),
+		'co_enable'          => array( __( 'Simple checkout', 'kenakata-kit' ), 'checkout', __( 'Name, phone, address, delivery area.', 'kenakata-kit' ) ),
+		'co_throttle_enable' => array( __( 'Repeat-order block', 'kenakata-kit' ), 'guard', __( 'One order per number within a set time.', 'kenakata-kit' ) ),
+		'ty_enable'          => array( __( 'Thank-you page', 'kenakata-kit' ), 'thankyou', __( 'Your own page after ordering.', 'kenakata-kit' ) ),
+		'sd_enable'          => array( __( 'Store dashboard', 'kenakata-kit' ), 'storedash', __( 'Orders, products and stock at /dashboard – no wp-admin needed.', 'kenakata-kit' ) ),
+		'search_enable'      => array( __( 'Live Search', 'kenakata-kit' ), 'search', __( 'Results with image and price while typing.', 'kenakata-kit' ) ),
+		'popup_enable'       => array( __( 'Login popup', 'kenakata-kit' ), 'account', __( 'Login/registration with phone number.', 'kenakata-kit' ) ),
+		'wa_float_enable'    => array( __( 'Floating WhatsApp', 'kenakata-kit' ), 'whatsapp', __( 'WhatsApp button in the corner of every page.', 'kenakata-kit' ) ),
+		'pp_wa_enable'       => array( __( 'Order on WhatsApp', 'kenakata-kit' ), 'product', __( 'Message with the product name on product pages.', 'kenakata-kit' ) ),
+		'pp_delivery_enable' => array( __( 'Delivery Info', 'kenakata-kit' ), 'product', __( 'Charges and time on product pages.', 'kenakata-kit' ) ),
+		'sticky_enable'      => array( __( 'Sticky Buy Now bar', 'kenakata-kit' ), 'product', __( 'At the bottom of product pages on mobile.', 'kenakata-kit' ) ),
+		'swatches_enable'    => array( __( 'Variation buttons', 'kenakata-kit' ), 'product', __( 'Size/colour options as buttons.', 'kenakata-kit' ) ),
+		'wl_enable'          => array( __( 'Wishlist', 'kenakata-kit' ), 'wishlist', __( '♡ button, wishlist page and count.', 'kenakata-kit' ) ),
+		'qa_enable'          => array( __( 'Questions & answers', 'kenakata-kit' ), 'qa', __( '"Questions" tab on product pages.', 'kenakata-kit' ) ),
+		'rv_enable'          => array( __( 'Photo reviews', 'kenakata-kit' ), 'reviews', __( 'Rating summary and customer photos.', 'kenakata-kit' ) ),
+		'cart_drawer_enable' => array( __( 'Side cart', 'kenakata-kit' ), 'cart', __( 'A cart that slides in from the side.', 'kenakata-kit' ) ),
+		'mnav_enable'        => array( __( 'Bottom Bar', 'kenakata-kit' ), 'mobile', __( 'An app-like menu at the bottom on phones.', 'kenakata-kit' ) ),
+		'sec_hide_users'     => array( __( 'Hide user names', 'kenakata-kit' ), 'security', __( 'Lowers hacking risk.', 'kenakata-kit' ) ),
+		'sec_force_https'    => array( __( 'Always https', 'kenakata-kit' ), 'security', __( 'Redirects http to https.', 'kenakata-kit' ) ),
+	);
+}
+
+/** Options for the "Highlighted item" select. */
+function kk_bbar_featured_options() {
+	$out = array( '' => __( 'None', 'kenakata-kit' ) );
+	foreach ( kk_bbar_default_items() as $it ) {
+		$out[ $it['id'] ] = $it['label'];
+	}
+	return $out;
+}

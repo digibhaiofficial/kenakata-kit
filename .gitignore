@@ -1,0 +1,6 @@
+dist/
+dev/node_modules/
+__pycache__/
+*.zip
+.DS_Store
+Thumbs.db

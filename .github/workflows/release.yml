@@ -1,0 +1,38 @@
+# Push a tag like v3.11.0 → checks run, the zip is built and attached to a new GitHub release.
+# Shops then see "Update available" in WordPress (includes/updater.php reads the latest release).
+name: Release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+      - name: PHP 7.4 syntax
+        run: find kenakata-kit -name '*.php' -print0 | xargs -0 -n1 php -l | (! grep -v '^No syntax errors')
+      - name: JS syntax
+        run: for f in $(find kenakata-kit -name '*.js'); do node --check "$f"; done
+      - name: Tag matches the plugin version
+        run: |
+          V=$(grep -oP "define\( 'KK_VERSION', '\K[^']+" kenakata-kit/kenakata-kit.php)
+          H=$(grep -oP '\* Version:\s+\K\S+' kenakata-kit/kenakata-kit.php)
+          test "$V" = "$H" || { echo "Version mismatch: header $H, KK_VERSION $V"; exit 1; }
+          test "v$V" = "$GITHUB_REF_NAME" || { echo "Tag $GITHUB_REF_NAME does not match version $V"; exit 1; }
+          if grep -q "__KK_PUBKEY__" kenakata-kit/includes/license.php; then echo "License public key missing"; exit 1; fi
+          echo "V=$V" >> "$GITHUB_ENV"
+      - name: Build zip
+        run: python3 dev/build-zip.py
+      - name: Release notes from readme.txt
+        run: |
+          awk -v v="= $V =" '$0==v{f=1;next} /^= [0-9]/{if(f)exit} f' kenakata-kit/readme.txt > notes.md
+          test -s notes.md || echo "Kenakata Kit $V" > notes.md
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" "dist/kenakata-kit-$V.zip" --title "Kenakata Kit $V" --notes-file notes.md

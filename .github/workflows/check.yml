@@ -1,0 +1,27 @@
+name: Check
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+      - name: PHP 7.4 syntax
+        run: find kenakata-kit -name '*.php' -print0 | xargs -0 -n1 php -l | (! grep -v '^No syntax errors')
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+      - name: PHP 8.3 syntax
+        run: find kenakata-kit -name '*.php' -print0 | xargs -0 -n1 php -l | (! grep -v '^No syntax errors')
+      - name: JS syntax
+        run: for f in $(find kenakata-kit -name '*.js'); do node --check "$f"; done
+      - name: Version in both places
+        run: |
+          H=$(grep -oP '\* Version:\s+\K\S+' kenakata-kit/kenakata-kit.php)
+          C=$(grep -oP "define\( 'KK_VERSION', '\K[^']+" kenakata-kit/kenakata-kit.php)
+          echo "header $H, KK_VERSION $C"; test "$H" = "$C"

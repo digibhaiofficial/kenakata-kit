@@ -1,0 +1,1153 @@
+<h4>সব কুরিয়ার মিলিয়ে হিসাব (BD Courier, ঐচ্ছিক)</h4>
+<p>শুধু আপনার দোকানের নয়, <strong>সব কুরিয়ারে</strong> (Pathao, Steadfast, RedX, Paperfly ইত্যাদি) এই ফোন নম্বরের হিসাব দেখতে BD Courier-এর টোকেন লাগে।</p>
+<ol class="steps">
+	<li><span class="path">bdcourier.com</span>-এ ফ্রি অ্যাকাউন্ট খুলুন, API Settings থেকে টোকেন কপি করুন।</li>
+	<li><span class="path">Kenakata Kit → Courier booking</span>-এ <strong>Turn on Courier check</strong> চালু করে <strong>BD Courier API token</strong> ঘরে টোকেন বসিয়ে <strong>Save</strong> করুন।</li>
+	<li><strong>Test BD Courier</strong> চাপলে "Connected" আর আপনার প্ল্যান ও বাকি ফ্রি যাচাই দেখাবে। এটা কোনো যাচাই খরচ করে না।</li>
+</ol>
+<ul>
+	<li>টোকেন দিলে Courier check-এ সবার ওপরে <strong>All couriers (BD Courier)</strong> আসে: মোট, সফল, বাতিল, শতকরা হার, কুরিয়ার অনুযায়ী ভাগ আর অন্য দোকানের রিপোর্ট। নিচে আপনার নিজের দোকানের হিসাবও থাকে। পরামর্শের রং আসে যেটাতে বেশি তথ্য আছে সেটা থেকে।</li>
+	<li>একই নম্বর আবার দেখলে নতুন যাচাই খরচ হয় না: ফলাফল কিছু ঘণ্টা (ডিফল্ট ২৪) মনে রাখা হয়। নতুন করে দেখতে ফলাফলের পাশের <strong>Refresh</strong> চাপুন।</li>
+	<li>BD Courier-এর সাথে যোগাযোগ না হলে একটা সতর্কবার্তা আসে, আর আপনার দোকানের হিসাব ঠিকই দেখা যায়। টোকেন না থাকলে বাইরে কোনো অনুরোধই যায় না।</li>
+</ul>
+<div class="warn"><strong>গোপনীয়তা</strong>Courier check চাপলে ক্রেতার ফোন নম্বর BD Courier-কে পাঠানো হয়। এটা আপনার দোকানের গোপনীয়তা নীতিতে উল্লেখ করে রাখুন।</div>
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>কেনাকাটা কিট গাইড</title>
+<meta name="description" content="Kenakata Kit (কেনাকাটা কিট) WordPress/WooCommerce প্লাগিনের সম্পূর্ণ বাংলা ব্যবহার নির্দেশিকা।">
+<style>
+:root {
+	--bg: #f7f6f2; --surface: #ffffff; --text: #17201c; --muted: #5c6661; --border: #e4e2dc;
+	--brand: #038348; --brand-d: #026b3a; --soft: #eaf5ef; --accent: #c8155a; --soft-accent: #fceaf1;
+	--warn-bg: #fff4e5; --warn: #8a4b00; --code-bg: #f1efe9;
+	--font: "Hind Siliguri", "Noto Sans Bengali", "Nirmala UI", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) {
+		--bg: #0f1412; --surface: #171e1b; --text: #e8ece9; --muted: #a4aea9; --border: #2a3430;
+		--brand: #3fbf7f; --brand-d: #63d397; --soft: #16302a; --accent: #f06a9b; --soft-accent: #3a1d29;
+		--warn-bg: #3a2a12; --warn: #f3c37a; --code-bg: #222b27;
+	}
+}
+:root[data-theme="dark"] {
+	--bg: #0f1412; --surface: #171e1b; --text: #e8ece9; --muted: #a4aea9; --border: #2a3430;
+	--brand: #3fbf7f; --brand-d: #63d397; --soft: #16302a; --accent: #f06a9b; --soft-accent: #3a1d29;
+	--warn-bg: #3a2a12; --warn: #f3c37a; --code-bg: #222b27;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 16px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font); font-size: 17px; line-height: 1.75; }
+a { color: var(--brand); }
+a:hover { color: var(--brand-d); }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+.layout { display: grid; grid-template-columns: 290px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+nav.toc { position: sticky; top: 0; height: 100vh; overflow-y: auto; padding: 24px 16px 40px; border-right: 1px solid var(--border); background: var(--surface); }
+.toc__brand { display: flex; align-items: center; gap: 10px; margin: 0 6px 16px; font-weight: 700; font-size: 18px; }
+.toc__logo { display: inline-flex; width: 38px; height: 38px; align-items: center; justify-content: center; border-radius: 10px; background: var(--brand); color: #fff; }
+.toc__search { width: 100%; margin: 0 0 12px; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font: inherit; font-size: 15px; }
+.toc ol { list-style: none; margin: 0; padding: 0; }
+.toc li a { display: block; padding: 5px 10px; border-radius: 7px; color: var(--text); text-decoration: none; font-size: 15px; line-height: 1.45; }
+.toc li a:hover { background: var(--soft); color: var(--brand-d); }
+.toc li li a { padding-left: 24px; font-size: 14px; color: var(--muted); }
+.toc li.is-hidden { display: none; }
+main { min-width: 0; padding: 32px 48px 80px; }
+header.hero { padding: 32px; margin-bottom: 32px; border-radius: 18px; background: linear-gradient(135deg, var(--brand), #015a32); color: #fff; }
+header.hero h1 { margin: 0 0 8px; font-size: 34px; line-height: 1.25; }
+header.hero p { margin: 0; max-width: 760px; font-size: 18px; opacity: .95; }
+header.hero ul { margin: 8px 0 10px; max-width: 760px; font-size: 17px; opacity: .95; }
+.hero__meta { margin-top: 16px !important; font-size: 14px !important; opacity: .85 !important; }
+section { margin: 0 0 40px; }
+h2 { margin: 48px 0 12px; padding-top: 8px; font-size: 27px; line-height: 1.3; border-top: 1px solid var(--border); padding-top: 28px; }
+section:first-of-type h2 { border-top: 0; margin-top: 0; padding-top: 0; }
+h3 { margin: 28px 0 8px; font-size: 21px; line-height: 1.35; }
+h4 { margin: 20px 0 6px; font-size: 18px; }
+p, li { max-width: 860px; }
+ul, ol { padding-left: 24px; }
+li { margin: 4px 0; }
+code { padding: 2px 6px; border-radius: 5px; background: var(--code-bg); font-family: ui-monospace, Consolas, monospace; font-size: .86em; overflow-wrap: anywhere; }
+kbd { padding: 1px 6px; border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 5px; background: var(--surface); font-size: .85em; }
+.path { display: inline-block; padding: 1px 8px; border-radius: 6px; background: var(--soft); color: var(--brand-d); font-weight: 600; font-size: .92em; }
+.card { margin: 16px 0; padding: 18px 22px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+.card > :first-child { margin-top: 0; }
+.card > :last-child { margin-bottom: 0; }
+.tip, .warn { margin: 16px 0; padding: 14px 18px; border-radius: 12px; max-width: 860px; }
+.tip { background: var(--soft); border-left: 4px solid var(--brand); }
+.warn { background: var(--warn-bg); border-left: 4px solid var(--warn); color: var(--text); }
+.tip strong:first-child, .warn strong:first-child { display: block; margin-bottom: 2px; }
+.steps { counter-reset: s; list-style: none; padding: 0; }
+.steps > li { position: relative; padding: 0 0 14px 52px; margin: 0; }
+.steps > li::before { counter-increment: s; content: counter(s); position: absolute; left: 0; top: 0; width: 36px; height: 36px; border-radius: 50%; background: var(--brand); color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; line-height: 1; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; margin: 16px 0; }
+.grid .card { margin: 0; }
+.grid .card h4 { margin: 0 0 6px; }
+table { width: 100%; max-width: 980px; margin: 14px 0; border-collapse: collapse; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; font-size: 15px; }
+th, td { padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+th { background: var(--soft); font-weight: 700; }
+tr:last-child td { border-bottom: 0; }
+.table-wrap { overflow-x: auto; }
+.widget { margin: 18px 0; padding: 20px 22px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+.widget h3 { margin-top: 0; display: flex; align-items: center; gap: 10px; }
+.widget h3 .tag { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--soft-accent); color: var(--accent); }
+.widget dl { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 6px 16px; margin: 10px 0 0; }
+.widget dt { font-weight: 700; color: var(--muted); }
+.widget dd { margin: 0; }
+.back { display: inline-block; margin-top: 8px; font-size: 14px; }
+footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--muted); font-size: 14px; }
+.menu-btn { display: none; }
+@media (max-width: 900px) {
+	.layout { grid-template-columns: 1fr; }
+	nav.toc { position: static; height: auto; max-height: none; border-right: 0; border-bottom: 1px solid var(--border); display: none; }
+	nav.toc.is-open { display: block; }
+	.menu-btn { display: inline-flex; position: sticky; top: 0; z-index: 3; width: 100%; padding: 12px 16px; border: 0; border-bottom: 1px solid var(--border); background: var(--surface); color: var(--text); font: 700 16px var(--font); cursor: pointer; }
+	main { padding: 20px 16px 60px; }
+	header.hero { padding: 22px; }
+	header.hero h1 { font-size: 26px; }
+	h2 { font-size: 23px; }
+	.widget dl { grid-template-columns: 1fr; }
+	.widget dt { margin-top: 6px; }
+}
+</style>
+</head>
+<body>
+<button type="button" class="menu-btn" aria-expanded="false" aria-controls="toc">☰ সূচিপত্র</button>
+<div class="layout">
+<nav class="toc" id="toc" aria-label="সূচিপত্র">
+	<div class="toc__brand"><span class="toc__logo" aria-hidden="true">🛒</span> কেনাকাটা কিট গাইড</div>
+	<label for="q" class="sr" style="position:absolute;left:-9999px">গাইডে খুঁজুন</label>
+	<input id="q" class="toc__search" type="search" placeholder="খুঁজুন… (যেমন: Bottom Bar, ব্যাজ, WhatsApp)">
+	<ol>
+		<li><a href="#intro">১. কেনাকাটা কিট কী</a></li>
+		<li><a href="#install">২. ইনস্টল ও আপডেট</a></li>
+		<li><a href="#quickstart">৩. প্রথম ১০ মিনিটের সেটআপ</a></li>
+		<li><a href="#admin">৪. সেটিংস পেজ চেনা</a><ol><li><a href="#language">ভাষা: ইংরেজি না বাংলা</a></li><li><a href="#menu-map">মেনুর নাম: ইংরেজি ↔ বাংলা</a></li></ol></li>
+		<li><a href="#settings">৫. প্রতিটি সেটিং</a>
+			<ol>
+				<li><a href="#s-design">Colours &amp; design</a></li>
+				<li><a href="#s-cards">Product cards</a></li>
+				<li><a href="#s-terms">Brands &amp; categories</a></li>
+				<li><a href="#s-buynow">Buy Now Button</a></li>
+				<li><a href="#s-checkout">Checkout</a></li>
+				<li><a href="#s-guard">Fake-order protection</a></li>
+				<li><a href="#s-thankyou">Thank-you page</a></li>
+				<li><a href="#s-tracking">Order tracking &amp; courier</a></li>
+				<li><a href="#s-storedash">Store dashboard</a></li>
+				<li><a href="#s-courier">Courier booking</a></li>
+				<li><a href="#s-incomplete">Incomplete orders</a></li>
+				<li><a href="#s-search">Live Search</a></li>
+				<li><a href="#s-account">Login popup</a></li>
+				<li><a href="#s-whatsapp">WhatsApp &amp; call</a></li>
+				<li><a href="#s-product">Product page (ভ্যারিয়েশন বাটন)</a></li>
+				<li><a href="#s-reviews">Reviews (ছবিসহ রিভিউ)</a></li>
+				<li><a href="#s-cart">Side cart</a></li>
+				<li><a href="#s-bbar">Bottom Bar (মোবাইল)</a></li>
+				<li><a href="#s-security">Security</a></li>
+				<li><a href="#s-tools">Tools (Export / Import)</a></li>
+			</ol>
+		</li>
+		<li><a href="#widgets">৬. Elementor উইজেট</a></li>
+		<li><a href="#recipes">৭. ধাপে ধাপে কাজ</a></li>
+		<li><a href="#shortcodes">৮. শর্টকোড</a></li>
+		<li><a href="#faq">৯. সমস্যা ও সমাধান</a></li>
+		<li><a href="#dev">১০. ডেভেলপারদের জন্য</a></li>
+		<li><a href="#changelog">১১. পরিবর্তনের তালিকা</a></li>
+	</ol>
+</nav>
+
+<main id="main">
+<header class="hero">
+	<h1>কেনাকাটা কিট (Kenakata Kit): সম্পূর্ণ গাইড</h1>
+	<p>বাংলাদেশি WooCommerce দোকানের জন্য একটি প্লাগিন। এতে আছে:</p>
+	<ul>
+		<li>সহজ চেকআউট, Buy Now আর ভুয়া অর্ডার সুরক্ষা।</li>
+		<li>অর্ডার ট্র্যাকিং আর কুরিয়ার লিংক।</li>
+		<li>সুন্দর প্রোডাক্ট কার্ড, ব্র্যান্ড আর ক্যাটাগরি ক্যারোসেল।</li>
+		<li>WhatsApp, সাইড কার্ট আর মোবাইল Bottom Bar।</li>
+		<li>ছবিসহ রিভিউ, সাইজ/রঙের বাটন আর ১৫টি Elementor উইজেট।</li>
+	</ul>
+	<p>কোড না জেনেও সব কিছু বদলানো যায়।</p>
+	<p class="hero__meta">ভার্সন ৩.৪.০ · তৈরি করেছে DigiBhai.com · প্রয়োজন: WordPress ৬.৩+, WooCommerce, PHP ৭.৪+ · Elementor থাকলে উইজেট, না থাকলে শর্টকোড</p>
+</header>
+
+<section id="intro">
+<h2>১. কেনাকাটা কিট কী</h2>
+<p>WooCommerce দিয়ে দোকান বানালে বাংলাদেশের কাস্টমারের জন্য অনেক কিছু বাড়তি লাগে:</p>
+<ul>
+	<li>ছোট চেকআউট ফর্ম</li>
+	<li>ঢাকার ভেতরে/বাইরে আলাদা ডেলিভারি চার্জ</li>
+	<li>১১ সংখ্যার মোবাইল নম্বর যাচাই</li>
+	<li>ফোন নম্বর দিয়ে অর্ডার ট্র্যাকিং</li>
+	<li>WhatsApp</li>
+	<li>মোবাইলে অ্যাপের মতো নিচের মেনু</li>
+</ul>
+<p>কেনাকাটা কিট এসব একসাথে দেয়, আর প্রতিটি জিনিস সেটিংস পেজ বা Elementor থেকে সাজানো যায়।</p>
+<div class="grid">
+	<div class="card"><h4>বিক্রি বাড়ায়</h4>Buy Now বাটন, ছোট চেকআউট, WhatsApp-এ অর্ডার, মোবাইলে স্টিকি Buy Now বার, সাইড কার্ট, Bottom Bar।</div>
+	<div class="card"><h4>ভুয়া অর্ডার কমায়</h4>ঠিক ১১ সংখ্যার নম্বর ছাড়া অর্ডার হয় না, আর একই নম্বর থেকে ৩০ মিনিটে একটার বেশি অর্ডার হয় না।</div>
+	<div class="card"><h4>কাস্টমারকে জানায়</h4>সুন্দর থ্যাংক-ইউ পেজ, ফোন নম্বর দিয়ে অর্ডার ট্র্যাকিং, কুরিয়ারের ট্র্যাকিং লিংক।</div>
+	<div class="card"><h4>দেখতে সুন্দর</h4>মোবাইলে ঠিকঠাক প্রোডাক্ট কার্ড, ছাড়ের ব্যাজ "-১২%", ব্র্যান্ড ও ক্যাটাগরি ক্যারোসেল, লাইভ সার্চ।</div>
+</div>
+</section>
+
+<section id="install">
+<h2>২. ইনস্টল ও আপডেট</h2>
+<ol class="steps">
+	<li><strong>zip ফাইলটা রাখুন।</strong> <code>kenakata-kit.zip</code> ফাইলটা আনজিপ করবেন না।</li>
+	<li>WordPress অ্যাডমিনে <span class="path">Plugins → Add New Plugin → Upload Plugin</span> চাপুন।</li>
+	<li>ফাইল বেছে <strong>Install Now</strong> চাপুন। আগের ভার্সন থাকলে WordPress জিজ্ঞেস করবে "Replace current with uploaded", সেখানে <strong>Replace</strong> চাপুন। আপনার সেটিংস হারাবে না।</li>
+	<li><strong>Activate</strong> চাপুন। বাম মেনুতে <span class="path">Kenakata Kit</span> দেখা যাবে।</li>
+</ol>
+<div class="tip"><strong>টিপ</strong>আপডেটের আগে <span class="path">Kenakata Kit → Tools (Export / Import)</span> থেকে সেটিংস ফাইল ডাউনলোড করে রাখুন। কিছু উল্টাপাল্টা হলে Import করে আগের অবস্থায় ফেরত যেতে পারবেন।</div>
+<div class="warn"><strong>ক্যাশ প্লাগিন থাকলে</strong>আপডেট বা সেটিং বদলানোর পর LiteSpeed Cache, WP Rocket বা Cloudflare-এর ক্যাশ মুছুন, নইলে পুরনো ডিজাইন দেখাতে পারে।</div>
+</section>
+
+<section id="quickstart">
+<h2>৩. প্রথম ১০ মিনিটের সেটআপ</h2>
+<ol class="steps">
+	<li><strong>ডেলিভারি চার্জ:</strong>
+		<ol>
+			<li><span class="path">WooCommerce → Settings → Shipping</span>-এ একটা জোন (Bangladesh) বানিয়ে দুটো <strong>Flat rate</strong> যোগ করুন।</li>
+			<li>নাম দিন "Inside Dhaka" (চার্জ ১০০) আর "Outside Dhaka" (চার্জ ১৫০)।</li>
+			<li>চেকআউটে এই দুটোই বড় বাটন হিসেবে দেখাবে।</li>
+		</ol>
+	</li>
+	<li><strong>পেমেন্ট:</strong> <span class="path">WooCommerce → Settings → Payments</span>-এ <strong>Cash on delivery</strong> চালু করুন।</li>
+	<li><strong>দুটো পেজ:</strong>
+		<ul>
+			<li>"Thank You" (স্লাগ <code>thank-you</code>): Elementor-এ <strong>Order Confirmation</strong> উইজেট বসান।</li>
+			<li>"Track Order" (স্লাগ <code>track-order</code>): <strong>Order Tracking</strong> উইজেট বসান।</li>
+			<li>Elementor না থাকলে পেজে <code>[kk_thank_you]</code> আর <code>[kk_order_tracking]</code> লিখুন।</li>
+		</ul>
+	</li>
+	<li><strong>রং:</strong> <span class="path">Kenakata Kit → Colours &amp; design</span>-এ ব্র্যান্ডের রং দিন। ডানে লাইভ প্রিভিউতে সাথে সাথে দেখা যাবে।</li>
+	<li><strong>WhatsApp:</strong> <span class="path">Kenakata Kit → WhatsApp &amp; call</span>-এ নম্বর দিন, তারপর ড্যাশবোর্ডে <strong>Floating WhatsApp</strong> আর <strong>Order on WhatsApp</strong> চালু করুন।</li>
+	<li><strong>মোবাইল মেনু:</strong> <span class="path">Kenakata Kit → Bottom Bar</span> চালু করুন (বিস্তারিত <a href="#s-bbar">এখানে</a>)।</li>
+	<li><strong>দেখে নিন:</strong> <span class="path">Kenakata Kit → Dashboard</span>-এর <strong>Site status</strong> অংশে সব সবুজ টিক আছে কি না দেখুন। লাল থাকলে পাশের <strong>Fix →</strong> লিংকে যান।</li>
+</ol>
+</section>
+
+<section id="admin">
+<h2>৪. সেটিংস পেজ চেনা</h2>
+<p>বাম মেনুর <span class="path">Kenakata Kit</span>-এ ক্লিক করলে সেটিংস পেজ খুলবে। পুরনো জায়গা <span class="path">WooCommerce → Kenakata Kit</span> থেকেও যাওয়া যায়।</p>
+<ul>
+	<li><strong>বাম পাশের তালিকা:</strong> বিভাগগুলো (Start, Design, Sales, Customers, Site, Help)। যেটায় ক্লিক করবেন তার সেটিং ডানে দেখাবে।</li>
+	<li><strong>সুইচ (On/Off):</strong> সবুজ মানে চালু। ড্যাশবোর্ডের সুইচ চাপলেই সাথে সাথে সেভ হয়।</li>
+	<li><strong>রঙের ঘর:</strong> ক্লিক করলে রং বাছার বক্স খোলে। "Default" চাপলে আগের রঙে ফেরে।</li>
+	<li><strong>স্লাইডার:</strong> টেনে বা পাশের ঘরে সংখ্যা লিখে মাপ দিন। সীমার বাইরে কিছু লিখলে প্লাগিন নিজে থেকে ঠিক করে নেয়।</li>
+	<li><strong>লাইভ প্রিভিউ:</strong> Colours &amp; design, Product cards আর Bottom Bar পেজে নমুনা দেখা যায়, সেভ করার আগেই।</li>
+	<li><strong>সেভ বাটন:</strong> <strong>Save settings</strong> নিচে আটকে থাকে। সেভ না করা পরিবর্তন থাকলে পাশে কমলা লেখা দেখাবে।</li>
+	<li><strong>ডিফল্টে ফেরত:</strong> প্রতিটি পেজের নিচে <strong>Reset this page to defaults</strong> লিংক আছে।</li>
+	<li><strong>About:</strong> ড্যাশবোর্ডে ভার্সন আর DigiBhai.com-এর লিংক।</li>
+</ul>
+<h3 id="language">ভাষা: ইংরেজি না বাংলা</h3>
+<p>প্লাগিনের সেটিংস পেজ আর Elementor উইজেট ডিফল্টে <strong>ইংরেজিতে</strong> থাকে। বাংলায় দেখতে চাইলে দুটো উপায়:</p>
+<ul>
+	<li><span class="path">Kenakata Kit → Dashboard → Plugin language</span>-এ <strong>বাংলা</strong> বেছে নিন। শুধু এই প্লাগিনের পেজ আর উইজেট বাংলা হবে, বাকি WordPress আগের মতো থাকবে।</li>
+	<li><strong>Automatic</strong> রাখলে আপনার WordPress প্রোফাইলের ভাষা মেনে চলে (<span class="path">Users → Profile → Language</span>-এ বাংলা দিলে বাংলা)।</li>
+</ul>
+<p>কাস্টমার যা দেখে (সার্চ, পপআপ, ট্র্যাকিং, থ্যাংক-ইউ পেজ) তা সাইটের ভাষা মেনে চলে: <span class="path">Settings → General → Site Language</span> বাংলা হলে বাংলায়, ইংরেজি হলে ইংরেজিতে। বাটন আর চেকআউটের লেখা (যেমন "Buy Now", "Confirm Order") সেটিংসে আপনি নিজে যা লিখবেন তা-ই দেখাবে।</p>
+<h3 id="menu-map">মেনুর নাম: ইংরেজি ↔ বাংলা</h3>
+<p>এই গাইডে মেনুর নাম ইংরেজিতে লেখা, কারণ প্লাগিন ডিফল্টে ইংরেজি। বাংলা ভাষা বাছলে একই জায়গায় নিচের নামগুলো দেখবেন:</p>
+<div class="table-wrap"><table>
+	<tr><th>English</th><th>বাংলা</th><th>English</th><th>বাংলা</th></tr>
+	<tr><td>Dashboard</td><td>ড্যাশবোর্ড</td><td>Live Search</td><td>লাইভ সার্চ</td></tr>
+	<tr><td>Colours &amp; design</td><td>রং ও ডিজাইন</td><td>Login popup</td><td>লগইন পপআপ</td></tr>
+	<tr><td>Product cards</td><td>প্রোডাক্ট কার্ড</td><td>WhatsApp &amp; call</td><td>WhatsApp ও কল</td></tr>
+	<tr><td>Brands &amp; categories</td><td>ব্র্যান্ড ও ক্যাটাগরি</td><td>Product page</td><td>প্রোডাক্ট পেজ</td></tr>
+	<tr><td>Buy Now Button</td><td>Buy Now বাটন</td><td>Side cart</td><td>সাইড কার্ট</td></tr>
+	<tr><td>Checkout</td><td>চেকআউট</td><td>Bottom Bar</td><td>বটম বার</td></tr>
+	<tr><td>Fake-order protection</td><td>ভুয়া অর্ডার সুরক্ষা</td><td>Security</td><td>নিরাপত্তা</td></tr>
+	<tr><td>Thank-you page</td><td>থ্যাংক-ইউ পেজ</td><td>Tools (Export / Import)</td><td>টুলস (Export / Import)</td></tr>
+	<tr><td>Store dashboard</td><td>স্টোর ড্যাশবোর্ড</td><td></td><td></td></tr>
+	<tr><td>Courier booking</td><td>কুরিয়ার বুকিং</td><td></td><td></td></tr>
+	<tr><td>Incomplete orders</td><td>অসমাপ্ত অর্ডার</td><td></td><td></td></tr>
+	<tr><td>Order tracking &amp; courier</td><td>অর্ডার ট্র্যাকিং ও কুরিয়ার</td><td>Elementor widgets / Shortcodes / Full guide</td><td>Elementor উইজেট / শর্টকোড / সম্পূর্ণ গাইড</td></tr>
+</table></div>
+</section>
+
+<section id="settings">
+<h2>৫. প্রতিটি সেটিং</h2>
+
+<h3 id="s-design">Colours &amp; design (রং ও ডিজাইন)</h3>
+<p>পুরো প্লাগিনের চেহারা এখান থেকে নিয়ন্ত্রণ হয়।</p>
+<div class="table-wrap"><table>
+	<tr><th>সেটিং</th><th>কী করে</th></tr>
+	<tr><td>Use Elementor Global Colors</td><td>চালু থাকলে Elementor-এর Site Settings → Global Colors-এর Primary, Accent আর Text রং ব্যবহার হয়। ফলে Elementor-এ রং বদলালে প্লাগিনেও বদলায়।</td></tr>
+	<tr><td>Primary colour</td><td>Add to cart, লিংক, বেছে নেওয়া ডেলিভারি এরিয়া, পেজ নম্বর।</td></tr>
+	<tr><td>Accent colour</td><td>Buy Now বাটন। সাদা লেখা পড়া যায় এমন গাঢ় রং দিন।</td></tr>
+	<tr><td>Discount badge colour / text colour</td><td>কার্ডের কোণের "-১২%" ব্যাজের পেছনের আর লেখার রং।</td></tr>
+	<tr><td>Price colour / Rating star colour</td><td>দামের লেখা; কার্ড আর রিভিউয়ের তারা।</td></tr>
+	<tr><td>Font</td><td>"inherit" থাকলে থিমের ফন্টই চলবে। বাংলা লেখার জন্য Hind Siliguri ভালো (থিমে লোড করা থাকতে হবে)।</td></tr>
+	<tr><td>Buttons</td><td>উচ্চতা, কোণ, লেখার সাইজ, মোটা-পাতলা, বড় হাতের অক্ষর আর লেখার রং (Button text colour)। মোবাইলে উচ্চতা ৪৪px বা বেশি রাখুন।</td></tr>
+	<tr><td>Form fields</td><td>চেকআউট, ট্র্যাকিং আর পপআপের লেখার ঘরের উচ্চতা ও কোণ।</td></tr>
+	<tr><td>Strong styles</td><td>থিম বাটনের রং বা মাপ বদলে দিলে এটা চালু রাখুন। Elementor উইজেটের Style সেটিং তবুও সবসময় কাজ করবে।</td></tr>
+</table></div>
+
+<h3 id="s-cards">Product cards (প্রোডাক্ট কার্ড)</h3>
+<p>শপ, ক্যাটাগরি, ব্র্যান্ড, সার্চ রেজাল্ট, রিলেটেড প্রোডাক্ট: সব জায়গার প্রোডাক্ট এই কার্ডে দেখায়। মোবাইলে নাম কখনো দামের নিচে ঢাকবে না, কারণ নাম নির্দিষ্ট লাইনে কেটে "…" দেখায় আর সব কার্ড সমান উঁচু থাকে।</p>
+<ul>
+	<li><strong>Card style:</strong> Bordered / Shadow / Flat।</li>
+	<li><strong>Image shape:</strong> বর্গ বা লম্বা। সব প্রোডাক্টের ছবি একই মাপে দেখায়।</li>
+	<li><strong>Image fit:</strong> "Whole image" দিলে বোতল বা বাক্সের কিছু কাটা যায় না।</li>
+	<li><strong>Product name lines:</strong> ২ রাখা ভালো। লম্বা নামের জন্য ৩।</li>
+	<li><strong>Badge text:</strong> <code>-{percent}%</code> দিলে "-১২%", <code>{amount}৳ ছাড়</code> দিলে "২০০৳ ছাড়", শুধু <code>Sale</code> দিলে "Sale"।</li>
+	<li><strong>Buttons to show:</strong> পাশাপাশি, উপর-নিচে, শুধু Buy Now, শুধু Add to cart, বা কোনোটাই না।</li>
+	<li><strong>Buttons on mobile:</strong> "Cart icon + Buy Now" দিলে ছোট স্ক্রিনে দুটো বাটন এক লাইনে আঁটে। কম্পিউটারেও কার্ড খুব সরু হলে (এক সারিতে ৫–৬টা) Add to cart নিজে থেকে আইকন হয়ে যায়।</li>
+	<li><strong>Shop, category and brand pages:</strong> প্রতি পেজে কয়টি প্রোডাক্ট (Products per page), আর কম্পিউটার, ট্যাবলেট ও মোবাইলে এক সারিতে কয়টি।</li>
+	<li><strong>Use this card for every product list:</strong> বন্ধ করলে থিম বা WooCommerce-এর নিজের কার্ড দেখায়, পাশে Buy Now বাটন যোগ হয়।</li>
+</ul>
+<div class="tip"><strong>টিপ</strong>Elementor-এর <strong>Products Grid</strong> উইজেটে প্রতিটি সেকশন আলাদা করে সাজানো যায়। এখানকার সেটিং হলো ডিফল্ট।</div>
+
+<h3 id="s-terms">Brands &amp; categories (ব্র্যান্ড ও ক্যাটাগরি)</h3>
+<p>ব্র্যান্ড আর ক্যাটাগরি কার্ডের ডিফল্ট সেটিং। Elementor-এর <strong>Brands</strong> আর <strong>Categories</strong> উইজেটে প্রতিটি সেকশন আলাদা করে বদলানো যায়।</p>
+<ul>
+	<li><strong>Card style:</strong> Card with border / No border / Round image + name / Logo only (ব্র্যান্ডের জন্য; লোগো না থাকলে নাম দেখায়)।</li>
+	<li><strong>ছবি দেওয়া:</strong> <span class="path">Products → Brands</span> (বা Categories) → এডিট → <strong>Thumbnail</strong>। ছবি না থাকলে নামের প্রথম অক্ষর দেখায়।</li>
+	<li><strong>ক্যারোসেল:</strong>
+		<ul>
+			<li>একসাথে কয়টি দেখাবে (কম্পিউটার, ট্যাবলেট ও মোবাইলে আলাদা)।</li>
+			<li>Autoplay আর কত সেকেন্ড পর পর।</li>
+			<li>Loop, তীর আর ডট।</li>
+		</ul>
+	</li>
+</ul>
+
+<h3 id="s-buynow">Buy Now Button</h3>
+<ul>
+	<li><strong>কীভাবে কাজ করে:</strong> Buy Now চাপলে প্রোডাক্টটি কার্টে যোগ হয়ে সরাসরি চেকআউট খোলে। প্রোডাক্ট পেজে quantity আর ভ্যারিয়েশন (সাইজ/রং) মেনে চলে।</li>
+	<li><strong>Buy only this product:</strong> চালু করলে কার্টের আগের জিনিস সরে যায়। বেশি বিক্রির জন্য অনেক দোকান এটা বন্ধ রাখে।</li>
+	<li><strong>প্রোডাক্ট কার্ডে:</strong> সব প্রোডাক্টে একই দুটো বাটন, Add to cart আর Buy Now ("Select options" আর দেখায় না)।</li>
+	<li><strong>ভ্যারিয়েবল প্রোডাক্ট (সাইজ/রং):</strong>
+		<ul>
+			<li>প্রতিটি অপশনের ডিফল্ট দেওয়া থাকলে (<span class="path">Product data → Variations → Default Form Values</span>): Add to cart সেই অপশনটা পেজ রিলোড ছাড়া কার্টে যোগ করে, আর Buy Now সরাসরি চেকআউটে নেয়।</li>
+			<li>ডিফল্ট না থাকলে, বা ডিফল্ট অপশন স্টকে না থাকলে: দুটো বাটনই প্রোডাক্ট পেজে নেয়, সেখানে কাস্টমার অপশন বাছবে।</li>
+		</ul>
+	</li>
+</ul>
+
+<h3 id="s-checkout">Checkout (চেকআউট)</h3>
+<ul>
+	<li><strong>ঘর:</strong> নাম, ফোন, ঠিকানা, ডেলিভারি এরিয়া আর (চাইলে) ইমেইল। প্রতিটি ঘরের লেবেল আর হালকা লেখা বদলানো যায়।</li>
+	<li><strong>দেশ:</strong> দেশের ঘর লুকানো থাকে; সব অর্ডার <strong>Country</strong> সেটিং অনুযায়ী ধরা হয়।</li>
+	<li><strong>Delivery area:</strong> শিপিং মেথডগুলোই এরিয়া বাটন। নতুন এরিয়া (যেমন "ঢাকার আশেপাশে ১২০") যোগ করতে শিপিং সেটিংয়ে আরেকটা Flat rate যোগ করুন।</li>
+	<li><strong>কার্ট পেজ:</strong> ডেলিভারি চার্জ শুধু তথ্য হিসেবে দেখায়; কাস্টমার এরিয়া বাছে চেকআউটে। এরিয়া বাছার আগে মোট টাকা লুকানো থাকে।</li>
+	<li><strong>ভুলের মেসেজ:</strong> পরিষ্কার একটাই মেসেজ দেখায়, যেমন "Full name is a required field."।</li>
+	<li><strong>Promo code (coupon) field:</strong> কার্ট আর চেকআউট দুটোতেই / শুধু চেকআউটে / শুধু কার্টে / কোথাও না। কোনো অফার না চললে লুকিয়ে রাখুন। WooCommerce-এ কুপন চালুই থাকে, তাই পরে আবার দেখানো যায়।</li>
+</ul>
+<div class="warn"><strong>মনে রাখুন</strong>সহজ চেকআউট WooCommerce-এর "ক্লাসিক" চেকআউটে কাজ করে (শর্টকোড <code>[woocommerce_checkout]</code> বা Elementor-এর <strong>Checkout Form</strong> উইজেট)। ব্লক চেকআউট ব্যবহার করলে Checkout পেজটা ক্লাসিক শর্টকোডে বদলে নিন।</div>
+
+<h3 id="s-guard">Fake-order protection (ভুয়া অর্ডার সুরক্ষা)</h3>
+<ul>
+	<li><strong>Phone number check:</strong> "Exactly 11 digits" দিলে কাস্টমার ১১টার বেশি সংখ্যা টাইপই করতে পারে না। ভুল নম্বরে (১০ সংখ্যা, +880, অক্ষর) অর্ডার হয় না। চেকআউট, ট্র্যাকিং আর রেজিস্ট্রেশন তিন জায়গায় কাজ করে।</li>
+	<li><strong>Repeat-order block:</strong> একই নম্বর থেকে নির্দিষ্ট মিনিটের মধ্যে দ্বিতীয় অর্ডার নেওয়া হয় না (ডিফল্ট ৩০)। আগের অর্ডার Cancelled বা Failed হলে আবার অর্ডার করা যায়। মেসেজে <code>{minutes}</code> = বাকি সময়, <code>{order}</code> = আগের অর্ডার নম্বর।</li>
+	<li><strong>Also block the same internet connection (IP):</strong> সাবধানে চালু করুন; একই মোবাইল অপারেটরের অনেক কাস্টমারের IP একই হতে পারে।</li>
+	<li><strong>Never block admins / shop managers:</strong> আপনি নিজে ফোনে অর্ডার নিয়ে বসাতে পারবেন।</li>
+</ul>
+
+<h3 id="s-thankyou">Thank-you page (থ্যাংক-ইউ পেজ)</h3>
+<ul>
+	<li><strong>কী দেখায়:</strong> অর্ডারের পর কাস্টমার আপনার বানানো পেজে যায়। সেখানে অর্ডার নম্বর, তারিখ, মোট টাকা, প্রোডাক্ট, ঠিকানা আর "Track your order" বাটন থাকে।</li>
+	<li><strong>শিরোনামে নাম:</strong> শিরোনামে <code>{name}</code> লিখলে কাস্টমারের নাম বসে যায়।</li>
+	<li><strong>নিরাপত্তা:</strong> অর্ডারের গোপন key ছাড়া কেউ অন্যের অর্ডার দেখতে পারে না।</li>
+</ul>
+
+<h3 id="s-tracking">Order tracking &amp; courier (অর্ডার ট্র্যাকিং ও কুরিয়ার)</h3>
+<p>কাস্টমার ট্র্যাকিং পেজে ফোন নম্বর দিলে শেষ ১০টা অর্ডার আর প্রতিটির অবস্থা (Received → Processing → With courier → Delivered) দেখে।</p>
+<h4>কুরিয়ার লিংক যোগ করা (প্রতিদিনের কাজ)</h4>
+<ol class="steps">
+	<li><span class="path">WooCommerce → Orders</span> থেকে অর্ডারটা খুলুন।</li>
+	<li>ডান পাশের <strong>Courier &amp; tracking</strong> বক্সে কুরিয়ার বাছুন (Steadfast, Pathao…), কনসাইনমেন্ট আইডি আর ট্র্যাকিং লিংক দিন।</li>
+	<li><strong>Update</strong> চাপুন। "Mark as Shipped when a tracking link is saved" চালু থাকলে:
+		<ul>
+			<li>অর্ডার <strong>Shipped</strong> হয়ে যাবে।</li>
+			<li>কাস্টমার লিংকসহ একটা নোট পাবে।</li>
+			<li>ট্র্যাকিং পেজে "Track parcel" বাটন দেখাবে।</li>
+		</ul>
+	</li>
+</ol>
+<p>কুরিয়ারের তালিকা বদলাতে <strong>Couriers</strong> ঘরে প্রতি লাইনে <code>key|নাম</code> লিখুন।</p>
+
+<h3 id="s-storedash">Store dashboard (স্টোর ড্যাশবোর্ড)</h3>
+<p>দোকান চালানোর জন্য আলাদা, হালকা একটা পাতা: <code>yoursite.com/dashboard</code>। wp-admin খুলতে হয় না, ফোনে সহজে চলে। এখানে থিম, Elementor বা অন্য প্লাগিনের ফাইল লোড হয় না, তাই খুব দ্রুত খোলে। দোকানের সাধারণ পাতায় এর কোনো ফাইল যায় না।</p>
+<h4>চালু করা</h4>
+<ol class="steps">
+	<li><span class="path">Kenakata Kit → Store dashboard</span> খুলুন।</li>
+	<li><strong>Turn on the store dashboard</strong> সুইচটা চালু করুন। ডিফল্টে এটা বন্ধ থাকে, তাই আপডেট করলে সাইটে কিছু বদলায় না।</li>
+	<li>ঠিকানাটা (যেমন <code>yoursite.com/dashboard</code>) ফোনের হোম স্ক্রিনে বুকমার্ক করে রাখুন।</li>
+</ol>
+<h4>এখানে কী কী করা যায়</h4>
+<ul>
+	<li><strong>Home:</strong> আজ, ৭ দিন আর ৩০ দিনের বিক্রি ও অর্ডার। "নজর দিতে হবে" অংশে নতুন অর্ডার, স্টক কম আর স্টক শেষ।</li>
+	<li><strong>Orders:</strong> স্ট্যাটাস বদলানো, Call ও WhatsApp বোতাম, কুরিয়ার ও ট্র্যাকিং, নোট, ক্রেতার আগের অর্ডারের ইতিহাস।</li>
+	<li><strong>Products:</strong> নাম, দাম, সেল প্রাইস, স্টক, ছবি, ক্যাটাগরি, বিবরণ বদলানো আর নতুন প্রোডাক্ট যোগ করা।</li>
+	<li><strong>Blog:</strong> পোস্ট লেখা, ছবি বসানো, ড্রাফট রাখা বা প্রকাশ করা।</li>
+</ul>
+<h4>টিমের লোককে দেওয়া</h4>
+<ol class="steps">
+	<li><span class="path">Users → Add New User</span> থেকে ইউজার বানান, রোল দিন <strong>Store Manager (Kenakata)</strong>।</li>
+	<li>এই রোল শুধু অর্ডার, প্রোডাক্ট, ছবি আর ব্লগ সামলাতে পারে। সেটিংস, প্লাগিন বা থিম ছুঁতে পারে না।</li>
+	<li>চাইলে <strong>Keep Store Managers out of WordPress admin</strong> চালু রাখুন: তাহলে তারা wp-admin খুললে ড্যাশবোর্ডে ফিরে আসবে।</li>
+</ol>
+<h4>লগইনের পর কোথায় যাবে <span class="tag">৩.৭.০-এ নতুন</span></h4>
+<p><span class="path">Kenakata Kit → Store dashboard → After login, go to</span> থেকে বাছুন:</p>
+<ul>
+	<li><strong>Dashboard for Store Managers only</strong> (ডিফল্ট): শুধু Store Manager লগইন করলে ড্যাশবোর্ডে যায়। অ্যাডমিনিস্ট্রেটর আর শপ ম্যানেজার আগের মতোই wp-admin-এ যান।</li>
+	<li><strong>Dashboard for the whole team</strong>: অ্যাডমিনিস্ট্রেটর, শপ ম্যানেজার আর Store Manager, সবাই লগইনের পর সরাসরি ড্যাশবোর্ডে যান।</li>
+</ul>
+<p>সাধারণ কাস্টমারদের কিছুই বদলায় না, তারা আগের মতো যেখানে যেতেন সেখানেই যান। কেউ নির্দিষ্ট কোনো পাতার লিংক (যেমন wp-admin-এর Plugins পাতা) থেকে লগইন করতে এলে সেই পাতাতেই যান। wp-admin দরকার হলে ড্যাশবোর্ডের <strong>More</strong> মেনুতে <strong>WordPress admin</strong> লিংক আছে।</p>
+<h4>কে কী দেখে</h4>
+<div class="table-wrap"><table>
+	<tr><th>কাজ</th><th>অ্যাডমিনিস্ট্রেটর</th><th>শপ ম্যানেজার</th><th>Store Manager</th></tr>
+	<tr><td>অর্ডার, প্রোডাক্ট, ব্লগ</td><td>হ্যাঁ</td><td>হ্যাঁ</td><td>হ্যাঁ</td></tr>
+	<tr><td>বিক্রির টাকার অঙ্ক ও "More insights"</td><td>সবসময় হ্যাঁ</td><td>সেটিং অনুযায়ী</td><td>সেটিং অনুযায়ী</td></tr>
+	<tr><td>Kenakata Kit-এর সেটিংস (wp-admin-এ)</td><td>হ্যাঁ</td><td>হ্যাঁ</td><td>না</td></tr>
+</table></div>
+<p>টাকার অঙ্ক লুকাতে <strong>Show sales amounts to managers</strong> বন্ধ করুন। তখন শপ ম্যানেজার আর Store Manager হোমে শুধু অর্ডারের সংখ্যা দেখেন, টাকা নয়। অ্যাডমিনিস্ট্রেটর সবসময় সব দেখেন।</p>
+<h4>More insights: চাপ দিলে লোড হয় <span class="tag">৩.৭.০-এ নতুন</span></h4>
+<p>হোম পেজের নিচে তিনটা বাক্স আছে। প্রতিটার <strong>Show</strong> চাপলে তবেই সেটার হিসাব আসে। না চাপলে কিছু লোড হয় না, তাই ড্যাশবোর্ড দ্রুত থাকে।</p>
+<ul>
+	<li><strong>Sales trend:</strong> দিন ধরে বিক্রির স্তম্ভচার্ট, মোট বিক্রি, অর্ডারের সংখ্যা আর গড় অর্ডার। ৭ দিন বা ৩০ দিন বাছা যায়। আজকের স্তম্ভটা দ্বিতীয় রঙে দেখায়।</li>
+	<li><strong>Best-selling products:</strong> গত ৩০ দিনে সবচেয়ে বেশি বিক্রি হওয়া ৫টা প্রোডাক্ট।</li>
+	<li><strong>Cash with couriers:</strong> <strong>Shipped</strong> স্ট্যাটাসের ক্যাশ অন ডেলিভারি অর্ডারের মোট টাকা, মানে কুরিয়ারের কাছ থেকে আপনার এখনো পাওয়ার বাকি। সাথে পার্সেল কয়টা পথে আছে আর সবচেয়ে পুরোনোটা কত দিন আগের।</li>
+</ul>
+<div class="tip"><strong>জেনে রাখুন</strong>হিসাব ৫ মিনিট মনে রাখা হয়। অর্ডার আসলে বা স্ট্যাটাস বদলালে নতুন করে হিসাব হয়। সর্বশেষ ৩,০০০টা অর্ডার পর্যন্ত গোনা হয়। "Cash with couriers" দেখাতে <span class="path">Order tracking &amp; courier</span>-এ Shipped স্ট্যাটাস চালু থাকতে হবে।</div>
+<h4>ড্যাশবোর্ড আর সেটিংসের রং বদলানো <span class="tag">৩.৭.০-এ নতুন</span></h4>
+<ol class="steps">
+	<li><span class="path">Kenakata Kit → Store dashboard → Dashboard colours</span> খুলুন।</li>
+	<li><strong>Colour set</strong> থেকে একটা সেট বাছুন। ৭টা তৈরি সেট আছে (বেগুনি, লাল-হলুদ, নীল-কমলা, সবুজ-হলুদ, কমলা-টিল, গোলাপি-বেগুনি, কালো-সোনালি)।</li>
+	<li>নিজের রং চাইলে <strong>My own two colours</strong> বাছুন, তারপর <strong>Main colour</strong> (বোতাম, সক্রিয় মেনু, লিংক) আর <strong>Second colour</strong> (নতুন অর্ডারের সতর্কতা, চার্টে আজকের স্তম্ভ, সক্রিয় মেনুর চিহ্ন) দিন।</li>
+	<li><strong>Save</strong> চাপুন। রং ড্যাশবোর্ডে আর প্লাগিনের সেটিংস পাতায় একসাথে বদলাবে।</li>
+</ol>
+<ul>
+	<li>সবসময় মাত্র দুটো রং বদলায়। সাদা, কালো আর ধূসর একই থাকে।</li>
+	<li>সফল (সবুজ), সতর্কতা (হলুদ) আর ত্রুটির (লাল) রং নির্দিষ্ট থাকে, যাতে মূল রং লাল হলেও ত্রুটি আর বোতাম গুলিয়ে না যায়।</li>
+	<li>বোতামের ওপরের লেখা সাদা হবে না কালো, তা রঙের উজ্জ্বলতা দেখে নিজে ঠিক হয়।</li>
+	<li><strong>Same as my shop (automatic)</strong> বাছলে আগের মতোই থাকে (Elementor-এর Primary রং, না থাকলে Colours &amp; design-এর মূল রং)।</li>
+	<li>ক্রেতারা দোকানে যে রং দেখে তা এখানে নয়, <span class="path">Colours &amp; design</span>-এ ঠিক হয়।</li>
+</ul>
+<div class="tip"><strong>পরামর্শ</strong>নিজের রঙে খুব হালকা রং (যেমন হালকা হলুদ) দিলে সাদা জমিনে লিংকের লেখা কম পড়া যায়। যথেষ্ট গাঢ় রং বাছুন।</div>
+<h4>সমস্যা হলে</h4>
+<ul>
+	<li><strong>/dashboard খুললে "পাতা পাওয়া যায়নি":</strong> <span class="path">Settings → Permalinks</span>-এ গিয়ে কিছু না বদলে <strong>Save Changes</strong> চাপুন।</li>
+	<li><strong>লগইনের পর ড্যাশবোর্ডে যাচ্ছে না:</strong> "After login, go to"-তে <em>whole team</em> বাছা আছে কি না দেখুন। আর ড্যাশবোর্ডের সুইচ চালু থাকতে হবে।</li>
+	<li><strong>হোমে টাকার অঙ্ক বা More insights নেই:</strong> সম্ভবত <strong>Show sales amounts to managers</strong> বন্ধ। অ্যাডমিনিস্ট্রেটর অ্যাকাউন্টে লগইন করে দেখুন।</li>
+	<li><strong>পুরনো রং দেখাচ্ছে:</strong> ক্যাশ প্লাগিনের ক্যাশ মুছুন। ড্যাশবোর্ড পাতা নিজে কখনো ক্যাশ হয় না, তবে সেটিংসের রং বদলালে ব্রাউজারের ক্যাশ (<kbd>Ctrl</kbd>+<kbd>F5</kbd>) মুছতে হতে পারে।</li>
+</ul>
+
+<h3 id="s-courier">Courier booking (এক চাপে কুরিয়ারে পাঠানো)</h3>
+<p>একবার কুরিয়ার বেছে তার API কী বসিয়ে দিলে, প্রতিটা অর্ডারে একটা <strong>Send to Steadfast</strong>-এর মতো বোতাম আসে। চাপলে পার্সেল বুক হয়, ট্র্যাকিং নিজে সেভ হয়, অর্ডার <strong>Shipped</strong> হয়ে যায়, আর ক্রেতাকে ট্র্যাকিং লিংক জানানো হয় (<span class="path">Order tracking &amp; courier</span>-এর নোটিফিকেশন সুইচ চালু থাকলে)। বোতাম পাবেন স্টোর ড্যাশবোর্ডের অর্ডারে আর WooCommerce-এর অর্ডার পাতায় <strong>Courier &amp; tracking</strong> বাক্সে।</p>
+<h4>সেটআপ (শুধু অ্যাডমিনিস্ট্রেটর, একবারই)</h4>
+<ol class="steps">
+	<li><span class="path">Kenakata Kit → Courier booking</span> খুলুন।</li>
+	<li>যে কুরিয়ার ব্যবহার করেন তার সুইচ (যেমন <strong>Steadfast</strong>) চালু করুন। তখন তার তথ্যের ঘরগুলো নিচে খুলে যাবে।</li>
+	<li>কুরিয়ারের মার্চেন্ট অ্যাকাউন্ট থেকে <strong>API key</strong> আর <strong>Secret key</strong> কপি করে বসান। কী দুটো গোপন থাকে: সেভ করার পর শুধু শেষ ৪টা অক্ষর দেখা যায়, আর সাধারণ সেটিংসের Export-এ যায় না।</li>
+	<li><strong>Save</strong> চাপুন, তারপর <strong>Test connection</strong>। এটা শুধু কুরিয়ারের কাছে ব্যালেন্স জানতে চায়, কিছুই বুক করে না। "Connected" এলে সেটআপ শেষ।</li>
+</ol>
+<p>এখন <strong>Steadfast</strong> আর <strong>Pathao</strong> যোগ করা আছে। প্রতিটা কুরিয়ারের আলাদা সুইচ আছে, তাই এক বা একাধিক কুরিয়ার একসাথে চালু রাখা যায়। <strong>শুধু চালু আর পুরো সেট-আপ করা কুরিয়ারগুলোই</strong> ড্যাশবোর্ড ও অর্ডারে দেখায়: একটা কুরিয়ার চালু থাকলে একটাই বোতাম, দুটো চালু থাকলে দুটো বোতাম (যেটায় চাপবেন সেটাতেই যাবে)। আরও কুরিয়ার পরের ভার্সনগুলোতে আসবে। সেটিংস শুধু অ্যাডমিনিস্ট্রেটর বদলাতে পারেন। শপ ম্যানেজার আর Store Manager শুধু পাঠাতে পারেন।</p>
+<h4>Pathao-র জন্য আলাদা ধাপ</h4>
+<ol class="steps">
+	<li><strong>Pathao</strong> সুইচটা চালু করুন।</li>
+	<li>Pathao মার্চেন্ট অ্যাকাউন্টের <em>Developers' API → API Credentials</em> থেকে <strong>Client ID</strong> আর <strong>Client secret</strong> বসান। সাথে আপনার Pathao <strong>লগইনের ইমেইল</strong> আর <strong>পাসওয়ার্ড</strong> দিন। সবগুলো গোপন থাকে।</li>
+	<li><strong>Save</strong> চাপুন, তারপর <strong>Test connection</strong>। সফল হলে আপনার স্টোরগুলো নম্বরসহ দেখাবে (যেমন <em>123456 = My Store</em>)।</li>
+	<li>সেই নম্বরটা <strong>Store ID</strong> ঘরে বসিয়ে আবার <strong>Save</strong> করুন। Store ID না দিলে বোতাম আসবে না।</li>
+</ol>
+<ul>
+	<li>Pathao ঠিকানা থেকে জেলা, জোন আর এরিয়া নিজে ধরে নেয়, তাই এখানে আলাদা করে দিতে হয় না। তবে ঠিকানা অন্তত ১০ অক্ষরের হতে হবে (বাড়ি, রাস্তা, এলাকাসহ)।</li>
+	<li>শুধু পরীক্ষার জন্য Pathao-র টেস্ট সার্ভার চালু করার সুইচ আছে। আসল দোকানে এটা বন্ধ রাখুন।</li>
+</ul>
+<h4>ট্র্যাকিং নিজে থেকে বসে</h4>
+<p>কোনো কুরিয়ার চালু থাকলে অর্ডারে <strong>কুরিয়ারের নাম, ট্র্যাকিং আইডি আর ট্র্যাকিং লিংক হাতে লেখার ঘর থাকে না</strong>। অর্ডার কুরিয়ারে পাঠালেই এগুলো নিজে থেকে বসে যায়, আর "Open tracking page" বোতামে ট্র্যাকিং পাতা খোলে। কোনো কুরিয়ারই চালু না থাকলে আগের মতো হাতে লেখার ঘর থাকে। WooCommerce অর্ডার পাতার "Courier &amp; tracking" বাক্সেও একই নিয়ম।</p>
+<h4>অর্ডার পাঠানো</h4>
+<ol class="steps">
+	<li>ড্যাশবোর্ডে অর্ডার খুলুন, <strong>Courier</strong> অংশের ওপরের <strong>Send to Steadfast</strong> চাপুন।</li>
+	<li>একটা ছোট বক্সে নাম, ফোন, ঠিকানা আর <strong>যত টাকা নিতে হবে</strong> দেখাবে। ভুল থাকলে এখানেই ঠিক করুন। ক্রেতা আগেই টাকা দিয়ে থাকলে অঙ্ক <strong>0</strong> করুন।</li>
+	<li><strong>Send now</strong> চাপুন। কয়েক সেকেন্ডে অর্ডারে "Sent to Steadfast", ট্র্যাকিং কোড আর Shipped স্ট্যাটাস দেখা যাবে।</li>
+</ol>
+<ul>
+	<li>ক্যাশ অন ডেলিভারি অর্ডারে টাকার অঙ্ক নিজে থেকে বসে, যতক্ষণ না পেমেন্টের তারিখ সেভ হয় (Processing অবস্থায় থাকলেও)।</li>
+	<li>ভুল করে দুবার চাপলেও একটাই পার্সেল তৈরি হয়। আগেই পাঠানো অর্ডারে বোতাম থাকে না।</li>
+	<li><strong>Refresh status</strong> চাপলে কুরিয়ারের কাছে পার্সেলের বর্তমান অবস্থা (Delivered, Cancelled ইত্যাদি) জানতে চাওয়া হয়। এটা নিজে নিজে চলে না, তাই দোকান ধীর হয় না।</li>
+	<li>কুরিয়ার পার্সেল বাতিল করে দিলে অর্ডারে আবার পাঠানোর বোতাম আসে।</li>
+</ul>
+<h4>কুরিয়ার চেক (পাঠানোর আগে ক্রেতাকে যাচাই)</h4>
+<p><span class="path">Kenakata Kit → Courier booking → Turn on Courier check</span> চালু করলে তবেই অর্ডারে ফোন নম্বরের নিচে <strong>Courier check</strong> বোতাম আসে (না চালালে কিছুই দেখায় না)। চাপলে এই ফোন নম্বরের আগের অর্ডারের হিসাব আসে: মোট কয়টা, কয়টা সফল, কয়টা বাতিল, আর সফলতার শতকরা হার। সাথে একটা ট্রাফিক লাইট:</p>
+<div class="table-wrap"><table>
+	<tr><th>রং</th><th>মানে</th><th>কী করবেন</th></tr>
+	<tr><td>সবুজ</td><td>ভালো ইতিহাস</td><td>ক্যাশ অন ডেলিভারি দেওয়া যায়</td></tr>
+	<tr><td>হলুদ</td><td>মাঝামাঝি</td><td>ফোন করে অর্ডার নিশ্চিত করে পাঠান</td></tr>
+	<tr><td>লাল</td><td>অনেক বাতিল</td><td>আগে ডেলিভারি চার্জ (বা পুরো টাকা) নিন</td></tr>
+	<tr><td>ধূসর</td><td>নতুন ক্রেতা বা এখনো সব পার্সেল পথে</td><td>নতুন ক্রেতা হিসেবে ধরুন</td></tr>
+</table></div>
+<p>সবুজ-লালের সীমা <span class="path">Kenakata Kit → Courier booking</span> থেকে বদলানো যায় (ডিফল্ট: ৮০% বা বেশি সবুজ, ৫০%-এর নিচে লাল)। +৮৮০ দিয়ে লেখা আর ০১ দিয়ে লেখা একই নম্বর ধরা হয়। হিসাব চাপ দিলে তবেই হয়, পাতা খোলার সময় নয়।</p>
+<div class="warn"><strong>সীমা জেনে রাখুন</strong>এই ভার্সনে হিসাবটা শুধু <strong>আপনার নিজের দোকানের</strong> অর্ডার থেকে আসে। অন্য দোকান বা অন্য কুরিয়ারের ইতিহাস আসেনি। ওটা BD Courier-এর মতো আলাদা সেবার API দিয়ে যোগ করার কাজ চলছে।</div>
+<h4>সমস্যা হলে</h4>
+<ul>
+	<li><strong>"Send to…" বোতাম আসছে না:</strong> <span class="path">Courier booking</span>-এ কুরিয়ার বাছা আর দুটো কী-ই সেভ করা আছে কি না দেখুন, আর অর্ডার আগেই পাঠানো হয়েছে কি না।</li>
+	<li><strong>"API key গ্রহণ করেনি":</strong> কী দুটো আবার কপি করে বসান। শুরুতে বা শেষে ফাঁকা জায়গা যেন না থাকে।</li>
+	<li><strong>"সময়মতো উত্তর আসেনি":</strong> কুরিয়ারের অ্যাকাউন্টে গিয়ে দেখুন পার্সেল তৈরি হয়ে গেছে কি না। হয়ে থাকলে ট্র্যাকিং হাতে বসান, নইলে আবার পাঠান।</li>
+	<li><strong>ঠিকানা বা ফোন নিয়ে আপত্তি:</strong> বক্সেই ঠিক করে আবার পাঠান। ফোন নম্বর ১১ সংখ্যার বাংলাদেশি মোবাইল নম্বর হতে হবে।</li>
+</ul>
+
+<h3 id="s-incomplete">Incomplete orders (অসমাপ্ত অর্ডার)</h3>
+<p>যারা চেকআউট পর্যন্ত গিয়ে ফোন নম্বর লিখেছেন কিন্তু "অর্ডার করুন" চাপেননি, তাদের তালিকা। ফোন করলে অনেকে অর্ডার করে ফেলেন। এক চাপে তাদের কার্টকে অর্ডারে বদলানোও যায়।</p>
+<h4>চালু করা</h4>
+<ol class="steps">
+	<li><span class="path">Kenakata Kit → Incomplete orders</span> খুলুন।</li>
+	<li><strong>Save incomplete orders</strong> চালু করে <strong>Save</strong> চাপুন। ডিফল্টে এটা বন্ধ থাকে।</li>
+	<li>চাইলে <strong>Count as left after</strong> (কতক্ষণ চুপ থাকলে "ছেড়ে গেছে" ধরা হবে, ডিফল্ট ১৫ মিনিট) আর <strong>Keep for</strong> (কত দিন রাখবে, ডিফল্ট ৩০ দিন) বদলান।</li>
+</ol>
+<h4>কীভাবে কাজ করে</h4>
+<ul>
+	<li>ক্রেতা চেকআউট পাতায় লিখতে লিখতে একটা <strong>সঠিক ফোন নম্বর</strong> দিলে তার নাম, ফোন, ঠিকানা আর কার্ট আপনার সাইটেই সেভ হয় (অন্য কাউকে পাঠানো হয় না)। ফোন নম্বর না দিলে বা কার্ট খালি থাকলে কিছুই সেভ হয় না।</li>
+	<li>লেখা শেষ হওয়ার একটু পরে সেভ হয়, আর পাতা বন্ধ করলেও শেষ তথ্য চলে যায়।</li>
+	<li>ক্রেতা যতক্ষণ লিখছেন (ডিফল্ট ১৫ মিনিট) ততক্ষণ তালিকায় আসে না। এর মধ্যে অর্ডার করে ফেললে তালিকায় কখনো আসেই না।</li>
+	<li>পরে ওই নম্বর দিয়ে অর্ডার হলে (যেকোনো ফরম্যাটে, <em>+৮৮০১…</em> বা <em>০১…</em>) আপনাআপনি "Ordered" হয়ে যায়।</li>
+	<li>আপনার বা আপনার টিমের নিজের পরীক্ষার চেকআউট তালিকায় ঢোকে না।</li>
+</ul>
+<h4>তালিকা দেখা ও কাজ করা</h4>
+<ol class="steps">
+	<li>ড্যাশবোর্ডের <strong>More</strong> মেনুতে (বা ডেস্কটপের পাশের মেনুতে) <strong>Incomplete orders</strong> খুলুন। সংখ্যা-ব্যাজ দেখায় কয়জন বাকি। হোমেও একটা সতর্কতা আসে।</li>
+	<li>প্রতিটা কার্ডে নাম, কার্টের প্রোডাক্ট ও মোট টাকা, ঠিকানা আর <strong>Call</strong> / <strong>WhatsApp</strong> বোতাম আছে।</li>
+	<li>ফোন করে <strong>Mark as called</strong> চাপুন। ক্রেতা নিশ্চিত করলে <strong>Make an order</strong> চাপুন: একটা ক্যাশ অন ডেলিভারি অর্ডার (Processing) তৈরি হবে আর স্টক কমবে। একই কার্ট থেকে দুবার অর্ডার হয় না।</li>
+	<li>আর দরকার না থাকলে <strong>Dismiss</strong> চাপুন, ক্রেতা আবার লিখলেও তা ফিরে আসবে না।</li>
+</ol>
+<ul>
+	<li><strong>To call / Called / Ordered / Dismissed / All</strong> ফিল্টারে আর ফোন বা নাম দিয়ে খুঁজে দেখা যায়।</li>
+	<li>ড্যাশবোর্ড ছাড়া <span class="path">WooCommerce → Incomplete orders</span> পাতায় সাধারণ তালিকা আছে।</li>
+	<li>Make an order চাপলে শিপিং খরচ যোগ হয় না। দরকার হলে অর্ডার খুলে যোগ করুন।</li>
+</ul>
+<div class="warn"><strong>গোপনীয়তা</strong>এই সুবিধা চালু করলে ক্রেতাদের নাম-ফোন অসমাপ্ত অবস্থাতেও আপনার সাইটে থাকে। আপনার গোপনীয়তা নীতিতে সেটা জানিয়ে রাখুন (WordPress → Privacy পাতায় একটা নমুনা লেখা নিজে থেকে যোগ হয়)। ব্যক্তি চাইলে WordPress-এর Export / Erase Personal Data টুলে (ইমেইল দিয়ে) তাঁর তথ্য বের করা বা মুছে ফেলা যায়।</div>
+<h4>সমস্যা হলে</h4>
+<ul>
+	<li><strong>তালিকায় কেউ আসছে না:</strong> সুইচ চালু আছে কি না, আর ক্রেতা একটা সঠিক বাংলাদেশি নম্বর (১১ সংখ্যা) দিয়েছেন কি না দেখুন। চেকআউটে আপনি নিজে অ্যাডমিন হিসেবে লগইন থাকলে সেটা ধরা হয় না, অন্য ব্রাউজারে (লগআউট অবস্থায়) পরীক্ষা করুন।</li>
+	<li><strong>সঙ্গে সঙ্গে আসছে না:</strong> "Count as left after"-এর সময় পার হলে তবেই আসে।</li>
+	<li><strong>ক্যাশ প্লাগিন:</strong> চেকআউট পাতার স্ক্রিপ্ট ছোট (প্রায় ২ KB) আর শুধু সেই পাতাতেই লোড হয়। চেকআউট পাতা ক্যাশ থেকে বাদ রাখা (WooCommerce-এর স্বাভাবিক নিয়ম) থাকলেই হয়।</li>
+</ul>
+
+<h3 id="s-search">Live Search (লাইভ সার্চ)</h3>
+<ul>
+	<li><strong>রেজাল্ট:</strong> ২টা অক্ষর লিখলেই ছবি, দাম আর স্টকের অবস্থাসহ প্রোডাক্ট দেখায়। কিবোর্ডের ↑ ↓ আর Enter-ও কাজ করে।</li>
+	<li><strong>উইজেটের দুই ধরন:</strong> Elementor-এর <strong>Live Search</strong> উইজেট "Icon" (ক্লিকে বড় সার্চ খোলে) বা "Search bar" (হেডারে পুরো ঘর)।</li>
+</ul>
+
+<h3 id="s-account">Login popup (লগইন পপআপ)</h3>
+<ul>
+	<li><strong>পপআপ:</strong> লগইন না করা কাস্টমার "My account" লিংকে ক্লিক করলে পপআপ খোলে।</li>
+	<li><strong>লগইন:</strong> ফোন নম্বর বা ইমেইল দিয়ে।</li>
+	<li><strong>রেজিস্ট্রেশন:</strong> নাম, ফোন, (ইচ্ছা হলে) ইমেইল আর পাসওয়ার্ড।</li>
+	<li><strong>ভুল পাসওয়ার্ড:</strong> ১৫ মিনিটে ১০বারের বেশি ভুল দিলে সাময়িক আটকে যায়।</li>
+</ul>
+
+<h3 id="s-whatsapp">WhatsApp &amp; call</h3>
+<ul>
+	<li><strong>নম্বর:</strong> একবার দিলেই সব জায়গায় ব্যবহার হয় (ভাসমান বাটন, প্রোডাক্ট পেজ, Bottom Bar, উইজেট, <code>[kk_whatsapp]</code>)। 01XXXXXXXXX লিখলেই হবে; +880 নিজে যোগ হয়।</li>
+	<li><strong>ভাসমান বাটন:</strong> কোণ, নিচ থেকে দূরত্ব, সাইজ, WhatsApp আর কল বাটনের আলাদা রং, আইকনের রং আর পাশের লেখা বদলানো যায়। মোবাইলে শুধু আইকন দেখায়, আর Bottom Bar থাকলে নিজে থেকে তার উপরে ওঠে। চেকআউট পেজে লুকানো থাকে।</li>
+	<li><strong>মেসেজে লাইন:</strong> আগে থেকে লেখা মেসেজে নতুন লাইন দিলে WhatsApp-এও নতুন লাইন হিসেবে যায়।</li>
+</ul>
+
+<h3 id="s-product">Product page (প্রোডাক্ট পেজ)</h3>
+<h4>ভ্যারিয়েশন বাটন (সাইজ, রং…)</h4>
+<ul>
+	<li><strong>কী করে:</strong> ড্রপডাউনের বদলে প্রতিটি অপশন (যেমন S, M, L) একটা বাটন হিসেবে দেখায়। পাশে বাছাই করা মানটাও লেখা থাকে ("Size: M")।</li>
+	<li><strong>স্টকে নেই এমন কম্বিনেশন:</strong> ধূসর আর কাটা দাগ দেওয়া থাকে, চাপা যায় না। যেমন L সাইজ বাছলে L-এ যে রং নেই সেটা ধূসর হবে।</li>
+	<li><strong>আবার চাপলে:</strong> বাছাই উঠে যায়। "Clear" লিংক সব অপশন মুছে দেয় (চাইলে লুকানো যায়)।</li>
+	<li><strong>সেটিং:</strong> <span class="path">Product page → Show options as buttons</span>, বাটনের উচ্চতা আর কোণ। রং প্রধান রং অনুযায়ী। <strong>Add to Cart Form</strong> উইজেটে প্রতিটি রং, লেখা আর মাপ আলাদা করে বদলানো যায়।</li>
+	<li><strong>কোথায় কাজ করে:</strong> থিমের প্রোডাক্ট পেজ, Elementor Pro-র "Add to Cart" উইজেট আর আমাদের "Add to Cart Form" উইজেট, সব জায়গায়।</li>
+</ul>
+<h4>প্রোডাক্টের বিবরণ (ইমপোর্ট করা প্রোডাক্ট)</h4>
+<ul>
+	<li><strong>সমস্যা:</strong> ইমপোর্টের সময় অনেক প্রোডাক্টের পুরো লেখা "Short description"-এ চলে যায় আর "Description" ফাঁকা থাকে। তখন লম্বা লেখা দামের পাশে বসে আর Description ট্যাব দেখায় না।</li>
+	<li><strong>Long short descriptions go to the Description tab</strong> (ডিফল্টে চালু): এমন প্রোডাক্টে Description ট্যাবে পুরো লেখা দেখায়, আর দামের পাশে প্রথম কয়েক লাইন, সাথে "Read more" (চাপলে Description ট্যাব খোলে)। প্রোডাক্টের ডেটা বদলায় না।</li>
+	<li>যেসব প্রোডাক্টের নিজের Description আছে বা Short description ছোট, সেগুলো আগের মতোই দেখায়।</li>
+</ul>
+<h4>অর্ডারের বাটন ও তথ্য</h4>
+<ul>
+	<li><strong>"Order on WhatsApp" বাটন:</strong> Add to cart-এর নিচে বসে। প্রোডাক্টের নাম, দাম আর লিংক আগে থেকে লেখা থাকে (<code>{product}</code>, <code>{price}</code>, <code>{url}</code>)।</li>
+	<li><strong>"Call to order" বাটন</strong></li>
+	<li><strong>রং:</strong> WhatsApp বাটন, কল বাটন (খালি রাখলে প্রধান রং) আর এদের লেখার রং আলাদা করে বদলানো যায়।</li>
+	<li><strong>Delivery information:</strong> শিপিং সেটিং থেকে চার্জ নিজে আসে, সাথে আপনার লেখা লাইন। বক্সের ব্যাকগ্রাউন্ড আর আইকনের রং বদলানো যায়।</li>
+	<li><strong>Sticky Buy Now bar:</strong> মোবাইলে নিচে স্ক্রল করলে ছবি, দাম আর Buy Now আটকে থাকে। এ সময় Bottom Bar লুকিয়ে যায়, ফলে দুটো একসাথে দেখায় না। ভ্যারিয়েবল প্রোডাক্টে সাইজ না বাছলে উপরে সাইজ বাছার জায়গায় নিয়ে যায়।</li>
+</ul>
+<div class="tip"><strong>Elementor দিয়ে প্রোডাক্ট পেজ বানালে</strong>Elementor টেমপ্লেটে থিমের "summary" অংশ থাকে না, তাই এই বাটনগুলো নিজে থেকে আসে না। <strong>Add to Cart Form</strong> উইজেট বসান: এতে ভ্যারিয়েশন বাটন, পরিমাণ, Add to cart, Buy Now, WhatsApp/কল বাটন আর ডেলিভারি বক্স একসাথে থাকে। আলাদা জায়গায় চাইলে <strong>WhatsApp / Call Button</strong> আর <strong>Delivery Info</strong> উইজেট ব্যবহার করুন।</div>
+
+<h3 id="s-reviews">Reviews (ছবিসহ রিভিউ)</h3>
+<p>প্রোডাক্ট পেজের রিভিউ অংশ গোছানো আর সুন্দর করে। WooCommerce-এর নিজের রিভিউ ব্যবহার করে, তাই আগের রিভিউ, "verified owner" লেবেল আর <span class="path">Products → Reviews</span> আগের মতোই কাজ করে।</p>
+<ul>
+	<li><strong>রেটিং সারাংশ:</strong> বড় করে গড় রেটিং (যেমন ৪.৬), তারা, মোট রেটিং আর ৫ থেকে ১ তারার বার, পাশে "Write a review" বাটন।</li>
+	<li><strong>কাস্টমারের ছবি:</strong> সব রিভিউয়ের ছবি উপরে এক সারিতে। ছবিতে চাপলে বড় করে দেখায়; ← → দিয়ে পরের ছবি, Esc দিয়ে বন্ধ।</li>
+	<li><strong>রিভিউ কার্ড:</strong> নামের আদ্যক্ষর দিয়ে গোল অ্যাভাটার, তারা, নাম, তারিখ, লেখা আর ছবি।</li>
+	<li><strong>রিভিউ ফর্ম:</strong> তারা বাছাই, লেখা আর "Choose photos" বাটন। ছবি বাছলেই ছোট প্রিভিউ দেখায়।</li>
+</ul>
+<h4>ছবি দেওয়ার নিয়ম (Photos in reviews)</h4>
+<ul>
+	<li><strong>কয়টা আর কত বড়:</strong> ডিফল্টে প্রতি রিভিউতে ৩টা, প্রতিটি ৩ MB পর্যন্ত। শুধু JPG, PNG আর WebP। বড় ছবি WordPress নিজে ছোট করে নেয়।</li>
+	<li><strong>নিরাপত্তা:</strong> ভুয়া ফাইল (ছবির নামে অন্য কিছু), বেশি ছবি বা বড় ফাইল দিলে রিভিউ জমাই হয় না, একটা পরিষ্কার মেসেজ দেখায়।</li>
+	<li><strong>কারা দিতে পারবেন:</strong> যারা রিভিউ দিতে পারেন সবাই / যারা প্রোডাক্টটা কিনেছেন (অর্ডারের ইমেইল মিলিয়ে) / শুধু লগইন করা কাস্টমার।</li>
+	<li><strong>অনুমোদন:</strong> "Approve reviews with photos before they appear" চালু থাকলে (সাজেস্টেড) ছবিসহ রিভিউ <span class="path">Products → Reviews</span>-এ Approve না করা পর্যন্ত দেখায় না। সেখানে রিভিউয়ের নিচে ছবিগুলোও দেখা যায়।</li>
+	<li><strong>মুছে ফেলা:</strong> রিভিউ স্থায়ীভাবে মুছলে (Trash খালি করলে) তার ছবিও মিডিয়া লাইব্রেরি থেকে মুছে যায়।</li>
+</ul>
+<ul>
+	<li><strong>কোথায় দেখায়:</strong> স্বাভাবিকভাবে প্রোডাক্ট ট্যাবের শেষ ট্যাব "Reviews (n)"-এর ভেতরে, এই নতুন ডিজাইনে। থিমের বা Elementor Pro-র Product Data Tabs, দুটোতেই কাজ করে।</li>
+	<li><strong>Allow reviews on every product:</strong> ইমপোর্ট করা প্রোডাক্টে প্রায়ই প্রোডাক্টের নিজের "Enable reviews" বন্ধ থাকে, ফলে Reviews ট্যাবই দেখায় না। এটা চালু করলে সব প্রোডাক্টে রিভিউ চলে, প্রোডাক্ট না বদলেই। (WooCommerce → Settings → Products → Enable product reviews চালু থাকতে হবে।)</li>
+</ul>
+<div class="tip"><strong>রিভিউ অন্য কোথাও চাইলে</strong>যেমন ল্যান্ডিং পেজে: <strong>Product Reviews</strong> উইজেট বসান। একই পেজে ট্যাবও থাকলে <span class="path">Reviews → Show reviews in the product tabs</span> বন্ধ করুন, যেন রিভিউ দুবার না দেখায়।</div>
+
+<h3 id="s-cart">Side cart (সাইড কার্ট)</h3>
+<ul>
+	<li><strong>খোলে:</strong> <strong>Cart Icon</strong> উইজেট, <code>[kk_cart_icon]</code> বা Bottom Bar-এর Cart-এ ক্লিক করলে, অথবা Add to cart চাপলে (চালু থাকলে)।</li>
+	<li><strong>ভেতরে:</strong> প্রোডাক্ট, মোট টাকা, "View cart" আর "Checkout"।</li>
+	<li><strong>বন্ধ করা:</strong> ✕ বাটন, বাইরে ক্লিক বা Esc কী।</li>
+	<li><strong>চওড়া:</strong> Side cart width (৩০০–৬৪০px)। ফোনে প্রায় পুরো স্ক্রিন।</li>
+</ul>
+<div class="warn"><strong>Elementor Pro-র Menu Cart ব্যবহার করলে</strong>ওটারও নিজের সাইড কার্ট আছে। দুটো একসাথে চালু রাখবেন না।</div>
+
+<h3 id="s-bbar">Bottom Bar (মোবাইলের নিচের মেনু)</h3>
+<p>শুধু ফোনে, স্ক্রিনের নিচে অ্যাপের মতো আটকে থাকা মেনু। কম্পিউটারে দেখায় না।</p>
+<ul>
+	<li><strong>কিছু ঢাকা পড়ে না:</strong> পেজের লেখা নিজে থেকে উপরে সরে যায়।</li>
+	<li><strong>iPhone:</strong> নিচের হোম-বারের জায়গা রাখা হয়।</li>
+	<li><strong>ভাসমান WhatsApp:</strong> বারের উপরে উঠে যায়।</li>
+</ul>
+<h4>চালু করা</h4>
+<ol class="steps">
+	<li><span class="path">Kenakata Kit → Bottom Bar</span> খুলুন (অথবা ড্যাশবোর্ডে <strong>Bottom Bar</strong> সুইচ)।</li>
+	<li><strong>Enable the bottom bar</strong> চালু করুন।</li>
+	<li><strong>Menu items</strong> অংশে আইটেম সাজান:
+		<ul>
+			<li><strong>ক্রম বদলাতে:</strong> বামের ☰ ধরে টেনে নিন, অথবা ↑ ↓ চাপুন।</li>
+			<li><strong>চালু/বন্ধ:</strong> প্রতিটি আইটেমের সুইচ দিয়ে।</li>
+			<li><strong>Label, Icon, Link:</strong> প্রতিটি আইটেমে আলাদা বদলানো যায়।</li>
+			<li><strong>Custom link:</strong> বাছলে URL-এর ঘর আসবে (যেমন অফার পেজ)।</li>
+			<li><strong>ডিফল্ট আইটেম:</strong> Home, Shop, Cart, Account, Orders।</li>
+			<li><strong>বন্ধ থাকা আইটেম:</strong> Categories, Search, Track, WhatsApp, Call আর ২টা নিজের লিংক। চালু করলেই দেখাবে।</li>
+			<li><strong>কয়টা রাখবেন:</strong> ৫টার বেশি চালু করলে সতর্কবার্তা আসে। ফোনে ৪–৫টা সবচেয়ে ভালো।</li>
+		</ul>
+	</li>
+	<li>ডানের ফোন-প্রিভিউতে দেখে <strong>Save settings</strong> চাপুন।</li>
+</ol>
+<h4>লিংকের ধরন</h4>
+<div class="table-wrap"><table>
+	<tr><th>Link</th><th>কী করে</th></tr>
+	<tr><td>Home page / Shop page</td><td>হোম বা শপ পেজে যায়। শপ, ক্যাটাগরি আর প্রোডাক্ট পেজে Shop আইটেম সক্রিয় দেখায়।</td></tr>
+	<tr><td>Categories page</td><td>"categories" স্লাগের পেজ (না থাকলে Shop)। নিজের লিংক দিতে <strong>Categories page link</strong> ঘরে লিখুন।</td></tr>
+	<tr><td>Open live search</td><td>লাইভ সার্চ খোলে।</td></tr>
+	<tr><td>Cart</td><td>কার্ট পেজে যায়; Side cart চালু থাকলে পাশে কার্ট খোলে। কার্টে কয়টি আছে তার সংখ্যা নিজে থেকে আপডেট হয়।</td></tr>
+	<tr><td>My account</td><td>লগইন থাকলে My account; লগইন না থাকলে লগইন পপআপ।</td></tr>
+	<tr><td>My orders</td><td>লগইন থাকলে অর্ডারের তালিকা; লগইন ছাড়া কাস্টমার (বেশিরভাগ COD কাস্টমার) ট্র্যাকিং পেজে যায়।</td></tr>
+	<tr><td>Order tracking page / WhatsApp chat / Phone call / Custom link</td><td>নাম অনুযায়ী।</td></tr>
+</table></div>
+<h4>দেখতে কেমন</h4>
+<ul>
+	<li><strong>Style:</strong>
+		<ul>
+			<li>Classic: সক্রিয় আইটেমের উপরে দাগ।</li>
+			<li>Pill: সক্রিয় আইকনের পেছনে হালকা রঙের পিল।</li>
+			<li>Floating: চারপাশে ফাঁকা রেখে গোল কোণার বার।</li>
+		</ul>
+	</li>
+	<li><strong>Highlighted item:</strong> একটা আইটেম (যেমন Cart) প্রধান রঙের উঁচু গোল বাটন হয়। তালিকার মাঝখানে রাখুন।</li>
+	<li><strong>Labels:</strong> আইকনের নিচের লেখা দেখানো বা লুকানো।</li>
+	<li><strong>মাপ:</strong> বারের উচ্চতা, আইকনের সাইজ আর লেবেলের সাইজ।</li>
+	<li><strong>রং:</strong> Background, Top border, Shadow, Icon colour, Label colour, Active item colour, Active pill colour, Cart count badge।</li>
+</ul>
+<h4>কোথায় ও কখন</h4>
+<ul>
+	<li><strong>Show on screens narrower than:</strong> ৭৬৭ = শুধু ফোন (সাজেস্টেড), ১০২৪ = ফোন ও ট্যাবলেট।</li>
+	<li><strong>চেকআউট আর কার্ট পেজ:</strong> দুটোতেই আলাদা করে লুকানো যায়।</li>
+	<li><strong>Hide while scrolling down:</strong> পড়ার সময় বার সরে যায়, উপরে স্ক্রল করলে ফিরে আসে।</li>
+</ul>
+<div class="tip"><strong>থিমের নিজের মোবাইল মেনু</strong>থিম বা অন্য প্লাগিনেরও নিচের মেনু থাকলে একটাই রাখুন। Bottom Bar থিমের হেডার বা ফুটার বদলায় না।</div>
+
+<h3 id="s-security">Security (নিরাপত্তা)</h3>
+<ul>
+	<li><strong>Always use https:</strong> কেউ http:// দিয়ে এলে https://-এ পাঠায়। ভুলে সাইট আটকে না যায় তাই শুধু তখনই চালু হয় যখন আপনি নিজে https দিয়ে অ্যাডমিনে আছেন।</li>
+	<li><strong>Hide admin user names:</strong> বাইরের লোক <code>/wp-json/wp/v2/users</code> বা <code>?author=1</code> দিয়ে আপনার লগইন নাম জানতে পারবে না।</li>
+	<li><strong>Disable XML-RPC:</strong> Jetpack বা WordPress মোবাইল অ্যাপ ব্যবহার না করলে বন্ধ রাখুন। এতে pingback-এর অপব্যবহারও বন্ধ হয়।</li>
+	<li><strong>Pause login after too many wrong passwords</strong> (ডিফল্টে চালু): একই সংযোগ থেকে ৬বার ভুল পাসওয়ার্ড দিলে (সংখ্যা বদলানো যায়) সেই সংযোগের জন্য ১৫ মিনিট লগইন বন্ধ থাকে। wp-login.php, My account, লগইন পপআপ আর XML-RPC সব জায়গায়। বাকি সবাই স্বাভাবিকভাবে লগইন করতে পারেন।</li>
+	<li><strong>Browser security headers</strong> (চালু): অন্য সাইট আপনার দোকান ফ্রেমে দেখাতে পারে না (click-jacking), ব্রাউজার ফাইলের ধরন বদলে চালাতে পারে না, PHP ভার্সন লুকানো থাকে। "Always use https" চালু থাকলে HSTS-ও পাঠায়।</li>
+	<li><strong>Hide the WordPress version</strong> (চালু)।</li>
+	<li><strong>Turn off the theme/plugin code editor</strong> (চালু): পাসওয়ার্ড ফাঁস হলেও অ্যাডমিন থেকে কোড বদলানো যায় না। প্লাগিন/থিম আপডেট আগের মতোই চলে।</li>
+	<li><strong>Block PHP files in the uploads folder:</strong> আপলোড ফোল্ডারে কোনো PHP ফাইল চলতে পারে না (ভাইরাস/ব্যাকডোর আটকাতে সবচেয়ে কাজের)। প্লাগিন বন্ধ করলে নিয়মটা নিজে থেকে মুছে যায়।</li>
+	<li><strong>শুধু অ্যাডমিনিস্ট্রেটর:</strong> এই পেজের সেটিং শুধু Administrator বদলাতে পারেন; Shop manager বাকি সব সেটিং বদলাতে পারেন, এগুলো পারেন না।</li>
+</ul>
+<h4>প্লাগিনের ভেতরের নিরাপত্তা</h4>
+<ul>
+	<li>সব ফর্ম আর AJAX-এ nonce আর অনুমতি যাচাই; সব ইনপুট পরিষ্কার করা (sanitize), সব আউটপুট escape করা। কোনো PHP ফাইল সরাসরি খোলা যায় না।</li>
+	<li>লগইন, রেজিস্ট্রেশন, ট্র্যাকিং আর ছবিসহ রিভিউয়ে সংখ্যার সীমা (rate limit)। Cloudflare থাকলেও আসল ভিজিটরের IP ধরা হয়, কেউ নকল হেডার দিয়ে ফাঁকি দিতে পারে না।</li>
+	<li>রিভিউয়ের ছবি: শুধু আসল JPG/PNG/WebP (ফাইলের ভেতর পরীক্ষা করে), সাইজ আর সংখ্যার সীমা।</li>
+	<li><strong>আপডেটে সাইট ভাঙবে না:</strong> WooCommerce ৭.০-এর পুরনো হলে প্লাগিন নিজে বন্ধ থাকে। Elementor-এর ভবিষ্যৎ ভার্সনে দরকারি কিছু না থাকলে শুধু উইজেটগুলো সাময়িক বন্ধ হয়, অ্যাডমিনে একটা নোটিশ দেখায়; দোকান চলতে থাকে। তার উপরে WordPress-এর নিজের Recovery Mode আছে।</li>
+</ul>
+<div class="tip"><strong>এগুলো ছাড়াও (আপনার করণীয়)</strong>
+	<ul>
+		<li>শক্ত পাসওয়ার্ড আর টু-ফ্যাক্টর লগইন (2FA)।</li>
+		<li>UpdraftPlus দিয়ে নিয়মিত ব্যাকআপ, অন্য জায়গায় (Google Drive) রাখা।</li>
+		<li>WordPress, প্লাগিন আর থিম সময়মতো আপডেট।</li>
+		<li>ব্যবহার হয় না এমন প্লাগিন মুছে ফেলা।</li>
+		<li>কারও সাথে শেয়ার করা Application Password কাজ শেষে বাতিল করা।</li>
+	</ul>
+</div>
+
+<h3 id="s-tools">Tools (Export / Import)</h3>
+<ul>
+	<li><strong>Export:</strong> সব সেটিং একটা .json ফাইলে ডাউনলোড হয়।</li>
+	<li><strong>Import:</strong> সেই ফাইল দিলে হুবহু একই সেটিং বসে যায়। ভুল মান (যেমন সীমার বাইরের মাপ) নিজে থেকে ঠিক হয়ে যায়, অজানা কিছু বাদ পড়ে। ভুল ফাইল দিলে একটা মেসেজ দেখায়।</li>
+	<li><strong>Reset everything:</strong> শুধু প্লাগিনের সেটিং মোছে। অর্ডার, প্রোডাক্ট আর পেজের কিছু হয় না; প্লাগিনের ভাষার পছন্দও থেকে যায়।</li>
+</ul>
+</section>
+
+<section id="widgets">
+<h2>৬. Elementor উইজেট</h2>
+<p>Elementor এডিটরের বাম প্যানেলে সার্চে <strong>"Kenakata"</strong> বা উইজেটের নাম লিখুন, অথবা নিচে স্ক্রল করে <strong>Kenakata Kit · DigiBhai</strong> বিভাগ খুলুন।</p>
+<ul>
+	<li><strong>Content:</strong> কী দেখাবে।</li>
+	<li><strong>Style:</strong> দেখতে কেমন (রং, লেখার ধরন, কোণ, ফাঁকা, বর্ডার, ছায়া)।</li>
+	<li><strong>Advanced:</strong> Elementor-এর সাধারণ অপশন।</li>
+</ul>
+<p>প্রতিটি উইজেটের উপরে সবুজ বক্সে ছোট ব্যাখ্যা আছে।</p>
+<div class="tip"><strong>মোবাইল ও ট্যাবলেটের জন্য আলাদা মাপ</strong>পাশে 🖥️ চিহ্ন থাকা অপশন (কলাম, সাইজ, ফাঁকা, কোণ, প্যাডিং) ডিভাইস অনুযায়ী আলাদা দেওয়া যায়। এডিটরের উপরের মোবাইল আইকন চেপে মোবাইল ভিউতে গিয়ে মান দিন।</div>
+<div class="card"><h4>প্রতিটি অপশন পরীক্ষা করা</h4>৩.৩ ভার্সনে ১৫টি উইজেটের ~১,৩০০টি স্টাইল অপশন একটা একটা করে পরীক্ষা করা হয়েছে (কম্পিউটার ও মোবাইল ভিউ)। এডিটরে বদলালে লাইভ সাইটেও ঠিক সেটাই দেখায়। একটা উইজেটের স্টাইল অন্য উইজেটে লাগে না।</div>
+
+<div class="widget"><h3>Products Grid <span class="tag">সবচেয়ে দরকারি</span></h3>
+<p>প্রোডাক্টের গ্রিড। শপ, ক্যাটাগরি আর ব্র্যান্ড পেজের টেমপ্লেটে বসালে পেজ নম্বর আর সর্টিংসহ পুরো তালিকা দেখায়।</p>
+<dl>
+	<dt>কোথায় বসাবেন</dt><dd><span class="path">Templates → Theme Builder → Products Archive</span> (শপ/ক্যাটাগরি/ব্র্যান্ড), হোমপেজ, যেকোনো ল্যান্ডিং পেজ।</dd>
+	<dt>Source</dt><dd>Products of this page (আর্কাইভ টেমপ্লেটে), Latest, Featured, On sale, Best selling, Top rated, Selected categories, Selected brands, Selected products (ID), Related, <strong>Recently viewed by the visitor</strong>।</dd>
+	<dt>Recently viewed</dt><dd>ভিজিটর সম্প্রতি যে প্রোডাক্টগুলো খুলেছেন (নতুনটা আগে, যে প্রোডাক্টের পেজে আছেন সেটা বাদে)। তালিকা ভিজিটরের ব্রাউজারে থাকে, আর পেজ লোড হওয়ার পর আসে, তাই পেজ ক্যাশ থাকলেও ঠিক কাজ করে। প্রথমবার আসা ভিজিটরকে কিছুই দেখায় না।</dd>
+	<dt>Layout</dt><dd>
+		<ul>
+			<li>Columns (ডিভাইস অনুযায়ী), কার্ড ও সারির মাঝে ফাঁকা।</li>
+			<li><strong>Pagination:</strong> Automatic (শপ পেজে পেজ নম্বর) / None / Page numbers (1, 2, 3…) / Page numbers without reloading (AJAX) / "Load more" button (AJAX)। যেকোনো Source-এ কাজ করে (Related আর Recently viewed বাদে)। তখন "Number of products" মানে প্রতি পেজে কয়টি।</li>
+			<li>Result count and sorting (শপ পেজে)।</li>
+			<li><strong>Section title:</strong> প্রোডাক্টের উপরে শিরোনাম। দেখানোর মতো প্রোডাক্ট না থাকলে শিরোনামও লুকায়।</li>
+			<li>প্রোডাক্ট না থাকলে যে লেখা দেখাবে।</li>
+		</ul>
+	</dd>
+	<dt>Card content</dt><dd>
+		<ul>
+			<li>ছবি, ব্র্যান্ড, নাম, রেটিং, দাম, ছাড়ের ব্যাজ আর স্টক নেই ব্যাজ (প্রতিটি চালু/বন্ধ)।</li>
+			<li>নামের লাইন, ছবির আকার, কার্ডের ধরন, লেখা কোন দিকে।</li>
+			<li>কোন বাটন দেখাবে, মোবাইলে বাটন কেমন, আর বাটনের লেখা।</li>
+		</ul>
+	</dd>
+	<dt>Style</dt><dd>
+		<ul>
+			<li><strong>Card / Card content area:</strong> ব্যাকগ্রাউন্ড, বর্ডার, কোণ, ছায়া, মাউস রাখলে কেমন হবে, প্যাডিং।</li>
+			<li><strong>Image:</strong> পেছনের রং, প্যাডিং, কোণ, মাউস রাখলে জুম।</li>
+			<li><strong>Badges:</strong> লেখার ধরন, রং, কোণ, অবস্থান।</li>
+			<li><strong>Section title:</strong> লেখার ধরন, রং, অবস্থান, নিচের ফাঁকা।</li>
+			<li><strong>Brand name / Product name / Price:</strong> লেখার ধরন ও রং। Price-এ পুরনো দামের সাইজ আর আগের ফাঁকা।</li>
+			<li><strong>Rating:</strong> তারার রং আর সাইজ, আর পাশের সংখ্যা "(১২)"-এর লেখার ধরন ও রং আলাদা। তারা বড় করলে সংখ্যা আর বড় হয় না।</li>
+			<li><strong>Buttons (both):</strong> দুই বাটনের লেখার ধরন, উচ্চতা, কোণ আর মাঝের ফাঁকা।</li>
+			<li><strong>Add to cart button / Buy Now Button:</strong> আলাদা রং, বর্ডার আর ছায়া।</li>
+			<li><strong>Page numbers &amp; sorting / Load more button</strong></li>
+		</ul>
+	</dd>
+</dl></div>
+
+<div class="widget"><h3>Products Carousel</h3>
+<p>একই কার্ড, স্লাইডার আকারে। হোমপেজের Featured / On sale / Best selling সেকশন বা প্রোডাক্ট পেজের Related products-এর জন্য।</p>
+<dl>
+	<dt>বাড়তি অপশন</dt><dd>Slides visible at once (ডিভাইস অনুযায়ী), Autoplay, Seconds between slides, Loop, Arrows, Dots। মোবাইলে সোয়াইপ করা যায়।</dd>
+	<dt>Style</dt><dd>গ্রিডের সব স্টাইল + Carousel arrows &amp; dots (সাইজ, রং, অবস্থান)।</dd>
+</dl></div>
+
+<div class="widget"><h3>Brands</h3>
+<p>ব্র্যান্ডের লোগো বা নাম কার্ড: ক্যারোসেল বা গ্রিড।</p>
+<dl>
+	<dt>কোথায় বসাবেন</dt><dd>হোমপেজের "Popular brands" সেকশন, All Brands পেজ।</dd>
+	<dt>Content</dt><dd>
+		<ul>
+			<li><strong>কোন ব্র্যান্ড:</strong> কয়টি, কীভাবে সাজানো, নির্দিষ্ট ব্র্যান্ড দেখানো বা লুকানো, খালি ব্র্যান্ড লুকানো।</li>
+			<li><strong>লেআউট:</strong> ক্যারোসেল/গ্রিড, একসাথে কয়টি।</li>
+			<li><strong>কার্ড:</strong> কার্ডের ধরন, নাম ও প্রোডাক্ট সংখ্যা দেখাবে কি না।</li>
+		</ul>
+	</dd>
+	<dt>Style</dt><dd>
+		<ul>
+			<li><strong>Card:</strong> ব্যাকগ্রাউন্ড, বর্ডার, ছায়া, মাউস রাখলে কেমন হবে।</li>
+			<li><strong>Image / logo / letter:</strong> সাইজ, আকার, ব্যাকগ্রাউন্ড, বর্ডার, প্যাডিং।</li>
+			<li><strong>লেখা:</strong> Name আর Product count।</li>
+			<li><strong>Alignment</strong></li>
+			<li><strong>তীর ও ডট</strong></li>
+		</ul>
+	</dd>
+</dl></div>
+
+<div class="widget"><h3>Categories</h3>
+<p>Brands-এর মতোই, ক্যাটাগরির জন্য। বাড়তি অপশন: "Top-level categories only"। "Uncategorized" নিজে থেকে লুকানো থাকে।</p></div>
+
+<div class="widget"><h3>Buy Now Button</h3>
+<p>যেকোনো জায়গায় একটা প্রোডাক্টের সরাসরি চেকআউট বাটন। প্রোডাক্ট টেমপ্লেটে "Product of this page", ল্যান্ডিং পেজে প্রোডাক্ট ID দিন। লেখা, আইকন, পুরো চওড়া, অবস্থান আর পুরো বাটন স্টাইল বদলানো যায়।</p></div>
+
+<div class="widget"><h3>Live Search</h3>
+<p>Icon বা Search bar।</p>
+<ul>
+	<li><strong>Icon:</strong> বাটনের সাইজ, আইকনের সাইজ, রং আর কোণ।</li>
+	<li><strong>Search bar:</strong> চওড়া, উচ্চতা, লেখার ধরন, ঘরের রং, বর্ডার, টাইপ করার সময়ের বর্ডার, কোণ আর বাটনের রং।</li>
+</ul></div>
+
+<div class="widget"><h3>Cart Icon</h3>
+<p>হেডারের কার্ট আইকন। কার্টে কয়টি প্রোডাক্ট আছে দেখায় আর পেজ রিলোড ছাড়া আপডেট হয়। চাইলে মোট টাকাও দেখায়। Side cart চালু থাকলে ক্লিকে পাশে কার্ট খোলে।</p></div>
+
+<div class="widget"><h3>Login / My Account</h3>
+<p>লগইন না থাকলে পপআপ খোলে, লগইন থাকলে My account-এ যায়। লেখা, আইকন, শুধু আইকন আর পুরো স্টাইল বদলানো যায়।</p></div>
+
+<div class="widget"><h3>WhatsApp / Call Button</h3>
+<p>WhatsApp চ্যাট বা ফোন কলের বাটন। নম্বর খালি রাখলে সেটিংসের নম্বর ব্যবহার হয়। প্রোডাক্ট টেমপ্লেটে বসালে মেসেজে <code>{product}</code>, <code>{price}</code>, <code>{url}</code> প্রোডাক্টের তথ্য দিয়ে বদলে যায়। বাটনের রং, লেখা, বর্ডার, কোণ আর আইকনের সাইজ বদলানো যায়।</p></div>
+
+<div class="widget"><h3>Delivery Info</h3>
+<p>ডেলিভারি চার্জ (শিপিং সেটিং থেকে) আর আপনার লেখা লাইন। বক্স, শিরোনাম, লাইন আর আইকনের রং ও সাইজ বদলানো যায়।</p></div>
+
+<div class="widget"><h3>Checkout Form</h3>
+<p>Checkout পেজে বসান। এডিটরে নমুনা ফর্ম দেখায়, তাই স্টাইল বদলালে সাথে সাথে দেখা যায়। কোন ঘর থাকবে আর লেবেল কী হবে তা <span class="path">Kenakata Kit → Checkout</span>-এ ঠিক করুন।</p>
+<dl><dt>Style</dt><dd>
+	<ul>
+		<li>বক্স, শিরোনাম, লেবেল।</li>
+		<li>লেখার ঘর: রং, বর্ডার, টাইপ করার সময়ের বর্ডার, উচ্চতা, কোণ।</li>
+		<li>ডেলিভারি এরিয়ার বাটন: সাধারণ আর বেছে নেওয়া অবস্থা।</li>
+		<li>অর্ডার সামারি, মোট টাকা আর অর্ডার বাটন।</li>
+	</ul>
+</dd></dl></div>
+
+<div class="widget"><h3>Add to Cart Form <span class="tag">প্রোডাক্ট পেজ</span></h3>
+<p>প্রোডাক্ট পেজ টেমপ্লেটের কেনার অংশ: ভ্যারিয়েশন বাটন, পরিমাণ, Add to cart, Buy Now, WhatsApp/কল বাটন আর ডেলিভারি বক্স। থিম বা Elementor Pro-র "Add to Cart" উইজেটের বদলে বসান।</p>
+<dl>
+	<dt>Content</dt><dd>
+		<ul>
+			<li>Product: এই পেজের প্রোডাক্ট, বা ID দিয়ে যেকোনো প্রোডাক্ট (ল্যান্ডিং পেজের জন্য)।</li>
+			<li>Variation options: সেটিংস অনুযায়ী / বাটন / ড্রপডাউন।</li>
+			<li>Buttons: পরিমাণ আর বাটন এক লাইনে, অথবা পুরো চওড়া বাটন; মোবাইলে পাশাপাশি বা একটার নিচে আরেকটা।</li>
+			<li>Quantity box, Buy Now, WhatsApp/call buttons, Delivery box: প্রতিটি চালু/বন্ধ।</li>
+		</ul>
+	</dd>
+	<dt>Style</dt><dd>
+		<ul>
+			<li><strong>Variation name:</strong> লেখার ধরন, রং, বাছাই করা মানের রং, সারির ফাঁকা।</li>
+			<li><strong>Option buttons:</strong> লেখার ধরন, উচ্চতা, প্যাডিং, ফাঁকা, কোণ, বর্ডার; Normal / Hover / Chosen অবস্থার লেখা, ব্যাকগ্রাউন্ড আর বর্ডারের রং; স্টকে নেই এমন অপশনের স্বচ্ছতা; "Clear" লিংকের রং।</li>
+			<li><strong>Price and stock:</strong> বাছাই করা অপশনের দাম, "In stock"/"Out of stock"-এর রং।</li>
+			<li><strong>Quantity box:</strong> চওড়া, উচ্চতা, লেখা, রং, বর্ডার, কোণ।</li>
+			<li><strong>Add to cart / Buy Now / WhatsApp / Call button:</strong> প্রতিটির পুরো বাটন স্টাইল।</li>
+		</ul>
+	</dd>
+</dl></div>
+
+<div class="widget"><h3>Product Reviews <span class="tag">প্রোডাক্ট পেজ</span></h3>
+<p>রেটিং সারাংশ, কাস্টমারের ছবি, রিভিউ কার্ড আর ছবিসহ রিভিউ ফর্ম (<a href="#s-reviews">Reviews</a> দেখুন)। বসালে <span class="path">Reviews → Show reviews in the product tabs</span> বন্ধ করুন।</p>
+<dl>
+	<dt>Content</dt><dd>Product, আর Rating summary / Customer photos strip / Review form চালু-বন্ধ, অংশগুলোর মাঝের ফাঁকা।</dd>
+	<dt>Style</dt><dd>Title; Rating summary বক্স; গড় সংখ্যা, তারার রং ও সাইজ, বারের রং ও উচ্চতা; "Write a review" বাটন; Review card (ব্যাকগ্রাউন্ড, বর্ডার, কোণ, প্যাডিং, ছায়া); নাম, তারিখ, লেখা, "verified owner" ব্যাজ; ছবির সাইজ ও কোণ; ফর্ম বক্স, ঘর আর Submit বাটন।</dd>
+</dl></div>
+
+<div class="widget"><h3>Order Tracking ও Order Confirmation</h3>
+<p>Track Order আর Thank You পেজে বসান। বক্স, শিরোনাম, লেখা আর বাটনের স্টাইল বদলানো যায়। লেখাগুলো সেটিংসে বদলান।</p></div>
+</section>
+
+<section id="recipes">
+<h2>৭. ধাপে ধাপে কাজ</h2>
+
+<h3>হোমপেজে ব্র্যান্ড ক্যারোসেল বসানো ও সাজানো</h3>
+<ol class="steps">
+	<li>হোমপেজ <strong>Edit with Elementor</strong> দিয়ে খুলুন।</li>
+	<li>বাম প্যানেলে "Brands" লিখে উইজেটটা টেনে সেকশনে বসান। পুরনো Shortcode উইজেট থাকলে মুছে দিন।</li>
+	<li>Content → <strong>How many</strong> = 18, <strong>Order by</strong> = Most products first, <strong>Card style</strong> = Logo only (লোগো থাকলে) বা Card with border।</li>
+	<li><strong>Items per view</strong>: কম্পিউটারে 6, মোবাইল আইকন চেপে মোবাইলে 3।</li>
+	<li>Carousel → <strong>Autoplay</strong> চালু, ৩ সেকেন্ড।</li>
+	<li>Style → Card-এ ব্যাকগ্রাউন্ড, বর্ডার আর কোণ দিন। <strong>Update</strong> চাপুন।</li>
+</ol>
+
+<h3>শপ / ক্যাটাগরি / ব্র্যান্ড পেজ নতুন কার্ডে</h3>
+<ol class="steps">
+	<li><span class="path">Templates → Theme Builder → Products Archive</span>-এ টেমপ্লেট এডিট করুন।</li>
+	<li>পুরনো "Archive Products" উইজেট সরিয়ে <strong>Products Grid</strong> বসান। Source = <strong>Products of this page</strong>।</li>
+	<li>Columns: কম্পিউটারে 4, ট্যাবলেটে 3, মোবাইলে 2।</li>
+	<li>প্রতি পেজে কয়টি দেখাবে তা <span class="path">Kenakata Kit → Product cards → Products per page</span>-এ দিন।</li>
+</ol>
+
+<h3>মোবাইলে অ্যাপের মতো নিচের মেনু</h3>
+<ol class="steps">
+	<li><span class="path">Kenakata Kit → Bottom Bar</span> → <strong>Enable the bottom bar</strong>।</li>
+	<li>Menu items-এ Home, Shop, Cart, Account, Orders রাখুন (ডিফল্ট)।</li>
+	<li><strong>Highlighted item</strong> = Cart, <strong>Style</strong> = Pill।</li>
+	<li>Save settings, তারপর ফোনে সাইট খুলে দেখুন।</li>
+</ol>
+
+<h3>মোবাইলে প্রোডাক্টের নাম পুরোটা দেখাতে চাই</h3>
+<p><span class="path">Product cards → Product name lines</span> ৩ করুন, অথবা উইজেটে "Name lines" শুধু মোবাইলের জন্য ৩ দিন।</p>
+
+<h3>ছাড়ের ব্যাজ বাংলায় দেখাতে চাই</h3>
+<p>Badge text-এ দিন: <code>{percent}% ছাড়</code>। ফলাফল: "১২% ছাড়"।</p>
+
+<h3>চেকআউটের সব লেখা বাংলা করতে চাই</h3>
+<p><span class="path">Kenakata Kit → Checkout</span>-এ প্রতিটি লেবেল বাংলায় লিখুন, যেমন: "আপনার নাম", "মোবাইল নম্বর", "পুরো ঠিকানা", "ডেলিভারি এরিয়া"; অর্ডার বাটনে লিখুন "অর্ডার কনফার্ম করুন"। শিপিং মেথডের নামও বাংলা দিতে পারেন ("ঢাকার ভেতরে")।</p>
+
+<h3>প্রোডাক্ট পেজ (Single Product টেমপ্লেট) সাজানো</h3>
+<ol class="steps">
+	<li><span class="path">Templates → Theme Builder → Single Product</span> খুলুন।</li>
+	<li>উপরের সারিতে তিনটা কলাম রাখুন: ছবি, তথ্য আর (চাইলে) পোস্টার। কলামের <strong>Width</strong> কম্পিউটারে ৩৮% / ৩৮% / ২৪%, ট্যাবলেটে ৪৮% / ৪৮% / ১০০%, <strong>মোবাইলে ১০০%</strong> দিন। মোবাইলে মান খালি রাখলে ট্যাবলেটের মান চলে, তখন ফোনে দুটো কলাম গাদাগাদি করে পাশাপাশি বসে।</li>
+	<li>তথ্যের কলামে Product Title, Rating, Price, তারপর <strong>Add to Cart Form</strong> (থিমের Add to Cart-এর বদলে), তারপর Short Description।</li>
+	<li>তার নিচে Elementor Pro-র <strong>Product Data Tabs</strong>: Description, Additional information আর শেষে Reviews, নতুন রিভিউ ডিজাইনসহ। ইমপোর্ট করা প্রোডাক্টের জন্য <span class="path">Reviews → Allow reviews on every product</span> চালু রাখুন।</li>
+	<li>সবার নিচে <strong>Products Carousel</strong>: Source = Related products, Section title = "Related Products"। আরেকটা: Source = Recently viewed, Section title = "Recently Viewed"।</li>
+	<li>Elementor-এর উপরের মোবাইল/ট্যাবলেট আইকন দিয়ে দুটো ভিউ দেখে নিয়ে <strong>Update</strong> চাপুন।</li>
+</ol>
+
+<h3>নতুন দোকানে একই সেটিং</h3>
+<p>পুরনো সাইটে <span class="path">Tools (Export / Import) → Download settings file</span>, নতুন সাইটে প্লাগিন বসিয়ে <strong>Import</strong>।</p>
+</section>
+
+<section id="shortcodes">
+<h2>৮. শর্টকোড</h2>
+<p>Elementor ছাড়া ব্লক এডিটর বা অন্য পেজ বিল্ডারে এগুলো ব্যবহার করুন। <span class="path">Kenakata Kit → Shortcodes</span>-এ ক্লিক করলেই কপি হয়।</p>
+<div class="table-wrap"><table>
+	<tr><th>শর্টকোড</th><th>কাজ ও অপশন</th></tr>
+	<tr><td><code>[kk_products]</code></td><td>প্রোডাক্ট গ্রিড/ক্যারোসেল।
+		<ul>
+			<li><code>source</code> = latest | featured | sale | best_selling | top_rated | category | brand | ids | related | recent | current</li>
+			<li><code>pagination</code> = none | numbers | ajax | loadmore, <code>load_more_text</code>, <code>title="Related products"</code></li>
+			<li><code>category="slug"</code>, <code>brand="slug"</code>, <code>ids="12,34"</code>, <code>limit</code></li>
+			<li><code>columns</code>, <code>columns_tablet</code>, <code>columns_mobile</code>, <code>layout="grid|carousel"</code></li>
+			<li><code>orderby</code>, <code>order</code>, <code>buttons</code>, <code>dots="yes"</code>, <code>autoplay="yes"</code></li>
+		</ul>
+	</td></tr>
+	<tr><td><code>[kk_brands]</code></td><td>ব্র্যান্ড কার্ড। <code>layout</code>, <code>limit</code>, <code>orderby="count|name"</code>, <code>style="card|minimal|circle|logo"</code>, <code>include</code>, <code>exclude</code>, <code>show_count</code>, <code>columns</code>…</td></tr>
+	<tr><td><code>[kk_categories]</code></td><td>ক্যাটাগরি কার্ড, একই অপশন + <code>parent="0"</code> (শুধু প্রধান)।</td></tr>
+	<tr><td><code>[kk_live_search]</code></td><td>লাইভ সার্চ। <code>mode="icon|bar"</code>, <code>placeholder</code>, <code>button_text</code>।</td></tr>
+	<tr><td><code>[kk_cart_icon]</code></td><td>কার্ট আইকন। <code>show_total="yes"</code>।</td></tr>
+	<tr><td><code>[kk_account_link]</code></td><td>লগইন/অ্যাকাউন্ট লিংক। <code>login_text</code>, <code>account_text</code>।</td></tr>
+	<tr><td><code>[kk_buy_now id="123"]</code></td><td>Buy Now বাটন। <code>text</code>, <code>class</code>।</td></tr>
+	<tr><td><code>[kk_whatsapp]</code></td><td>WhatsApp/কল বাটন। <code>type="whatsapp|call"</code>, <code>text</code>, <code>number</code>, <code>message</code>।</td></tr>
+	<tr><td><code>[kk_delivery_info]</code></td><td>ডেলিভারি তথ্য। <code>title</code>, <code>charges="yes|no"</code>।</td></tr>
+	<tr><td><code>[kk_order_tracking]</code></td><td>অর্ডার ট্র্যাকিং ফর্ম।</td></tr>
+	<tr><td><code>[kk_thank_you]</code></td><td>অর্ডার কনফার্মেশন।</td></tr>
+</table></div>
+<p>Bottom Bar-এর শর্টকোড নেই, সেটা সেটিংস থেকে চালু হয়। পুরনো <code>[ss_terms]</code>, <code>[ss_live_search]</code>, <code>[ss_thank_you]</code>, <code>[ss_order_tracking]</code> এখনো কাজ করে।</p>
+</section>
+
+<section id="faq">
+<h2>৯. সমস্যা ও সমাধান</h2>
+<h4>সেটিং বদলালাম, সাইটে কিছু বদলায়নি</h4>
+<ol>
+	<li>ক্যাশ মুছুন: ক্যাশ প্লাগিন, Cloudflare আর ব্রাউজার (<kbd>Ctrl</kbd>+<kbd>F5</kbd>)।</li>
+	<li>Elementor উইজেটে নিজস্ব স্টাইল দেওয়া থাকলে সেটাই আগে চলে। উইজেটের Style-এ মানটা খালি করুন।</li>
+</ol>
+<h4>Bottom Bar দেখাচ্ছে না</h4>
+<ul>
+	<li><strong>Enable the bottom bar</strong> চালু আছে কি না, আর অন্তত একটা আইটেম চালু আছে কি না দেখুন।</li>
+	<li>শুধু <strong>Show on screens narrower than</strong>-এর চেয়ে ছোট স্ক্রিনে দেখায়। কম্পিউটারে দেখাবে না।</li>
+	<li>চেকআউট পেজে ডিফল্টে লুকানো থাকে।</li>
+	<li>WhatsApp/Call আইটেম নম্বর না দিলে দেখায় না।</li>
+</ul>
+<h4>চেকআউটে ডেলিভারি এরিয়া দেখাচ্ছে না</h4>
+<ul>
+	<li><span class="path">WooCommerce → Settings → Shipping</span>-এ বাংলাদেশের জোনে অন্তত একটা শিপিং মেথড চালু আছে কি না দেখুন।</li>
+	<li><strong>Country</strong> সেটিং Bangladesh আছে কি না দেখুন।</li>
+	<li>Checkout পেজ ব্লক চেকআউট হলে ক্লাসিক শর্টকোডে বদলান।</li>
+</ul>
+<h4>"An order was already placed…" মেসেজ আসছে</h4>
+<p>এটা ভুয়া অর্ডার সুরক্ষা: একই নম্বর থেকে ৩০ মিনিটের মধ্যে আরেকটা অর্ডার হচ্ছে। সত্যিকারের কাস্টমার হলে আগের অর্ডারে প্রোডাক্ট যোগ করে দিন, অথবা সময় কমান।</p>
+<h4>Buy Now বাটন কিছু প্রোডাক্টে নেই</h4>
+<p>স্টকে নেই এমন প্রোডাক্টে Buy Now দেখায় না। ভ্যারিয়েবল প্রোডাক্টে বাটন সবসময় দেখায়; ডিফল্ট অপশন না থাকলে প্রোডাক্ট পেজে নেয়। এক ক্লিকে কার্টে বা চেকআউটে নিতে প্রোডাক্টের <span class="path">Variations → Default Form Values</span>-এ প্রতিটি অপশনের ডিফল্ট দিন।</p>
+<h4>কাস্টমার ছবিসহ রিভিউ দিয়েছেন, কিন্তু সাইটে দেখাচ্ছে না</h4>
+<p>"Approve reviews with photos before they appear" চালু থাকলে <span class="path">Products → Reviews</span>-এ রিভিউটা Approve করুন। কাস্টমার নিজে অপেক্ষার মেসেজসহ তার রিভিউ দেখতে পায়।</p>
+<h4>প্রোমো কোডের ঘর দেখাচ্ছে না</h4>
+<p><span class="path">Checkout → Promo code (coupon) field</span> দেখুন। <span class="path">WooCommerce → Settings → General → Enable the use of coupon codes</span>-ও চালু থাকতে হবে।</p>
+<h4>Brands উইজেট খালি</h4>
+<p>প্রোডাক্টে ব্র্যান্ড দেওয়া আছে কি না দেখুন (<span class="path">Products → Brands</span>)। প্রোডাক্ট নেই এমন ব্র্যান্ড ডিফল্টে লুকানো থাকে।</p>
+<h4>থিমের সাথে বাটন অদ্ভুত দেখাচ্ছে</h4>
+<p><span class="path">Colours &amp; design → Strong styles</span> চালু করুন।</p>
+<h4>কাস্টমার পাসওয়ার্ড ভুলে গেছে</h4>
+<p>পপআপের "Forgot password?" লিংক WooCommerce-এর পাসওয়ার্ড রিসেট পেজে নিয়ে যায় (ইমেইল লাগবে)। ইমেইল না থাকলে <span class="path">Users</span> থেকে আপনি নতুন পাসওয়ার্ড দিন।</p>
+</section>
+
+<section id="dev">
+<h2>১০. ডেভেলপারদের জন্য</h2>
+<ul>
+	<li><strong>সেটিংস:</strong> একটা অপশনে থাকে, <code>kk_settings</code>। পড়তে <code>kk_opt( 'key' )</code>।</li>
+	<li><strong>REST:</strong>
+		<ul>
+			<li><code>GET/POST /wp-json/kenakata/v1/settings</code> (শুধু shop manager)।</li>
+			<li><code>/wp-json/kenakata/v1/search?q=</code>: লাইভ সার্চ।</li>
+			<li><code>/wp-json/kenakata/v1/recent</code>: "Recently viewed" তালিকা (সাইন করা অপশন ছাড়া কাজ করে না)।</li>
+			<li><code>POST /wp-json/kenakata/v1/elementor-css</code>: Elementor-এর CSS নতুন করে তৈরি (শুধু অ্যাডমিন)।</li>
+		</ul>
+	</li>
+	<li><strong>AJAX:</strong> <code>?wc-ajax=kk_add_variation</code>: কার্ড থেকে ভ্যারিয়েবল প্রোডাক্টের ডিফল্ট অপশন কার্টে যোগ (WooCommerce-এর add_to_cart-এর মতো fragments ফেরত দেয়)।</li>
+	<li><strong>রিভিউয়ের ছবি:</strong> comment meta <code>kk_review_images</code> (attachment ID-এর তালিকা); প্রতিটি ছবিতে <code>_kk_review_comment</code>।</li>
+	<li><strong>ফিল্টার:</strong>
+		<ul>
+			<li><code>kk_products_query_args</code>: প্রোডাক্ট কোয়েরি বদলানো।</li>
+			<li><code>kk_bottom_bar_visible</code>: কোনো পেজে Bottom Bar লুকানো (false ফেরত দিন)।</li>
+		</ul>
+	</li>
+	<li><strong>অ্যাকশন:</strong> <code>kk_card_after_price</code> (কার্ডে দামের পরে নিজের কিছু বসানো)।</li>
+	<li><strong>অর্ডার মেটা:</strong> <code>_kk_delivery_area</code>, <code>_kk_courier</code>, <code>_kk_tracking_id</code>, <code>_kk_tracking_url</code>।</li>
+	<li><strong>CSS ভ্যারিয়েবল:</strong>
+		<ul>
+			<li><code>--kk-primary</code>, <code>--kk-accent</code>, <code>--kk-radius</code>, <code>--kk-card-lines</code>, <code>--kk-cols</code>, <code>--kk-pv</code>।</li>
+			<li>Bottom Bar: <code>--kk-bbar-h</code>, <code>--kk-bbar-bg</code>, <code>--kk-bbar-active</code> ইত্যাদি।</li>
+		</ul>
+	</li>
+	<li><strong>অনুবাদ:</strong> টেক্সট ডোমেইন <code>kenakata-kit</code>; বাংলা ফাইল <code>languages/kenakata-kit-bn_BD.po/.mo</code>।</li>
+	<li><strong>টেমপ্লেট:</strong> <code>templates/content-product.php</code> (WooCommerce-এর প্রোডাক্ট কার্ডের বদলে)।</li>
+	<li><strong>সামঞ্জস্য:</strong> HPOS কম্প্যাটিবল।</li>
+</ul>
+</section>
+
+<section id="changelog">
+<h2>১১. পরিবর্তনের তালিকা</h2>
+<h4>৩.১০.০</h4>
+<ul>
+	<li><strong>নতুন:</strong> Incomplete orders: চেকআউটে ফোন নম্বর দিয়ে অর্ডার না করা ক্রেতাদের তালিকা, Call/WhatsApp, "ফোন করা হয়েছে", "অর্ডার তৈরি করুন" আর "বাদ দিন"। ডিফল্টে বন্ধ।</li>
+	<li><strong>বদলেছে:</strong> কুরিয়ার এখন প্রতিটার আলাদা সুইচে চালু হয়, একাধিক একসাথে চালু রাখা যায়। অর্ডারে শুধু চালু কুরিয়ারগুলো দেখায়, আর কোনো কুরিয়ার চালু থাকলে কুরিয়ার/ট্র্যাকিং আইডি/লিংক হাতে লেখার ঘর থাকে না: কুরিয়ারে পাঠালে নিজে থেকে বসে।</li>
+	<li><strong>বদলেছে:</strong> Courier check এখন নিজের সুইচ চালু করলে তবেই দেখায়। দেখতে নতুন করে সাজানো (ফলাফল আলাদা প্যানেলে, বড় ট্রাফিক লাইট)।</li>
+	<li><strong>ঠিক করা হয়েছে:</strong> Courier check-এর ফলাফল ডেস্কটপে পাশে সরে যেত।</li>
+	<li><strong>দ্রুত:</strong> ড্যাশবোর্ডের হোমের হিসাব এখন অর্ডারগুলো একসাথে এনে করে।</li>
+</ul>
+<h4>৩.৯.০</h4>
+<ul>
+	<li><strong>নতুন:</strong> Pathao দিয়ে এক চাপে পার্সেল বুক। লগইনের তথ্য ও Store ID বসালে হয়, স্টোরের নম্বর পরীক্ষার সময় তালিকা করে দেখায়।</li>
+	<li><strong>নতুন:</strong> BD Courier টোকেন দিলে Courier check-এ সব কুরিয়ার মিলিয়ে ক্রেতার হিসাব, কুরিয়ার অনুযায়ী ভাগ আর অন্য দোকানের রিপোর্ট। ফলাফল ক্যাশ হয়, Refresh বোতাম আছে।</li>
+</ul>
+<h4>৩.৮.০</h4>
+<ul>
+	<li><strong>নতুন:</strong> Courier booking: কুরিয়ার বেছে API কী বসান, তারপর অর্ডারে এক চাপে পার্সেল বুক (এখন Steadfast)। ড্যাশবোর্ড ও WooCommerce অর্ডার পাতা দুই জায়গাতেই।</li>
+	<li><strong>নতুন:</strong> Courier check: ফোন নম্বর ধরে আগের অর্ডারের সফল/বাতিলের হিসাব আর সবুজ-হলুদ-লাল পরামর্শ।</li>
+	<li><strong>ঠিক করা হয়েছে:</strong> ক্যাশ অন ডেলিভারি অর্ডার Processing অবস্থায় থাকলে "যত টাকা নিতে হবে" খালি দেখাত। এখন সঠিক অঙ্ক আসে।</li>
+</ul>
+<h4>৩.৭.০</h4>
+<ul>
+	<li><strong>নতুন:</strong> লগইনের পর অ্যাডমিনিস্ট্রেটর ও শপ ম্যানেজারকেও ড্যাশবোর্ডে নেওয়ার অপশন (After login, go to)। ডিফল্টে আগের মতোই থাকে।</li>
+	<li><strong>নতুন:</strong> হোম পেজে "More insights": বিক্রির ধারা, সেরা ৫ প্রোডাক্ট আর কুরিয়ারের কাছে টাকা। প্রতিটা চাপ দিলে তবেই লোড হয়।</li>
+	<li><strong>নতুন:</strong> ম্যানেজারদের বিক্রির টাকার অঙ্ক লুকানোর সুইচ।</li>
+	<li><strong>নতুন:</strong> ড্যাশবোর্ড ও সেটিংস পাতার রং: ৭টা তৈরি সেট বা নিজের দুটো রং।</li>
+</ul>
+<h4>৩.৬.০</h4>
+<ul>
+	<li><strong>নতুন:</strong> স্টোর ড্যাশবোর্ড (<code>/dashboard</code>): অর্ডার, প্রোডাক্ট আর ব্লগ ফোনে সহজে সামলানো, আর Store Manager রোল।</li>
+</ul>
+<h4>৩.৪.৩</h4>
+<ul>
+	<li><strong>নতুন:</strong> ড্যাশবোর্ড → Site status-এ "নির্ধারিত কাজ (cron)" চলছে কি না দেখায়। ব্যাকআপ, নির্ধারিত সেল আর ইমেইল এর উপর নির্ভর করে। হোস্টিংয়ে cron job যোগ করার পর এখান থেকেই যাচাই করা যায়।</li>
+</ul>
+<h4>৩.৪.২</h4>
+<ul>
+	<li><strong>ঠিক করা:</strong> রিভিউ ফর্মে মাউস রাখলে বা রেটিং বাছলে তারার জায়গায় খালি বাক্স দেখাত।</li>
+</ul>
+<h4>৩.৪.১</h4>
+<ul>
+	<li><strong>ঠিক করা:</strong> Elementor-এর গ্লোবাল লিংক রং এই বাটনগুলোর লেখার রং বদলে দিত: "Write a review", "Load more", Buy Now উইজেট, কার্ট আইকন আর অ্যাকাউন্ট লিংক। ফলে সবুজ বাটনে সবুজ লেখা হয়ে লেখা দেখা যেত না।</li>
+</ul>
+<h4>৩.৪.০</h4>
+<ul>
+	<li><strong>রিভিউ আবার প্রোডাক্ট ট্যাবের শেষ ট্যাবে</strong> (নতুন ডিজাইনে)। নতুন সেটিং "Allow reviews on every product": রিভিউ বন্ধ থাকা ইমপোর্ট করা প্রোডাক্টেও রিভিউ চলে।</li>
+	<li><strong>প্রোডাক্টের বিবরণ:</strong> পুরো লেখা Short description-এ থাকলে Description ট্যাবে দেখায়, দামের পাশে প্রথম লাইন আর "Read more"। এতে সিম্পল আর ভ্যারিয়েবল সব প্রোডাক্ট পেজ এক রকম দেখায়।</li>
+	<li><strong>নিরাপত্তা:</strong>
+		<ul>
+			<li>ভুল পাসওয়ার্ডে লগইন সাময়িক বন্ধ; ব্রাউজার নিরাপত্তা হেডার; ভার্সন লুকানো।</li>
+			<li>কোড এডিটর বন্ধ; uploads-এ PHP আটকানো; XML-RPC পুরো বন্ধ।</li>
+			<li>Cloudflare-নিরাপদ IP; ছবিসহ রিভিউয়ের সীমা।</li>
+			<li>নিরাপত্তার সেটিং শুধু অ্যাডমিনিস্ট্রেটরের জন্য।</li>
+		</ul>
+	</li>
+	<li><strong>আপডেট-নিরাপত্তা:</strong> পুরনো WooCommerce-এ নিজে বন্ধ থাকে; Elementor-এর অমিল হলে শুধু উইজেট সাময়িক বন্ধ হয়, সাইট নয়।</li>
+	<li><strong>ঠিক করা:</strong> Shop manager সেটিংস সেভ করতে পারতেন না।</li>
+</ul>
+<h4>৩.৩.০</h4>
+<ul>
+	<li><strong>প্রোডাক্ট পেজ:</strong>
+		<ul>
+			<li>সাইজ/রঙের অপশন বাটন হিসেবে; স্টকে নেই এমন কম্বিনেশন ধূসর।</li>
+			<li>নতুন <strong>Add to Cart Form</strong> উইজেট: অপশন বাটন, পরিমাণ, Add to cart, Buy Now, WhatsApp/কল, ডেলিভারি বক্স, সব স্টাইলসহ।</li>
+		</ul>
+	</li>
+	<li><strong>রিভিউ:</strong> রেটিং সারাংশ ও বার, কাস্টমারের ছবি, রিভিউ কার্ড, ২–৩টা ছবিসহ রিভিউ (যাচাই আর অনুমোদনসহ), নতুন <strong>Product Reviews</strong> উইজেট।</li>
+	<li><strong>প্রোডাক্ট কার্ড:</strong> ভ্যারিয়েবল প্রোডাক্টেও Add to cart + Buy Now; ডিফল্ট অপশন থাকলে সরাসরি কার্টে/চেকআউটে।</li>
+	<li><strong>Products Grid:</strong>
+		<ul>
+			<li>Pagination: পেজ নম্বর, AJAX পেজ নম্বর, "Load more"।</li>
+			<li>নতুন Source "Recently viewed"; সেকশন শিরোনাম।</li>
+			<li>রেটিংয়ের সংখ্যার আলাদা সাইজ/রং; দামের রেঞ্জে ফাঁকা কমানো।</li>
+		</ul>
+	</li>
+	<li><strong>নতুন সেটিং:</strong> প্রোমো কোড ঘর চালু/বন্ধ; কল বাটন, WhatsApp বাটন, আইকন, তারা, ব্যাজের লেখা, বাটনের লেখা, স্টিকি বার, ডেলিভারি বক্সের রং; ভাসমান বাটনের সাইজ; সাইড কার্টের চওড়া।</li>
+	<li><strong>ঠিক করা:</strong>
+		<ul>
+			<li>কিছু না বদলালেও অন্য সেটিংয়ে গেলে "সেভ করা হয়নি" সতর্কবার্তা আসত।</li>
+			<li>"Open the side cart after Add to cart" বন্ধ থাকলেও সাইড কার্ট খুলে যেত।</li>
+			<li>Buy Now বাটনের বর্ডারের রং উইজেট থেকে বদলাত না।</li>
+		</ul>
+	</li>
+</ul>
+<h4>৩.২.০</h4>
+<ul>
+	<li><strong>নতুন Bottom Bar:</strong>
+		<ul>
+			<li>ড্র্যাগ করে আইটেম সাজানো; প্রতিটির লেবেল, আইকন (১৭টা) আর লিংক (১১ ধরন) বদলানো।</li>
+			<li>৩টা স্টাইল, উঁচু হাইলাইট বাটন, পুরো রং ও মাপ, ফোন-প্রিভিউ।</li>
+			<li>কার্টের সংখ্যা, iPhone safe-area, স্ক্রল করলে লুকানো।</li>
+		</ul>
+	</li>
+	<li><strong>Elementor উইজেটের বাগ ঠিক:</strong>
+		<ul>
+			<li>কয়েকটা স্টাইল অপশন অন্য উইজেটেও লেগে যেত।</li>
+			<li>বাটনের লেখার ধরন, বর্ডার আর ছায়া কাজ করত না।</li>
+			<li>"Left" অ্যালাইনমেন্ট, ক্যারোসেলের তীরের সাইজ, সার্চ বারের লেখার ধরন আর WhatsApp বাটনের লেখার রং কাজ করত না।</li>
+			<li>চেকআউটের মোট টাকার লেখার ধরন অন্য সেটিংয়ে চাপা পড়ত।</li>
+			<li>প্রোডাক্ট কার্ডের বাটনের একই অপশন দুই জায়গায় ছিল; এখন সাইজ ও লেখার ধরন এক জায়গায়, রং আলাদা।</li>
+		</ul>
+	</li>
+	<li><strong>অন্যান্য ঠিক:</strong>
+		<ul>
+			<li>WhatsApp মেসেজের নতুন লাইন হারিয়ে যেত।</li>
+			<li>চেকআউটে একই ভুলের দুটো মেসেজ আসত, আর লেবেলের আগে "Billing" লেখা থাকত।</li>
+			<li>ড্যাশবোর্ডে দ্রুত কয়েকটা সুইচ চাপলে কোনোটা সেভ হতো না।</li>
+			<li>AJAX-এ কার্টে যোগ করার পর সাইড কার্টের ডিজাইন ভেঙে যেত।</li>
+		</ul>
+	</li>
+	<li><strong>ব্র্যান্ডিং:</strong> DigiBhai.com (Author, About, Elementor বিভাগ, গাইড)।</li>
+</ul>
+<h4>৩.১.০</h4>
+<ul>
+	<li>সেটিংস পেজ আর উইজেট ইংরেজিতে, বাংলা অনুবাদসহ (Plugin language)।</li>
+	<li>সরু কার্ডে Add to cart নিজে থেকে আইকন।</li>
+</ul>
+<h4>৩.০.০</h4>
+<ul>
+	<li><strong>নতুন সেটিংস পেজ:</strong> ড্যাশবোর্ড, লাইভ প্রিভিউ, Export/Import।</li>
+	<li><strong>প্রোডাক্ট কার্ড:</strong> নতুন কার্ড, মোবাইলে নাম আর ঢাকে না।</li>
+	<li><strong>নতুন উইজেট:</strong> ৮টি।</li>
+	<li><strong>নতুন ফিচার:</strong> WhatsApp, ডেলিভারি তথ্য, স্টিকি বার, সাইড কার্ট।</li>
+	<li><strong>নিরাপত্তা:</strong> নতুন সুইচ।</li>
+</ul>
+<h4>২.x</h4><ul><li>১১ সংখ্যার ফোন যাচাই, বারবার অর্ডার আটকানো, Buy Now, সহজ চেকআউট, থ্যাংক-ইউ, ট্র্যাকিং, সার্চ, পপআপ।</li></ul>
+</section>
+
+<footer>কেনাকাটা কিট (Kenakata Kit) · তৈরি করেছে <a href="https://digibhai.com/" target="_blank" rel="noopener">DigiBhai.com</a> · যেকোনো বাংলাদেশি WooCommerce দোকানে ব্যবহারযোগ্য · লাইসেন্স: GPL-2.0-or-later</footer>
+</main>
+</div>
+<script>
+(function () {
+	var q = document.getElementById('q');
+	var items = Array.prototype.slice.call(document.querySelectorAll('.toc li'));
+	q.addEventListener('input', function () {
+		var term = q.value.trim().toLowerCase();
+		items.forEach(function (li) {
+			var a = li.querySelector('a');
+			var target = a && document.querySelector(a.getAttribute('href'));
+			var text = ((a ? a.textContent : '') + ' ' + (target ? target.textContent : '')).toLowerCase();
+			li.classList.toggle('is-hidden', term !== '' && text.indexOf(term) === -1);
+		});
+	});
+	var btn = document.querySelector('.menu-btn');
+	var toc = document.getElementById('toc');
+	btn.addEventListener('click', function () {
+		var open = toc.classList.toggle('is-open');
+		btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+	});
+	toc.addEventListener('click', function (e) { if (e.target.closest('a') && window.innerWidth <= 900) { toc.classList.remove('is-open'); btn.setAttribute('aria-expanded', 'false'); } });
+})();
+</script>
+</body>
+</html>

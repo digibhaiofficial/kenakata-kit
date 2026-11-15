@@ -1,0 +1,8 @@
+{
+  "name": "kenakata-kit-dev",
+  "private": true,
+  "description": "Development tools for Kenakata Kit (never shipped).",
+  "dependencies": {
+    "php-parser": "3.7.0"
+  }
+}

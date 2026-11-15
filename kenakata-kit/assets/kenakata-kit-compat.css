@@ -1,0 +1,68 @@
+/*
+ * Kenakata Kit – "Strong styles" (Kenakata Kit → Colours & design → Strong styles).
+ * Higher-specificity rules so themes / page builders (Hello, Astra, Kadence, Blocksy, OceanWP, Flatsome…)
+ * can't shrink or recolour Kenakata Kit buttons, fields and cards. Values come from the settings (--kk-*).
+ * Only colours use !important; sizes and text use specificity, so Elementor widget Style settings always win.
+ */
+html body .kk-btn,
+html body .woocommerce ul.products li.product .kk-card-actions .button,
+html body .woocommerce a.button.kk-buy-now,
+html body .woocommerce button.button.kk-buy-now,
+html body a.button.kk-buy-now--standalone,
+html body .woocommerce #place_order,
+html body .woocommerce-cart .wc-proceed-to-checkout a.checkout-button {
+	min-height: var(--kk-btn-height);
+	border-radius: var(--kk-btn-radius);
+	font-family: var(--kk-font);
+	font-size: var(--kk-btn-font-size);
+	font-weight: var(--kk-btn-weight);
+	text-transform: var(--kk-btn-transform);
+	letter-spacing: normal;
+	line-height: 1.2;
+	box-shadow: none;
+	text-decoration: none;
+}
+html body .woocommerce ul.products li.product .kk-card-actions .button { width: 100%; margin: 0; display: flex; align-items: center; justify-content: center; text-align: center; }
+html body .woocommerce ul.products li.product .kk-card-actions .add_to_cart_button,
+html body .woocommerce #place_order,
+html body .kk-btn--primary { background-color: var(--kk-primary) !important; color: var(--kk-btn-text, #fff) !important; border-color: var(--kk-primary); }
+html body .woocommerce ul.products li.product .kk-card-actions .add_to_cart_button:hover,
+html body .woocommerce #place_order:hover,
+html body .kk-btn--primary:hover { background-color: var(--kk-primary-hover) !important; border-color: var(--kk-primary-hover); }
+html body .woocommerce a.button.kk-buy-now,
+html body .woocommerce button.button.kk-buy-now,
+html body a.button.kk-buy-now--standalone { background-color: var(--kk-accent) !important; color: var(--kk-btn-text, #fff) !important; border-color: var(--kk-accent); }
+html body .woocommerce a.button.kk-buy-now:hover,
+html body .woocommerce button.button.kk-buy-now:hover,
+html body a.button.kk-buy-now--standalone:hover { background-color: var(--kk-accent-hover) !important; border-color: var(--kk-accent-hover); }
+
+/* Product card: colours and text that themes like to override inside product loops */
+html body .kk-pcard a.kk-pcard__btn--cart { background-color: var(--kk-primary) !important; color: var(--kk-btn-text, #fff) !important; border-color: var(--kk-primary); }
+html body .kk-pcard a.kk-pcard__btn--cart:hover { background-color: var(--kk-primary-hover) !important; color: var(--kk-btn-text, #fff) !important; border-color: var(--kk-primary-hover); }
+html body .kk-pcard a.kk-pcard__btn--buy { background-color: var(--kk-accent) !important; color: var(--kk-btn-text, #fff) !important; border-color: var(--kk-accent); }
+html body .kk-pcard a.kk-pcard__btn--buy:hover { background-color: var(--kk-accent-hover) !important; color: var(--kk-btn-text, #fff) !important; border-color: var(--kk-accent-hover); }
+html body .kk-pcard a.kk-pcard__btn { font-family: var(--kk-font); text-transform: var(--kk-btn-transform); letter-spacing: normal; text-decoration: none; box-shadow: none; }
+html body .kk-pcard .kk-pcard__title a { color: var(--kk-text) !important; text-decoration: none; }
+html body .kk-pcard .kk-pcard__title a:hover { color: var(--kk-primary) !important; }
+html body ul.products li.product .kk-pcard__price .price { display: flex !important; margin: 0 !important; color: var(--kk-price, var(--kk-text)) !important; font-size: var(--kk-card-price-size, 17px); font-weight: 700; }
+html body ul.products li.product .kk-pcard__price del { display: inline !important; opacity: 1 !important; color: var(--kk-muted) !important; font-size: .8em; font-weight: 400; }
+html body ul.products li.product .kk-pcard__price ins { display: inline !important; font-weight: inherit; }
+
+/* Form fields */
+html body .woocommerce form .form-row input.input-text,
+html body .woocommerce form .form-row select,
+html body .kk-field input[type=text], html body .kk-field input[type=tel], html body .kk-field input[type=email], html body .kk-field input[type=password],
+html body .kk-track-form__row input {
+	min-height: var(--kk-input-height);
+	border-radius: var(--kk-input-radius);
+	font-family: var(--kk-font);
+	font-size: max(16px, var(--kk-font-size)); /* 16px+ avoids iOS zoom */
+	box-shadow: none;
+}
+html body .woocommerce form .form-row textarea { border-radius: var(--kk-input-radius); font-family: var(--kk-font); font-size: max(16px, var(--kk-font-size)); }
+
+/* Delivery-area choice cards */
+html body .kk-delivery-area label.radio { border-radius: var(--kk-input-radius); min-height: var(--kk-input-height); }
+
+/* Text inside Kenakata Kit components follows the base size */
+html body .kk-thanks, html body .kk-track-results, html body .kk-modal__card { font-size: var(--kk-font-size); }

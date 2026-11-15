@@ -3,10 +3,19 @@
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
-const Parser = require(path.join(__dirname, 'node_modules', 'php-parser'));
+// php-parser (vendored in dev/node_modules, or `npm install` in dev/); without it, `php -l` is used if PHP is installed.
+let Parser = null;
+try { Parser = require(path.join(__dirname, 'node_modules', 'php-parser')); } catch (e) { Parser = null; }
 
 const root = path.join(__dirname, '..', 'kenakata-kit');
-const parser = new Parser({ parser: { php7: true, php8: true, extractDoc: false }, ast: { withPositions: true } });
+const parser = Parser ? new Parser({ parser: { php7: true, php8: true, extractDoc: false }, ast: { withPositions: true } }) : null;
+const phpCheck = (f) => {
+  if (parser) { parser.parseCode(fs.readFileSync(f, 'utf8'), f); return; }
+  try { execFileSync('php', ['-l', f], { stdio: 'pipe' }); } catch (e) {
+    if (e.code === 'ENOENT') { console.log('No php-parser (run npm install in dev/) and no php: PHP files not checked'); process.exit(2); }
+    throw new Error(String(e.stdout || e.stderr).trim().split('\n')[0]);
+  }
+};
 const php = [];
 const js = [];
 (function walk(d) {
@@ -20,7 +29,7 @@ const js = [];
 
 let bad = 0;
 for (const f of php) {
-  try { parser.parseCode(fs.readFileSync(f, 'utf8'), f); } catch (e) { bad++; console.log('PHP FAIL', path.relative(root, f), e.message); }
+  try { phpCheck(f); } catch (e) { bad++; console.log('PHP FAIL', path.relative(root, f), e.message); }
 }
 for (const f of js) {
   try { execFileSync(process.execPath, ['--check', f], { stdio: 'pipe' }); } catch (e) { bad++; console.log('JS FAIL', path.relative(root, f), String(e.stderr).split('\n').slice(0, 4).join(' | ')); }

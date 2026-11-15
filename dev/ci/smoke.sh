@@ -217,6 +217,34 @@ get "$URL/wp-admin/admin.php?page=kenakata-kit&tab=speed" >/dev/null
 check "Speed & health tab shows the checkups" 'grep -q "kk-health" /tmp/body && clean /tmp/body'
 wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["turnstile_enable"] = 0; kk_update_settings( $s );'
 
+echo "== 3.13: page-only styles, tracking not cached, live courier status"
+check "home page: core styles only (no account/checkout/order/product styles)" 'curl -s "$URL/" | grep -q "kenakata-kit-css" && ! curl -s "$URL/" | grep -qE "kenakata-kit-(account|checkout|order|product)-css"'
+check "product page loads the product styles" 'curl -sL "$URL/?p=$PID" | grep -q "kenakata-kit-product-css"'
+check "cart page loads the checkout styles" 'curl -sL "$URL/?page_id=$(wpc option get woocommerce_cart_page_id)" | grep -q "kenakata-kit-checkout-css"'
+check "account page loads the account styles" 'curl -sL "$URL/?page_id=$(wpc option get woocommerce_myaccount_page_id)" | grep -q "kenakata-kit-account-css"'
+check "tracking page loads the order styles" 'curl -sL "$URL/?pagename=track" | grep -q "kenakata-kit-order-css"'
+check "WooCommerce form fields keep their style everywhere (core)" 'grep -q "\.woocommerce form \.form-row label" "$WP/wp-content/plugins/kenakata-kit/assets/kenakata-kit.min.css"'
+check "tracking results are never cached" 'curl -s -D - -o /dev/null "$URL/?pagename=track&kk_phone=01712345678" | grep -qi "cache-control: no-cache"'
+mkdir -p "$WP/wp-content/mu-plugins"
+cat > "$WP/wp-content/mu-plugins/kk-fake-courier.php" <<'PHP'
+<?php
+add_filter( 'pre_http_request', function ( $pre, $args, $url ) {
+	if ( false === strpos( $url, 'status_by_cid' ) ) { return $pre; }
+	update_option( 'kk_fake_calls', (int) get_option( 'kk_fake_calls' ) + 1 );
+	return array( 'headers' => array(), 'body' => '{"status":200,"delivery_status":"delivered"}', 'response' => array( 'code' => 200, 'message' => 'OK' ), 'cookies' => array() );
+}, 10, 3 );
+PHP
+LID=$(wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["tr_require_order"] = 0; $s["tr_live_courier"] = 1; $s["tr_auto_complete"] = 1; kk_update_settings( $s ); $o = wc_create_order(); $o->set_billing_phone( "01712345678" ); $o->update_meta_data( "_kk_courier_booking", array( "provider" => "steadfast", "consignment_id" => "999", "tracking_code" => "ABC", "status" => "pending", "booked_at" => time() - 86400, "checked_at" => time() - 7200 ) ); $o->update_meta_data( "_kk_courier", "steadfast" ); $o->update_meta_data( "_kk_tracking_url", "https://steadfast.com.bd/t/ABC" ); $o->set_status( "processing" ); $o->save(); update_option( "kk_fake_calls", 0 ); echo $o->get_id();' 2>/dev/null | tail -1)
+curl -sL -o /tmp/body "$URL/?pagename=track&kk_phone=01712345678"
+check "live courier status shown on the tracking page" 'grep -q "kk-order__live" /tmp/body && clean /tmp/body'
+check "courier said Delivered → order Completed (setting on)" '[ "$(wpc eval "echo wc_get_order( $LID )->get_status();")" = completed ]'
+curl -sL -o /dev/null "$URL/?pagename=track&kk_phone=01712345678"
+check "the courier is asked only once (answer kept 30 minutes)" '[ "$(wpc option get kk_fake_calls)" = 1 ]'
+rm -f "$WP/wp-content/mu-plugins/kk-fake-courier.php"
+wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["tr_live_courier"] = 0; $s["tr_auto_complete"] = 0; kk_update_settings( $s );'
+get "$URL/wp-admin/admin.php?page=kenakata-kit&tab=license" >/dev/null
+check "License tab: no WhatsApp buy button while no sales number is set" '! grep -q "kk-buy-pro" /tmp/body && clean /tmp/body'
+
 echo "== Bots"
 wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["speed_robots_shop"] = 1; $s["speed_bot_block"] = 1; $s["speed_ai_block"] = 1; kk_update_settings( $s );'
 check "robots.txt keeps crawlers off search/sort/filter pages and names the blocked bots" 'curl -s "$URL/?robots=1" | grep -q "orderby" && curl -s "$URL/?robots=1" | grep -q "User-agent: AhrefsBot"'

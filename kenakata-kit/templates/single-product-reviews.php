@@ -12,6 +12,7 @@ if ( ! $kk_product || ! comments_open() ) {
 	return;
 }
 
+echo kk_need_css( 'product' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- a <link> built from our own URL
 $kk_stats   = kk_review_stats( $kk_product );
 $kk_ratings = wc_review_ratings_enabled();
 $kk_title   = kk_opt( 'rv_title' ) ? kk_opt( 'rv_title' ) : __( 'Customer reviews', 'kenakata-kit' );

@@ -92,11 +92,84 @@ function kk_body_classes( $classes ) {
 	return $classes;
 }
 
+/**
+ * Styles that only some pages need (3.13): 'checkout', 'account', 'order' (thank-you + tracking), 'product' (Q&A + reviews).
+ * Pages known in advance get the file in <head>. A shortcode or widget shown somewhere else calls this while it is
+ * being drawn and puts the returned <link> in front of its own HTML, so the style is there before the content
+ * (no flash of unstyled content, and it also works inside cached Elementor widgets and the Elementor editor).
+ *
+ * @param string $part Part name.
+ * @return string '' or a <link> tag to print before the component's HTML.
+ */
+function kk_need_css( $part ) {
+	static $sent = array();
+	$parts = array( 'checkout', 'account', 'order', 'product' );
+	if ( ! in_array( $part, $parts, true ) || isset( $sent[ $part ] ) ) {
+		return '';
+	}
+	$handle = 'kenakata-kit-' . $part;
+	if ( ! wp_style_is( $handle, 'registered' ) ) {
+		wp_register_style( $handle, kk_asset( 'kenakata-kit-' . $part . '.css' ), array( 'kenakata-kit' ), KK_VERSION );
+	}
+	if ( wp_style_is( $handle, 'enqueued' ) || wp_style_is( $handle, 'done' ) ) {
+		$sent[ $part ] = true;
+		return '';
+	}
+	// Styles of the <head> not printed yet (also block themes, which draw the content before the head): the normal way.
+	if ( ! did_action( 'wp_print_styles' ) && ! wp_doing_ajax() && ! ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+		$sent[ $part ] = true;
+		if ( did_action( 'wp_enqueue_scripts' ) ) {
+			wp_enqueue_style( $handle );
+		} else {
+			// Too early (a block theme draws the content first): our wp_enqueue_scripts step adds it, in the usual order.
+			$GLOBALS['kk_css_parts'][ $part ] = true;
+		}
+		return '';
+	}
+	$sent[ $part ] = true;
+	if ( ! wp_style_is( 'kenakata-kit', 'done' ) && ! wp_style_is( 'kenakata-kit', 'enqueued' ) ) {
+		return ''; // no Kenakata Kit styles on this page at all (e.g. an admin screen)
+	}
+	return '<link rel="stylesheet" id="' . esc_attr( $handle ) . '-css" href="' . esc_url( add_query_arg( 'ver', KK_VERSION, kk_asset( 'kenakata-kit-' . $part . '.css' ) ) ) . '" media="all">' . "\n";
+}
+
 add_action( 'wp_enqueue_scripts', function () {
 	wp_enqueue_style( 'kenakata-kit', kk_asset( 'kenakata-kit.css' ), array(), KK_VERSION );
 	wp_add_inline_style( 'kenakata-kit', kk_css_vars() );
+	// Page-only styles asked for while a block theme drew the content, then the pages we can recognise.
+	foreach ( array_keys( isset( $GLOBALS['kk_css_parts'] ) ? (array) $GLOBALS['kk_css_parts'] : array() ) as $part ) {
+		wp_enqueue_style( 'kenakata-kit-' . $part );
+	}
+	if ( function_exists( 'is_cart' ) && ( is_cart() || is_checkout() ) ) {
+		kk_need_css( 'checkout' );
+	}
+	if ( function_exists( 'is_account_page' ) && is_account_page() ) {
+		kk_need_css( 'account' );
+	}
+	if ( function_exists( 'is_order_received_page' ) && is_order_received_page() ) {
+		kk_need_css( 'order' );
+	}
+	if ( function_exists( 'is_product' ) && is_product() ) {
+		kk_need_css( 'product' );
+	}
+	if ( is_singular() ) {
+		$post = get_post();
+		$text = $post ? (string) $post->post_content : '';
+		foreach ( array( 'kk_my_account' => 'account', 'kk_order_tracking' => 'order', 'ss_order_tracking' => 'order', 'kk_thank_you' => 'order', 'ss_thank_you' => 'order', 'woocommerce_checkout' => 'checkout', 'woocommerce_cart' => 'checkout' ) as $code => $part ) {
+			if ( false !== strpos( $text, '[' . $code ) ) {
+				kk_need_css( $part );
+			}
+		}
+	}
+	// "Strong styles" come last, as before 3.13 (after the page-only styles too).
 	if ( kk_opt( 'compat_strong' ) ) {
-		wp_enqueue_style( 'kenakata-kit-compat', kk_asset( 'kenakata-kit-compat.css' ), array( 'kenakata-kit' ), KK_VERSION );
+		$deps = array( 'kenakata-kit' );
+		foreach ( array( 'checkout', 'account', 'order', 'product' ) as $part ) {
+			if ( wp_style_is( 'kenakata-kit-' . $part, 'enqueued' ) ) {
+				$deps[] = 'kenakata-kit-' . $part;
+			}
+		}
+		wp_enqueue_style( 'kenakata-kit-compat', kk_asset( 'kenakata-kit-compat.css' ), $deps, KK_VERSION );
 	}
 	add_filter( 'body_class', 'kk_body_classes' );
 

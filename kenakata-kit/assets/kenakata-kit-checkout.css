@@ -1,0 +1,68 @@
+/*
+ * Kenakata Kit – Cart and checkout pages (also loaded by the Checkout/Cart widgets).
+ * Loaded only where needed (kk_need_css( 'checkout' )); colours come from the --kk-* variables of kenakata-kit.css.
+ */
+/* =====================================================================
+ * Cart & checkout (classic shortcodes)
+ * =================================================================== */
+.woocommerce-cart .woocommerce, .woocommerce-checkout .woocommerce { font-family: var(--kk-font); }
+.woocommerce form.checkout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 0 32px; align-items: start; }
+.woocommerce form.checkout > * { grid-column: 1; }
+.woocommerce form.checkout #customer_details { grid-row: 1 / span 30; }
+.woocommerce form.checkout #order_review_heading, .woocommerce form.checkout #order_review { grid-column: 2; }
+.woocommerce form.checkout #order_review_heading { grid-row: 1; margin: 0 0 12px; }
+.woocommerce form.checkout #order_review { grid-row: 2 / span 20; position: sticky; top: 24px; }
+.woocommerce form.checkout .col2-set { width: 100%; }
+.woocommerce form.checkout .col2-set .col-1, .woocommerce form.checkout .col2-set .col-2 { float: none; width: 100%; max-width: none; }
+.woocommerce form.checkout .col2-set .col-2:empty, .woocommerce-shipping-fields:empty, .woocommerce-additional-fields:empty { display: none; }
+.woocommerce form.checkout h3, #order_review_heading { font-size: 20px; font-weight: 700; color: var(--kk-text); }
+.woocommerce-billing-fields, #order_review { background: #fff; border: 1px solid var(--kk-border); border-radius: var(--kk-radius); padding: 24px; }
+.kk-delivery-area .woocommerce-input-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.kk-delivery-area input[type=radio] { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.kk-delivery-area label.radio { display: flex !important; align-items: center; justify-content: center; text-align: center; min-height: var(--kk-input-height, 56px); margin: 0 !important; padding: 10px; border: 2px solid var(--kk-border); border-radius: var(--kk-input-radius, 8px); background: #fff; font-weight: 600; cursor: pointer; transition: border-color .15s, background-color .15s; }
+.kk-delivery-area label.radio:hover { border-color: var(--kk-primary); }
+.kk-delivery-area input[type=radio]:checked + label.radio { border-color: var(--kk-primary); background: var(--kk-soft-primary); color: var(--kk-primary); }
+.kk-delivery-area input[type=radio]:focus-visible + label.radio { outline: 3px solid var(--kk-text); outline-offset: 2px; }
+.kk-delivery-area label.radio .required { display: none; } /* newer WooCommerce adds a * to every option */
+.kk-area-prompt { display: none; padding: 12px; margin: 0 0 12px; border-radius: var(--kk-radius); background: #FFF4E5; color: #8A4B00; font-size: 14px; font-weight: 600; text-align: center; }
+.kk-no-area .kk-area-prompt { display: block; }
+.kk-no-area .woocommerce-shipping-totals, .kk-no-area #order_review .order-total { display: none; }
+#order_review table.shop_table { border: 0; margin: 0 0 16px; }
+#order_review table.shop_table th, #order_review table.shop_table td { border-color: var(--kk-border); border-left: 0 !important; border-right: 0 !important; background: transparent !important; padding: 10px 0; }
+#order_review table.shop_table thead th { border-top: 0; }
+#order_review table.shop_table td.product-total, #order_review table.shop_table tfoot td, #order_review table.shop_table thead th.product-total { text-align: right; padding-left: 12px; }
+#order_review .order-total th, #order_review .order-total td { font-size: 18px; color: var(--kk-text); }
+#order_review #shipping_method { margin: 0; padding: 0; list-style: none; }
+#payment { background: var(--kk-soft) !important; border-radius: var(--kk-radius) !important; }
+#payment div.payment_box { background: #fff !important; }
+#payment div.payment_box::before { border-bottom-color: #fff !important; }
+#place_order { width: 100%; min-height: 56px; font-size: 18px; }
+.woocommerce-cart table.cart img { width: 64px; border-radius: var(--kk-radius); background: var(--kk-soft); }
+.woocommerce-cart table.shop_table { border-radius: var(--kk-radius); border-color: var(--kk-border); }
+.woocommerce-cart .cart-collaterals .cart_totals { width: 100%; max-width: 440px; float: right; background: #fff; border: 1px solid var(--kk-border); border-radius: var(--kk-radius); padding: 24px; }
+.woocommerce-cart .wc-proceed-to-checkout a.checkout-button { min-height: 56px; display: flex !important; align-items: center; justify-content: center; font-size: 18px !important; }
+.kk-delivery-note small { color: var(--kk-muted); }
+.kk-co-mock .woocommerce-input-wrapper { display: block; }
+.kk-co-mock #payment { padding: 16px; }
+@media (max-width: 900px) {
+	.woocommerce form.checkout { display: block; }
+	.woocommerce form.checkout #order_review { position: static; margin-top: 16px; }
+	.woocommerce-cart .cart-collaterals .cart_totals { float: none; max-width: none; }
+}
+/* "View cart" in the notice is pointless on the cart page itself. */
+.woocommerce-cart .woocommerce-message .button.wc-forward { display: none !important; } /* !important: beats the phone notice-button rule below */
+@media (max-width: 768px) {
+	/* Phones: white product list with the picture shown (WooCommerce hides it), cleaner rows. */
+	.woocommerce-cart table.shop_table_responsive { background: #fff; overflow: hidden; }
+	.woocommerce-cart table.shop_table_responsive tr td { background: #fff !important; }
+	.woocommerce-cart table.cart td.product-thumbnail { display: block !important; text-align: left !important; }
+	.woocommerce-cart table.cart td.product-thumbnail::before { display: none; }
+	.woocommerce-cart table.cart tr.cart_item + tr.cart_item td.product-remove { border-top: 6px solid var(--kk-soft); }
+	.woocommerce-cart table.cart td.actions .coupon { display: flex; gap: 8px; }
+	.woocommerce-cart table.cart td.actions .coupon .input-text { flex: 1 1 0; min-width: 0; width: 0 !important; }
+	/* Notice buttons above the text instead of squeezed beside it. */
+}
+@media (max-width: 480px) {
+	.kk-delivery-area .woocommerce-input-wrapper { grid-template-columns: 1fr; }
+	.woocommerce-billing-fields, #order_review { padding: 16px; }
+}

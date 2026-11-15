@@ -206,6 +206,33 @@ function kk_license_message( $code ) {
 	return isset( $m[ $code ] ) ? $m[ $code ] : $m['format'];
 }
 
+/** WhatsApp number that sells Pro keys (country code, digits only). Empty = no "buy" button. */
+if ( ! defined( 'KK_SALES_WHATSAPP' ) ) {
+	define( 'KK_SALES_WHATSAPP', '' );
+}
+
+/** wa.me link with a ready message (this site's address included), or '' when no sales number is set. */
+function kk_buy_pro_url() {
+	$num = preg_replace( '/\D/', '', (string) apply_filters( 'kk_sales_whatsapp', KK_SALES_WHATSAPP ) );
+	if ( '' === $num ) {
+		return '';
+	}
+	$host = (string) wp_parse_url( home_url( '/' ), PHP_URL_HOST );
+	/* translators: %s: website address */
+	$text = sprintf( __( 'Hello, I want to buy Kenakata Kit Pro. My website: %s', 'kenakata-kit' ), $host );
+	return 'https://wa.me/' . $num . '?text=' . rawurlencode( $text );
+}
+
+/** The green "buy on WhatsApp" button (nothing when no sales number is set or the key already works). */
+function kk_buy_pro_button() {
+	$url = kk_buy_pro_url();
+	if ( '' === $url || ( function_exists( 'kk_is_pro' ) && kk_license_state()['ok'] ) ) {
+		return '';
+	}
+	return '<a class="button kk-buy-pro" href="' . esc_url( $url ) . '" target="_blank" rel="noopener noreferrer" style="background:#25D366;border-color:#1EBE5A;color:#fff">'
+		. esc_html__( 'No key yet? Order on WhatsApp', 'kenakata-kit' ) . '</a>';
+}
+
 /** The License tab in Kenakata Kit settings. */
 function kk_render_license_page() {
 	$s     = kk_license_state();
@@ -251,6 +278,7 @@ function kk_render_license_page() {
 	if ( '' !== $s['key'] ) {
 		echo '<button type="submit" name="kk_license_remove" value="1" class="button">' . esc_html__( 'Remove key', 'kenakata-kit' ) . '</button>';
 	}
+	echo kk_buy_pro_button(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped inside
 	if ( $is_ok ) {
 		echo '<p class="kk-card__desc">' . esc_html__( 'Moving to another website? Remove the key here, then ask us to move it to the new address.', 'kenakata-kit' ) . '</p>';
 	}
@@ -276,7 +304,8 @@ function kk_render_license_page() {
 	echo '<div class="kk-card"><h3>' . esc_html__( 'Free and Pro', 'kenakata-kit' ) . '</h3>';
 	echo '<p class="kk-card__desc">' . esc_html__( 'Free: product cards, Buy Now, checkout, delivery charges, fake-order protection, side cart, search, wishlist, reviews, questions, order tracking, security and all Elementor widgets.', 'kenakata-kit' ) . '</p>';
 	echo '<p class="kk-card__desc">' . esc_html__( 'Pro: store dashboard, one-tap courier booking and courier check, incomplete orders.', 'kenakata-kit' ) . '</p>';
-	echo '<p class="kk-card__desc">' . esc_html__( 'To buy a key, contact DigiBhai.com. Tell us your website address.', 'kenakata-kit' ) . '</p></div>';
+	$buy = kk_buy_pro_button();
+	echo '' !== $buy ? '<p>' . $buy . '</p></div>' : '<p class="kk-card__desc">' . esc_html__( 'To buy a key, contact DigiBhai.com. Tell us your website address.', 'kenakata-kit' ) . '</p></div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped inside
 }
 
 /** Shown instead of a Pro tab's settings when there is no valid key. */
@@ -287,5 +316,5 @@ function kk_render_pro_locked( $label ) {
 		esc_html( $label )
 	) . '</strong></p>';
 	echo '<p class="kk-card__desc">' . esc_html__( 'Add a license key to turn it on. Your other settings and data are kept.', 'kenakata-kit' ) . '</p>';
-	echo '<p><a class="button button-primary" href="' . esc_url( admin_url( 'admin.php?page=kenakata-kit&tab=license' ) ) . '">' . esc_html__( 'Add license key', 'kenakata-kit' ) . '</a></p></div>';
+	echo '<p><a class="button button-primary" href="' . esc_url( admin_url( 'admin.php?page=kenakata-kit&tab=license' ) ) . '">' . esc_html__( 'Add license key', 'kenakata-kit' ) . '</a> ' . kk_buy_pro_button() . '</p></div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped inside
 }

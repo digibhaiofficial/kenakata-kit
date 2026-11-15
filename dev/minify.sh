@@ -4,7 +4,7 @@
 set -e
 cd "$(dirname "$0")/../kenakata-kit/assets"
 E="${ESBUILD:-npx --yes esbuild@0.28.2}"
-for f in kenakata-kit store-dashboard courier-check admin kenakata-kit-compat; do
+for f in kenakata-kit kenakata-kit-checkout kenakata-kit-account kenakata-kit-order kenakata-kit-product store-dashboard courier-check admin kenakata-kit-compat; do
   [ -f "$f.css" ] && $E "$f.css" --minify --log-level=warning --outfile="$f.min.css"
 done
 for f in kenakata-kit store-dashboard courier-check admin kenakata-kit-incomplete; do

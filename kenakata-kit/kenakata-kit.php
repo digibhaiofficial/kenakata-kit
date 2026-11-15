@@ -3,7 +3,7 @@
  * Plugin Name:       Kenakata Kit – WooCommerce Toolkit for Bangladesh
  * Plugin URI:        https://digibhai.com/
  * Description:       Everything a Bangladeshi WooCommerce store needs: Buy Now, simple checkout with delivery areas, fake-order protection, thank-you page, order tracking by phone, live search, login popup, product cards, brand/category carousels, WhatsApp, variation buttons, photo reviews, side cart, mobile bar and 15 Elementor widgets. English and Bengali (বাংলা). Settings: left menu → Kenakata Kit.
- * Version:           3.12.4
+ * Version:           3.13.0
  * Requires at least: 6.3
  * Requires PHP:      7.4
  * Requires Plugins:  woocommerce
@@ -21,7 +21,7 @@ defined( 'ABSPATH' ) || exit;
 
 $GLOBALS['kk_load_ms'] = -microtime( true ); // time spent loading this plugin (Speed & health shows it)
 
-define( 'KK_VERSION', '3.12.4' );
+define( 'KK_VERSION', '3.13.0' );
 define( 'KK_FILE', __FILE__ );
 define( 'KK_DIR', __DIR__ );
 define( 'KK_URL', plugin_dir_url( __FILE__ ) );
@@ -143,6 +143,8 @@ function kk_defaults() {
 		'tr_button_text'        => 'Track order',
 		'tr_rate_limit'         => 20,
 		'tr_require_order'      => 0,
+		'tr_live_courier'       => 0,
+		'tr_auto_complete'      => 0,
 		'tr_text_received'      => 'We have your order and will confirm it by phone.',
 		'tr_text_processing'    => 'We are preparing your order for delivery.',
 		'tr_text_shipped'       => 'Your parcel is on the way.',

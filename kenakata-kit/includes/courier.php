@@ -45,6 +45,12 @@ function kk_courier_is_cancelled( $provider, $status ) {
 	return isset( $list[ $provider ] ) && in_array( $status, $list[ $provider ], true );
 }
 
+/** Has the courier delivered the parcel (fully)? */
+function kk_courier_is_delivered( $provider, $status ) {
+	$status = strtolower( str_replace( array( '-', ' ' ), '_', (string) $status ) );
+	return in_array( $status, array( 'delivered', 'delivered_approval_pending' ), true );
+}
+
 /**
  * Services that only look a customer up (no parcels): they add records from other shops and couriers to the Courier check.
  * Each has one adapter in courier-core.php.

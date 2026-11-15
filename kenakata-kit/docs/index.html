@@ -368,6 +368,8 @@ footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border
 		</ul>
 	</li>
 </ol>
+<h4>কুরিয়ারের লাইভ স্ট্যাটাস (Pro)</h4>
+<p><strong>Live courier status</strong> চালু করলে, Courier booking দিয়ে পাঠানো অর্ডারে কাস্টমার ট্র্যাকিং পেজে "কুরিয়ার বলছে: …" দেখবে (Steadfast, Pathao, RedX, eCourier)। কুরিয়ারকে জিজ্ঞেস করা হয় শুধু কাস্টমার দেখলে, এক অর্ডারে ৩০ মিনিটে একবার। <strong>Mark the order Completed…</strong> চালু থাকলে কুরিয়ার "Delivered" বললে অর্ডার Completed হয়ে যায়।</p>
 <h4>Couriers I use (যেসব কুরিয়ার ব্যবহার করি)</h4>
 <p>বাংলাদেশের ১৮টি কুরিয়ারের তালিকা আছে (Steadfast, Pathao, RedX, Paperfly, eCourier, CarryBee, Delivery Tiger, Sundarban, SA Paribahan, Karatoa, Janani, Continental, AFS, Sheba, Navana, বাংলাদেশ পোস্ট, নিজের ডেলিভারি ম্যান, অন্যান্য)। যেগুলো ব্যবহার করেন সেগুলোতে টিক দিন: অর্ডারে শুধু এগুলোই আসবে।</p>
 <ul>
@@ -1012,6 +1014,14 @@ footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border
 
 <section id="changelog">
 <h2>১১. পরিবর্তনের তালিকা</h2>
+<h4>৩.১৩.০</h4>
+<ul>
+	<li><strong>দ্রুত:</strong> স্টাইল ফাইল ভাগ করা হয়েছে। প্রতিটা পেজে মূল ফাইল এখন ৫৯ KB (আগে ১০৩ KB)। অ্যাকাউন্ট, কার্ট/চেকআউট, থ্যাংক-ইউ/ট্র্যাকিং আর রিভিউ/প্রশ্নোত্তরের স্টাইল শুধু সেই পেজেই লোড হয়। দেখতে কিছুই বদলায়নি।</li>
+	<li><strong>নতুন (Pro, শুরুতে বন্ধ):</strong> ট্র্যাকিং পেজে কুরিয়ারের লাইভ স্ট্যাটাস। কাস্টমার দেখলে তখনই কুরিয়ারকে জিজ্ঞেস করে, উত্তর ৩০ মিনিট মনে রাখে। ব্যাকগ্রাউন্ডে কিছু চলে না।</li>
+	<li><strong>নতুন (শুরুতে বন্ধ):</strong> কুরিয়ার "ডেলিভারি হয়েছে" বললে অর্ডার নিজে থেকে Completed।</li>
+	<li><strong>ঠিক করা হয়েছে:</strong> ট্র্যাকিংয়ের ফলাফল কখনো ক্যাশে থাকে না।</li>
+	<li><strong>নতুন চেক:</strong> LiteSpeed Cache-এর ধীর করা সেটিং (Purge All, Guest Mode, Cache Mobile) আর জমে থাকা ব্যর্থ ব্যাকগ্রাউন্ড কাজ।</li>
+</ul>
 <h4>৩.১২.১</h4>
 <ul>
 	<li><strong>নতুন:</strong> নতুন ভার্সন এলে Kenakata Kit-এর পেজে আর WordPress ড্যাশবোর্ডে বক্স: "এখনই আপডেট", "zip ডাউনলোড" (হাতে আপলোডের জন্য) আর "কী নতুন"। License → Updates-এ "এখনই আপডেট খুঁজুন"।</li>

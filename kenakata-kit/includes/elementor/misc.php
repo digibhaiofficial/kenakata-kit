@@ -340,6 +340,7 @@ class KK_EW_Checkout extends KK_EW_Base {
 	}
 
 	protected function render() {
+		echo kk_need_css( 'checkout' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- a <link> built from our own URL
 		if ( kk_is_editor() ) {
 			echo $this->mock(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static markup
 			return;
@@ -392,7 +393,7 @@ class KK_EW_Cart extends KK_EW_Base {
 			echo '<div class="woocommerce kk-ew-note"><p class="cart-empty woocommerce-info">' . esc_html__( 'The customer\'s cart appears here on the live page.', 'kenakata-kit' ) . '</p></div>';
 			return;
 		}
-		echo do_shortcode( '[woocommerce_cart]' );
+		echo kk_need_css( 'checkout' ) . do_shortcode( '[woocommerce_cart]' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 }
 

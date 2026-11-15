@@ -8058,3 +8058,45 @@ msgstr "AI ট্রেনিং ক্রলার আটকান"
 
 msgid "GPTBot, ClaudeBot, CCBot, Google-Extended, Meta and Perplexity crawlers download whole shops for AI training. Normal Google search is not affected."
 msgstr "GPTBot, ClaudeBot, CCBot, Google-Extended, Meta আর Perplexity-র ক্রলার AI ট্রেনিংয়ের জন্য পুরো শপ নামিয়ে নেয়। সাধারণ Google সার্চে কোনো প্রভাব নেই।"
+
+msgid "Live courier status (Pro)"
+msgstr "কুরিয়ারের লাইভ স্ট্যাটাস (Pro)"
+
+msgid "For orders sent with Courier booking, the tracking page asks the courier for the parcel's latest status when the customer looks (Steadfast, Pathao, RedX, eCourier). The answer is kept for 30 minutes, nothing runs in the background."
+msgstr "Courier booking দিয়ে পাঠানো অর্ডারে, কাস্টমার ট্র্যাকিং পেজ খুললে তখনই কুরিয়ারের কাছ থেকে পার্সেলের সর্বশেষ অবস্থা আনা হয় (Steadfast, Pathao, RedX, eCourier)। উত্তরটা ৩০ মিনিট মনে রাখা হয়; ব্যাকগ্রাউন্ডে কিছু চলে না।"
+
+msgid "Mark the order Completed when the courier says Delivered"
+msgstr "কুরিয়ার \"ডেলিভারি হয়েছে\" বললে অর্ডার Completed করা"
+
+msgid "Happens when the status is checked: on the tracking page or with Sync in the order. Partly delivered parcels are left for you."
+msgstr "স্ট্যাটাস দেখার সময় হয়: ট্র্যাকিং পেজে বা অর্ডারের Sync-এ। আংশিক ডেলিভারি হলে আপনার জন্য রেখে দেওয়া হয়।"
+
+msgid "Kenakata Kit: %s says the parcel was delivered."
+msgstr "Kenakata Kit: %s জানিয়েছে পার্সেল ডেলিভারি হয়েছে।"
+
+msgid "Courier says"
+msgstr "কুরিয়ার বলছে"
+
+msgid "LiteSpeed: \"Purge All On Post Update\" is on, so every order (stock change) empties the whole cache. Turn it off in LiteSpeed Cache → Cache → Purge; the product and its categories are still refreshed."
+msgstr "LiteSpeed: \"Purge All On Post Update\" চালু, তাই প্রতিটা অর্ডারে (স্টক বদলালে) পুরো ক্যাশ মুছে যায়। LiteSpeed Cache → Cache → Purge থেকে বন্ধ করুন; প্রোডাক্ট আর তার ক্যাটাগরি তবুও নতুন হবে।"
+
+msgid "LiteSpeed: an update refreshes only the pages that changed"
+msgstr "LiteSpeed: আপডেটে শুধু বদলানো পেজগুলো নতুন হয়"
+
+msgid "LiteSpeed: Guest Mode is on. It keeps extra copies of pages and sends an extra request for every new visitor; on a busy shared server it usually costs more than it saves. Consider turning it off in LiteSpeed Cache → General."
+msgstr "LiteSpeed: Guest Mode চালু। এটা পেজের বাড়তি কপি রাখে আর প্রতিটা নতুন ভিজিটরের জন্য একটা বাড়তি অনুরোধ পাঠায়; ব্যস্ত শেয়ার্ড সার্ভারে সাধারণত লাভের চেয়ে খরচ বেশি। LiteSpeed Cache → General থেকে বন্ধ করার কথা ভাবুন।"
+
+msgid "LiteSpeed: \"Cache Mobile\" keeps a separate copy of every page for phones. Only needed if your theme shows different HTML on phones (Elementor and Kenakata Kit do not); otherwise turn it off in LiteSpeed Cache → Cache."
+msgstr "LiteSpeed: \"Cache Mobile\" প্রতিটা পেজের ফোনের জন্য আলাদা কপি রাখে। থিম ফোনে আলাদা HTML দেখালে তবেই লাগে (Elementor আর Kenakata Kit দেখায় না); নইলে LiteSpeed Cache → Cache থেকে বন্ধ করুন।"
+
+msgid "Failed background tasks: %s"
+msgstr "ব্যর্থ ব্যাকগ্রাউন্ড কাজ: %s"
+
+msgid "%s failed background tasks are stored, mostly left by plugins that were removed. Delete them in WooCommerce → Status → Scheduled Actions → Failed."
+msgstr "%sটা ব্যর্থ ব্যাকগ্রাউন্ড কাজ জমে আছে, বেশিরভাগই মুছে ফেলা প্লাগইনের রেখে যাওয়া। WooCommerce → Status → Scheduled Actions → Failed থেকে মুছে দিন।"
+
+msgid "Hello, I want to buy Kenakata Kit Pro. My website: %s"
+msgstr "হ্যালো, আমি Kenakata Kit Pro কিনতে চাই। আমার ওয়েবসাইট: %s"
+
+msgid "No key yet? Order on WhatsApp"
+msgstr "লাইসেন্স কী নেই? WhatsApp-এ অর্ডার করুন"

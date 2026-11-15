@@ -68,7 +68,7 @@ function kk_qa_render( $product ) {
 	kk_need_js();
 	$items = kk_qa_items( $product->get_id() );
 	$team  = kk_opt( 'qa_team_name' ) ? kk_opt( 'qa_team_name' ) : sprintf( /* translators: %s: shop name */ __( '%s team', 'kenakata-kit' ), wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES ) );
-	$out   = '<div class="kk-qa" data-kk-qa>';
+	$out   = kk_need_css( 'product' ) . '<div class="kk-qa" data-kk-qa>';
 	$out  .= '<h2 class="kk-qa__title">' . esc_html__( 'Questions & answers', 'kenakata-kit' ) . '</h2>';
 	if ( count( $items ) > 3 ) {
 		$out .= '<label class="kk-qa__search"><span class="screen-reader-text">' . esc_html__( 'Search questions', 'kenakata-kit' ) . '</span>'

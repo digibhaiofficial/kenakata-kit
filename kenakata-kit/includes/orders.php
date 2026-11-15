@@ -22,6 +22,11 @@ if ( kk_opt( 'ty_enable' ) ) {
 }
 
 function kk_thank_you_shortcode() {
+	return kk_need_css( 'order' ) . kk_thank_you_html();
+}
+
+/** The thank-you box itself. */
+function kk_thank_you_html() {
 	$order_id = isset( $_GET['order'] ) ? absint( $_GET['order'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$key      = isset( $_GET['key'] ) ? wc_clean( wp_unslash( $_GET['key'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$order    = $order_id ? wc_get_order( $order_id ) : false;
@@ -310,6 +315,11 @@ function kk_status_view( WC_Order $order ) {
 }
 
 function kk_tracking_shortcode() {
+	return kk_need_css( 'order' ) . kk_tracking_html();
+}
+
+/** The tracking form and results. */
+function kk_tracking_html() {
 	wp_enqueue_script( 'kenakata-kit' ); // live phone check
 	$param = isset( $_GET['kk_phone'] ) ? 'kk_phone' : 'ss_phone'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$raw   = isset( $_GET[ $param ] ) ? sanitize_text_field( wp_unslash( $_GET[ $param ] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -368,7 +378,12 @@ function kk_tracking_shortcode() {
 	if ( ! $orders ) {
 		$out .= '<p class="kk-notice">' . esc_html__( 'No orders found for this phone number.', 'kenakata-kit' ) . '</p>';
 	}
+	$live_left = 3; // at most 3 courier look-ups per page view
 	foreach ( $orders as $order ) {
+		$live = kk_tracking_live_status( $order, $live_left );
+		if ( $live && ! empty( $live['refreshed'] ) ) {
+			$order = wc_get_order( $order->get_id() ); // the status may just have become Completed
+		}
 		list( $state, $label, $text ) = kk_status_view( $order );
 		$courier = kk_order_meta( $order, 'courier' );
 		$t_url   = kk_order_meta( $order, 'tracking_url' );
@@ -397,12 +412,59 @@ function kk_tracking_shortcode() {
 		$out .= '<p class="kk-muted kk-order__items">' . esc_html( implode( ', ', $names ) ) . '</p>';
 		if ( $t_url ) {
 			$out .= '<div class="kk-order__courier"><div><strong>' . esc_html( isset( $couriers[ $courier ] ) ? $couriers[ $courier ] : __( 'Courier', 'kenakata-kit' ) ) . '</strong>'
-				. ( $t_id ? '<br><span class="kk-muted">' . esc_html__( 'Tracking ID', 'kenakata-kit' ) . ': ' . esc_html( $t_id ) . '</span>' : '' ) . '</div>'
+				. ( $t_id ? '<br><span class="kk-muted">' . esc_html__( 'Tracking ID', 'kenakata-kit' ) . ': ' . esc_html( $t_id ) . '</span>' : '' )
+				. ( $live && '' !== $live['label'] ? '<br><span class="kk-order__live">' . esc_html__( 'Courier says', 'kenakata-kit' ) . ': <strong>' . esc_html( $live['label'] ) . '</strong></span>' : '' ) . '</div>'
 				. '<a class="kk-btn kk-btn--primary" href="' . esc_url( $t_url ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Track parcel', 'kenakata-kit' ) . ' <span class="screen-reader-text">' . esc_html__( '(opens courier website in a new tab)', 'kenakata-kit' ) . '</span></a></div>';
 		}
 		$out .= '</article>';
 	}
 	return $out . '</div>';
 }
+/**
+ * Live courier status for the tracking page (setting "Live courier status"): asks the courier only when the customer
+ * looks, at most once per 30 minutes per order, and only for parcels booked through Courier booking (Pro).
+ *
+ * @param WC_Order $order Order.
+ * @param int      $left  Look-ups still allowed on this page view (counted down).
+ * @return array|null array( label, refreshed ) or null.
+ */
+function kk_tracking_live_status( WC_Order $order, &$left ) {
+	if ( ! kk_opt( 'tr_live_courier' ) || ! function_exists( 'kk_courier_load' ) ) {
+		return null;
+	}
+	$b = $order->get_meta( '_kk_courier_booking' );
+	if ( ! is_array( $b ) || empty( $b['consignment_id'] ) || empty( $b['provider'] ) ) {
+		return null;
+	}
+	kk_courier_load();
+	$refreshed = false;
+	$fresh     = ! empty( $b['checked_at'] ) && ( time() - (int) $b['checked_at'] ) < 30 * MINUTE_IN_SECONDS;
+	$final     = $order->has_status( array( 'completed', 'cancelled', 'refunded', 'failed' ) );
+	if ( ! $fresh && ! $final && $left > 0 && kk_lock( 'kk_trk_' . $order->get_id(), 60 ) ) {
+		$left--;
+		$view = kk_courier_refresh_status( $order );
+		kk_unlock( 'kk_trk_' . $order->get_id() );
+		if ( ! is_wp_error( $view ) ) {
+			$b['status'] = $view['status'];
+			$refreshed   = true;
+		}
+	}
+	return array(
+		'label'     => kk_courier_status_label( (string) $b['provider'], (string) ( $b['status'] ?? '' ) ),
+		'refreshed' => $refreshed,
+	);
+}
+
+// Tracking results are personal and change: never keep them in a page cache.
+add_action( 'template_redirect', function () {
+	if ( isset( $_GET['kk_phone'] ) || isset( $_GET['ss_phone'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+			define( 'DONOTCACHEPAGE', true );
+		}
+		do_action( 'litespeed_control_set_nocache', 'Kenakata Kit order tracking' );
+		nocache_headers();
+	}
+} );
+
 add_shortcode( 'kk_order_tracking', 'kk_tracking_shortcode' );
 add_shortcode( 'ss_order_tracking', 'kk_tracking_shortcode' ); // backward compatibility

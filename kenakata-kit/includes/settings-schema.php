@@ -200,6 +200,8 @@ function kk_fields() {
 		'tr_button_text'       => kk_f( 'tracking', 'text', __( 'Button text', 'kenakata-kit' ) ),
 		'tr_rate_limit'        => kk_f( 'tracking', 'number', __( 'Lookups per visitor per 10 minutes', 'kenakata-kit' ), __( 'Stops people trying many numbers.', 'kenakata-kit' ), array( 'min' => 1, 'max' => 500, 'unit' => __( 'times', 'kenakata-kit' ) ) ),
 		'tr_require_order'     => kk_f( 'tracking', 'toggle', __( 'Also ask for the order number', 'kenakata-kit' ), __( 'More private: someone who only knows a phone number cannot see that person\'s orders. The customer finds the order number on the thank-you page and in the order SMS/email.', 'kenakata-kit' ) ),
+		'tr_live_courier'      => kk_f( 'tracking', 'toggle', __( 'Live courier status (Pro)', 'kenakata-kit' ), __( 'For orders sent with Courier booking, the tracking page asks the courier for the parcel\'s latest status when the customer looks (Steadfast, Pathao, RedX, eCourier). The answer is kept for 30 minutes, nothing runs in the background.', 'kenakata-kit' ) ),
+		'tr_auto_complete'     => kk_f( 'tracking', 'toggle', __( 'Mark the order Completed when the courier says Delivered', 'kenakata-kit' ), __( 'Happens when the status is checked: on the tracking page or with Sync in the order. Partly delivered parcels are left for you.', 'kenakata-kit' ) ),
 		'h_tr_texts'           => kk_f( 'tracking', 'heading', __( 'Text for each order step', 'kenakata-kit' ) ),
 		'tr_text_received'     => kk_f( 'tracking', 'text', __( 'Order received', 'kenakata-kit' ) ),
 		'tr_text_processing'   => kk_f( 'tracking', 'text', __( 'Processing', 'kenakata-kit' ) ),

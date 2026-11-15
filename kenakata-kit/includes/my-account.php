@@ -49,7 +49,7 @@ function kk_my_account_render( $a ) {
 	kk_account_current( $a );
 	$html = do_shortcode( '[woocommerce_my_account]' );
 	kk_account_current( false );
-	return '<div class="' . esc_attr( implode( ' ', $classes ) ) . '">' . $html . '</div>';
+	return kk_need_css( 'account' ) . '<div class="' . esc_attr( implode( ' ', $classes ) ) . '">' . $html . '</div>';
 }
 
 add_shortcode( 'kk_my_account', function ( $atts ) {

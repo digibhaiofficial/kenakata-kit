@@ -315,6 +315,24 @@ function kk_health_checks() {
 	$c['site'][] = wp_using_ext_object_cache() ? array( true, __( 'Object cache is on (Redis / Memcached / LiteSpeed)', 'kenakata-kit' ) ) : array( false, __( 'No object cache: if your hosting offers Redis or LiteSpeed Object Cache, turn it on (less database work on every page)', 'kenakata-kit' ) );
 	$page_cache = defined( 'LSCWP_V' ) || defined( 'WP_ROCKET_VERSION' ) || defined( 'W3TC' ) || class_exists( 'WpFastestCache' ) || defined( 'WPCACHEHOME' ) || class_exists( 'Swift_Performance' ) || defined( 'BREEZE_VERSION' );
 	$c['site'][] = $page_cache ? array( true, __( 'A page cache plugin is active', 'kenakata-kit' ) ) : array( false, __( 'No page cache plugin found: LiteSpeed Cache (free, on LiteSpeed hosting) makes pages much faster', 'kenakata-kit' ) );
+	if ( defined( 'LSCWP_V' ) ) { // LiteSpeed Cache: the settings that most often empty or split the cache (read only, nothing is changed)
+		$ls = function ( $id ) {
+			return (int) get_option( 'litespeed.conf.' . $id, 0 );
+		};
+		$c['site'][] = $ls( 'purge-post_all' ) ? array( false, __( 'LiteSpeed: "Purge All On Post Update" is on, so every order (stock change) empties the whole cache. Turn it off in LiteSpeed Cache → Cache → Purge; the product and its categories are still refreshed.', 'kenakata-kit' ), admin_url( 'admin.php?page=litespeed-cache#purge' ) ) : array( true, __( 'LiteSpeed: an update refreshes only the pages that changed', 'kenakata-kit' ) );
+		if ( $ls( 'guest' ) ) {
+			$c['site'][] = array( false, __( 'LiteSpeed: Guest Mode is on. It keeps extra copies of pages and sends an extra request for every new visitor; on a busy shared server it usually costs more than it saves. Consider turning it off in LiteSpeed Cache → General.', 'kenakata-kit' ), admin_url( 'admin.php?page=litespeed-general' ) );
+		}
+		if ( $ls( 'cache-mobile' ) ) {
+			$c['site'][] = array( false, __( 'LiteSpeed: "Cache Mobile" keeps a separate copy of every page for phones. Only needed if your theme shows different HTML on phones (Elementor and Kenakata Kit do not); otherwise turn it off in LiteSpeed Cache → Cache.', 'kenakata-kit' ), admin_url( 'admin.php?page=litespeed-cache' ) );
+		}
+	}
+	$as_table = $wpdb->prefix . 'actionscheduler_actions';
+	if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $as_table ) ) === $as_table ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$failed = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$as_table} WHERE status = 'failed'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name from $wpdb->prefix
+		/* translators: %s: number of tasks */
+		$c['site'][] = $failed < 300 ? array( true, sprintf( __( 'Failed background tasks: %s', 'kenakata-kit' ), number_format_i18n( $failed ) ) ) : array( false, sprintf( __( '%s failed background tasks are stored, mostly left by plugins that were removed. Delete them in WooCommerce → Status → Scheduled Actions → Failed.', 'kenakata-kit' ), number_format_i18n( $failed ) ), admin_url( 'admin.php?page=wc-status&tab=action-scheduler&status=failed' ) );
+	}
 	$kb          = kk_health_autoload_kb();
 	/* translators: %d: size in KB */
 	$c['site'][] = $kb < 800 ? array( true, sprintf( __( 'Settings loaded on every page: %d KB (good)', 'kenakata-kit' ), $kb ) ) : array( false, sprintf( __( 'Settings loaded on every page: %d KB. Over 800 KB slows every page: remove plugins you no longer use, then run the clean-up below.', 'kenakata-kit' ), $kb ) );

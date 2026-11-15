@@ -3,7 +3,7 @@ Contributors: DigiBhai.com
 Plugin URI: https://digibhai.com/
 Requires at least: 6.3
 Requires PHP: 7.4
-Stable tag: 3.12.4
+Stable tag: 3.13.0
 License: GPLv2 or later
 
 Everything a Bangladeshi WooCommerce store usually needs. Settings: left admin menu → Kenakata Kit.
@@ -29,6 +29,14 @@ Products Grid, Products Carousel, Brands, Categories, Buy Now Button, Live Searc
 Older [ss_…] shortcodes keep working. Options: see the guide or Kenakata Kit → Shortcodes.
 
 == Changelog ==
+= 3.13.0 =
+* Faster pages: the shop styles are split. Every page loads a smaller main file (103 KB → 59 KB, 17 KB → 11 KB zipped); account, cart/checkout, thank-you/tracking and product reviews/questions styles load only on the pages that show them (also inside Elementor widgets and block themes). Pages look exactly the same (checked screen by screen).
+* New (Order tracking, Pro, off by default): live courier status. When a customer tracks an order that was sent with Courier booking, the courier (Steadfast, Pathao, RedX, eCourier) is asked for the latest status right then; the answer is kept for 30 minutes. Nothing runs in the background.
+* New (off by default): mark the order Completed when the courier says Delivered (on the tracking page or with Sync in the order).
+* Tracking results are never kept in a page cache (they are personal and change).
+* Speed & health: checks the LiteSpeed Cache settings that most often slow a shop (Purge All on update, Guest Mode, Cache Mobile) and warns when many failed background tasks are stored. Read only, nothing is changed.
+* License: "Order on WhatsApp" button for buying a Pro key (shown when a sales number is set).
+
 = 3.12.4 =
 * New (Speed & health → "Less load from bots", all off by default): keep crawlers off search / sort / filter / cart / checkout / account pages (robots.txt); block SEO-tool and scraper bots (Ahrefs, Semrush, MJ12, PetalBot, Bytespider…) and AI training crawlers (GPTBot, ClaudeBot, CCBot…) with a tiny 403 before a page is built. Google, Bing, Facebook and WhatsApp are never blocked; blocked bots can still read robots.txt.
 

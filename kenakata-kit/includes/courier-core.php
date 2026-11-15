@@ -638,6 +638,11 @@ function kk_courier_refresh_status( WC_Order $order ) {
 	$b['checked_at'] = time();
 	$order->update_meta_data( '_kk_courier_booking', $b );
 	$order->save();
+	// Optional: delivered parcel → order Completed (only from Shipped/Processing, never from a cancelled or refunded order).
+	if ( kk_opt( 'tr_auto_complete' ) && kk_courier_is_delivered( (string) $b['provider'], (string) $status ) && $order->has_status( array( 'shipped', 'processing', 'on-hold' ) ) ) {
+		/* translators: %s: courier name */
+		$order->update_status( 'completed', sprintf( __( 'Kenakata Kit: %s says the parcel was delivered.', 'kenakata-kit' ), kk_courier_booking_view( $order )['label'] ) );
+	}
 	return kk_courier_booking_view( $order );
 }
 

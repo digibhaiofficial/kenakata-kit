@@ -1370,10 +1370,13 @@
 			clear(attrBox);
 			attrs.forEach(function (a, ai) {
 				var nameIn = input({ value: a.name, list: listId, placeholder: t('optionNameHint'), autocomplete: 'off', 'aria-label': t('optionName') });
+				// Only the value suggestions and the rows change: the fields are not rebuilt, so the field the user moves to keeps its focus.
 				nameIn.addEventListener('change', function () {
 					var old = a.name; a.name = nameIn.value.trim();
 					rows.forEach(function (r) { if (old && r.options[old] !== undefined) { r.options[a.name] = r.options[old]; delete r.options[old]; } });
-					drawAttrs(); drawRows();
+					clear(vData);
+					suggestionsFor(a.name).filter(function (x) { return a.values.indexOf(x) === -1; }).forEach(function (x) { vData.appendChild(h('option', { value: x })); });
+					setDirty(true); drawRows();
 				});
 				var chips = h('div', { class: 'sd-chips sd-chips--wrap sd-vals' });
 				a.values.forEach(function (v, vi) {

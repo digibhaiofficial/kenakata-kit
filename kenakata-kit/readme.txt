@@ -32,6 +32,7 @@ Older [ss_…] shortcodes keep working. Options: see the guide or Kenakata Kit �
 == Changelog ==
 = 3.16.1 =
 * Speed & health (off until turned on): "Block editor styles only where blocks are used". Pages built with Elementor skip the block editor's style file (about 100 KB before compression, render-blocking). Posts written with blocks, cart, checkout and My account keep it.
+* Store dashboard: typing an option name and then tapping the values field no longer rebuilds the fields (the tap was lost).
 
 = 3.16.0 =
 * New (off until turned on): bKash / Nagad / Rocket / Upay by hand (Kenakata Kit → Mobile payment). The customer sends money to your number, then types the number they sent from and the Transaction ID, and may add a screenshot (kept privately, only staff can open it). No API and no fees. A TrxID can be used only once. The order waits On hold until you press "Payment received" (order screen or store dashboard) or "Not received".

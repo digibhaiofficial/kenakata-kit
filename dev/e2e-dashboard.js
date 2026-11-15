@@ -196,10 +196,12 @@ function check(name, ok, info) { if (ok) { pass++; console.log('  ✓ ' + name);
   await setVal('.sd-card input', 'Test Salwar Kameez');
   await ev(`document.querySelectorAll('.sd-seg--type button')[1].click();return 1`);
   check('options editor appears', (await ev(`return !document.querySelector('.sd-opts-card').hidden && document.querySelector('.sd-opts-card .sd-attr input').placeholder.length>0`)) === true);
+  await waitFor(`return document.querySelector('.sd-opts-card:not([hidden]) .sd-attr input[list^="sd-attrnames"]') && document.querySelector('.sd-attr__val input')`);
   await sleep(300);
   await setVal('.sd-attr input[list^="sd-attrnames"]', 'Size');
   await sleep(200);
   await ev(`const i=document.querySelector('.sd-attr__val input');i.value='S, M';i.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));return 1`);
+  if (!(await ev(`return document.querySelectorAll('.sd-chip--val').length`))) { await sleep(500); await ev(`const i=document.querySelector('.sd-attr__val input');i.value='S, M';i.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));return 1`); }
   await waitFor(`return document.querySelectorAll('.sd-chip--val').length===2`);
   check('values added as chips', (await ev(`return [...document.querySelectorAll('.sd-chip--val span:first-child')].map(x=>x.textContent).join(',')`)) === 'S,M');
   await click('.sd-opts-bar .sd-btn--primary');

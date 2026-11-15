@@ -62,6 +62,7 @@ wpc post update "$(wpc option get woocommerce_checkout_page_id)" --post_content=
 wpc post update "$(wpc option get woocommerce_cart_page_id)" --post_content='[woocommerce_cart]' >/dev/null
 PID=$(wpc wc product create --user=1 --name="Test Saree" --regular_price=1500 --porcelain)
 wpc post create --post_type=page --post_status=publish --post_title=Track --post_content='[kk_order_tracking]' --porcelain >/dev/null
+CARDS=$(wpc post create --post_type=page --post_status=publish --post_title=Cards --post_content='[kk_products limit="4"]' --porcelain)
 echo "product $PID"
 
 php -S localhost:8080 -t "$WP" > /tmp/server.log 2>&1 &
@@ -77,7 +78,7 @@ for path in "/" "/?post_type=product" "/?p=$PID" "/?page_id=$(wpc option get woo
 	code=$(curl -sL -o /tmp/body -w "%{http_code}" "$URL$path")
 	check "GET $path → $code, no PHP errors" '[ "$code" = 200 ] && clean /tmp/body'
 done
-check "Buy Now button on the product page" 'curl -sL "$URL/?p=$PID" | grep -q "kk-buy-now"'
+check "product cards have instant Add to cart + Buy Now" 'curl -sL "$URL/?page_id=$CARDS" | grep -q "data-kk-add" && curl -sL "$URL/?page_id=$CARDS" | grep -q "data-kk-buy"'
 check "robots.txt blocks add-to-cart links for bots" 'curl -s "$URL/?robots=1" | grep -qi "add-to-cart"'
 
 echo "== Add to cart"
@@ -118,6 +119,20 @@ r=$(post_key "$(mkkey localhost)")
 check "key for this site is saved (license-saved)" 'echo "$r" | grep -q "kk_msg=license-saved"'
 get "$URL/wp-admin/admin.php?page=kenakata-kit&tab=license" >/dev/null
 check "header shows Pro activated" 'grep -q "Pro activated" /tmp/body'
+
+echo "== Update box and courier log"
+wpc eval 'set_site_transient( "kk_update_latest", array( "v" => "99.0.0", "zip" => "https://github.com/x/y/releases/download/v99.0.0/kenakata-kit-99.0.0.zip", "url" => "https://github.com/x/y/releases/tag/v99.0.0", "notes" => "", "published" => "" ), 600 );'
+get "$URL/wp-admin/admin.php?page=kenakata-kit&tab=license" >/dev/null
+check "Kenakata Kit screens show 'new version is ready' with Update now + Download" 'grep -q "kk-update-notice" /tmp/body && grep -q "upgrade-plugin" /tmp/body && grep -q "kenakata-kit-99.0.0.zip" /tmp/body'
+get "$URL/wp-admin/index.php" >/dev/null
+check "…and the WordPress Dashboard too" 'grep -q "kk-update-notice" /tmp/body'
+wpc eval 'delete_site_transient( "kk_update_latest" );'
+wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["courier_pathao_on"] = 1; $s["courier_pathao_store_id"] = "1"; kk_update_settings( $s ); foreach ( array( "client_id", "client_secret", "username", "password" ) as $k ) { kk_courier_save_secret( "courier_pathao_" . $k, "ci-" . $k ); }'
+RN=$(curl -s -b "$JAR" "$URL/wp-admin/admin-ajax.php?action=rest-nonce")
+curl -s -o /tmp/body -b "$JAR" -H "X-WP-Nonce: $RN" -X POST "$URL/?rest_route=/kenakata/v1/courier/test&target=pathao"
+check "Pathao test with wrong keys gives a clear message: $(head -c 160 /tmp/body)" 'grep -q "message" /tmp/body && ! grep -q "critical error" /tmp/body'
+get "$URL/wp-admin/admin.php?page=kenakata-kit&tab=courier" >/dev/null
+check "courier log lists the call (no secrets in it)" 'grep -q "kk-clog" /tmp/body && grep -q "issue-token" /tmp/body && ! grep -q "ci-password" /tmp/body'
 
 echo "== Internals"
 out=$(wpc eval '

@@ -223,3 +223,11 @@ p .kk-copy { display: inline-flex; width: auto; }
 .kk-cpick__tag { margin-left: auto; padding: 1px 8px; border-radius: 99px; background: #e8f0fe; color: #1a4fb4; font-size: 11px; font-weight: 600; }
 .kk-cpick__link { width: 100%; font-size: 12px; display: none; }
 .kk-cpick__row:has(input:checked) .kk-cpick__link { display: block; }
+
+/* Courier log */
+.kk-clog-wrap { max-height: 360px; overflow: auto; border: 1px solid #dcdcde; border-radius: 8px; }
+.kk-clog { border: 0; font-size: 12px; }
+.kk-clog td, .kk-clog th { padding: 6px 10px; vertical-align: top; }
+.kk-clog tr.is-bad td:nth-child(4) { color: #b32d2e; }
+.kk-clog tr.is-ok td:nth-child(4) { color: #116329; }
+.kk-clog code { font-size: 11px; background: none; padding: 0; }

@@ -118,3 +118,67 @@ add_action( 'load-update-core.php', function () {
 		delete_site_transient( 'kk_update_latest' );
 	}
 } );
+
+/**
+ * "A new version is ready" box on the Kenakata Kit screens and the WordPress Dashboard, with "Update now"
+ * (WordPress installs the zip from GitHub), "Download from GitHub" (to upload by hand) and "What's new".
+ * Hidden per version with "Later".
+ */
+add_action( 'admin_notices', function () {
+	global $pagenow;
+	if ( ! current_user_can( 'update_plugins' ) && ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+	$ours = 'admin.php' === $pagenow && isset( $_GET['page'] ) && 'kenakata-kit' === $_GET['page']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ( ! $ours && 'index.php' !== $pagenow ) {
+		return;
+	}
+	$latest = kk_update_latest();
+	if ( ! $latest || ! version_compare( $latest['v'], KK_VERSION, '>' ) ) {
+		return;
+	}
+	if ( ! $ours && get_user_meta( get_current_user_id(), 'kk_update_later', true ) === $latest['v'] ) {
+		return;
+	}
+	$file   = plugin_basename( KK_FILE );
+	$update = kk_update_allowed() && current_user_can( 'update_plugins' ) ? wp_nonce_url( self_admin_url( 'update.php?action=upgrade-plugin&plugin=' . rawurlencode( $file ) ), 'upgrade-plugin_' . $file ) : '';
+	$later  = wp_nonce_url( add_query_arg( array( 'kk_update_later' => rawurlencode( $latest['v'] ) ) ), 'kk_update_later' );
+	echo '<div class="notice notice-info inline kk-update-notice" style="margin:12px 20px 0 0"><p><strong>'
+		/* translators: 1: new version 2: installed version */
+		. esc_html( sprintf( __( 'Kenakata Kit %1$s is ready (you have %2$s).', 'kenakata-kit' ), $latest['v'], KK_VERSION ) ) . '</strong> '
+		. esc_html__( 'Update to get the newest fixes and features. Your settings stay as they are.', 'kenakata-kit' ) . '</p><p>';
+	if ( $update ) {
+		echo '<a class="button button-primary" href="' . esc_url( $update ) . '">' . esc_html__( 'Update now', 'kenakata-kit' ) . '</a> ';
+	}
+	echo '<a class="button" href="' . esc_url( $latest['zip'] ) . '">' . esc_html__( 'Download the zip', 'kenakata-kit' ) . '</a> '
+		. '<a class="button button-link" href="' . esc_url( $latest['url'] ) . '" target="_blank" rel="noopener">' . esc_html__( 'What\'s new (GitHub)', 'kenakata-kit' ) . ' ↗</a>';
+	if ( ! $ours ) {
+		echo ' <a class="button button-link" href="' . esc_url( $later ) . '">' . esc_html__( 'Later', 'kenakata-kit' ) . '</a>';
+	}
+	echo '</p><p class="description">' . esc_html__( 'Manual update: download the zip, then Plugins → Add New → Upload Plugin → choose the file → "Replace current with uploaded".', 'kenakata-kit' );
+	if ( ! kk_update_allowed() ) {
+		echo ' <strong>' . esc_html__( 'Your Kenakata Kit update period has ended. Contact us to renew; Pro keeps working meanwhile.', 'kenakata-kit' ) . '</strong>';
+	}
+	echo '</p></div>';
+} );
+
+add_action( 'admin_init', function () {
+	if ( isset( $_GET['kk_update_later'] ) && check_admin_referer( 'kk_update_later' ) ) {
+		update_user_meta( get_current_user_id(), 'kk_update_later', sanitize_text_field( wp_unslash( $_GET['kk_update_later'] ) ) );
+		wp_safe_redirect( remove_query_arg( array( 'kk_update_later', '_wpnonce' ) ) );
+		exit;
+	}
+	// "Check for updates" (License tab): ask GitHub now instead of waiting up to 6 hours.
+	if ( isset( $_GET['kk_update_check'] ) && check_admin_referer( 'kk_update_check' ) && current_user_can( 'update_plugins' ) ) {
+		delete_site_transient( 'kk_update_latest' );
+		delete_site_transient( 'update_plugins' );
+		$l = kk_update_latest( true );
+		wp_safe_redirect( add_query_arg( 'kk_msg', $l && version_compare( $l['v'], KK_VERSION, '>' ) ? 'update-found' : 'update-none', remove_query_arg( array( 'kk_update_check', '_wpnonce' ) ) ) );
+		exit;
+	}
+} );
+
+/** Link for the "Check for updates" button. */
+function kk_update_check_url() {
+	return wp_nonce_url( admin_url( 'admin.php?page=kenakata-kit&tab=license&kk_update_check=1' ), 'kk_update_check' );
+}

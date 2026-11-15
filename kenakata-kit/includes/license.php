@@ -118,7 +118,7 @@ function kk_license_state() {
 	$res['dev']  = kk_license_is_dev_host( $host );
 	$exp         = (string) ( $res['data']['e'] ?? '' );
 	$res['expires']      = $exp; // '' = lifetime
-	$res['updates_ok']   = '' === $exp || $exp >= gmdate( 'Y-m-d' );
+	$res['updates_ok']   = in_array( $exp, array( '', '0' ), true ) || $exp >= gmdate( 'Y-m-d' ); // '' or 0 = no end date
 	$state = $res;
 	return $state;
 }
@@ -255,6 +255,23 @@ function kk_render_license_page() {
 		echo '<p class="kk-card__desc">' . esc_html__( 'Moving to another website? Remove the key here, then ask us to move it to the new address.', 'kenakata-kit' ) . '</p>';
 	}
 	echo '</p></form></div>';
+
+	// Updates: installed version, newest on GitHub, check now.
+	$latest = function_exists( 'kk_update_latest' ) ? kk_update_latest() : null;
+	echo '<div class="kk-card"><h3>' . esc_html__( 'Updates', 'kenakata-kit' ) . '</h3><p class="kk-card__desc">';
+	/* translators: %s: version */
+	echo esc_html( sprintf( __( 'Installed: %s.', 'kenakata-kit' ), KK_VERSION ) ) . ' ';
+	if ( $latest && version_compare( $latest['v'], KK_VERSION, '>' ) ) {
+		/* translators: %s: version */
+		echo '<strong>' . esc_html( sprintf( __( 'Newest: %s (see the box above to update).', 'kenakata-kit' ), $latest['v'] ) ) . '</strong>';
+	} elseif ( $latest ) {
+		echo esc_html__( 'You have the newest version.', 'kenakata-kit' );
+	}
+	echo '</p>';
+	if ( current_user_can( 'update_plugins' ) && function_exists( 'kk_update_check_url' ) ) {
+		echo '<p><a class="button" href="' . esc_url( kk_update_check_url() ) . '">' . esc_html__( 'Check for updates now', 'kenakata-kit' ) . '</a></p>';
+	}
+	echo '</div>';
 
 	echo '<div class="kk-card"><h3>' . esc_html__( 'Free and Pro', 'kenakata-kit' ) . '</h3>';
 	echo '<p class="kk-card__desc">' . esc_html__( 'Free: product cards, Buy Now, checkout, delivery charges, fake-order protection, side cart, search, wishlist, reviews, questions, order tracking, security and all Elementor widgets.', 'kenakata-kit' ) . '</p>';

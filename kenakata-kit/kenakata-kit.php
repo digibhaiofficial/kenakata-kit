@@ -3,7 +3,7 @@
  * Plugin Name:       Kenakata Kit – WooCommerce Toolkit for Bangladesh
  * Plugin URI:        https://digibhai.com/
  * Description:       Everything a Bangladeshi WooCommerce store needs: Buy Now, simple checkout with delivery areas, fake-order protection, thank-you page, order tracking by phone, live search, login popup, product cards, brand/category carousels, WhatsApp, variation buttons, photo reviews, side cart, mobile bar and 15 Elementor widgets. English and Bengali (বাংলা). Settings: left menu → Kenakata Kit.
- * Version:           3.12.0
+ * Version:           3.12.1
  * Requires at least: 6.3
  * Requires PHP:      7.4
  * Requires Plugins:  woocommerce
@@ -19,7 +19,9 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'KK_VERSION', '3.12.0' );
+$GLOBALS['kk_load_ms'] = -microtime( true ); // time spent loading this plugin (Speed & health shows it)
+
+define( 'KK_VERSION', '3.12.1' );
 define( 'KK_FILE', __FILE__ );
 define( 'KK_DIR', __DIR__ );
 define( 'KK_URL', plugin_dir_url( __FILE__ ) );
@@ -328,6 +330,11 @@ function kk_defaults() {
 		'courier_redx_store_id'        => '',
 		'courier_redx_area_id'         => '',
 		'courier_redx_sandbox'         => 0,
+		'courier_ecourier_on'          => 0,
+		'courier_ecourier_package'     => '',
+		'courier_ecourier_zip'         => '',
+		'courier_ecourier_city'        => 'Dhaka',
+		'courier_ecourier_sandbox'     => 0,
 		'courier_default_weight'       => '0.5', // kg per parcel (couriers that need a weight)
 		'courier_bdcourier_token' => '',       // optional look-up service token (private option, never here)
 		'courier_check_cache'   => 24,         // hours a looked-up phone number is remembered
@@ -414,7 +421,7 @@ function kk_courier_catalog() {
 		'pathao'      => array( 'name' => 'Pathao Courier', 'site' => 'https://merchant.pathao.com', 'link' => 'https://merchant.pathao.com/tracking?consignment_id={id}&phone={phone}', 'api' => true ),
 		'redx'        => array( 'name' => 'RedX', 'site' => 'https://redx.com.bd', 'link' => 'https://redx.com.bd/track-parcel/?trackingId={id}', 'api' => true ),
 		'paperfly'    => array( 'name' => 'Paperfly', 'site' => 'https://paperfly.com.bd', 'link' => '' ),
-		'ecourier'    => array( 'name' => 'eCourier', 'site' => 'https://ecourier.com.bd', 'link' => '' ),
+		'ecourier'    => array( 'name' => 'eCourier', 'site' => 'https://ecourier.com.bd', 'link' => '', 'api' => true ),
 		'carrybee'    => array( 'name' => 'CarryBee', 'site' => 'https://carrybee.com', 'link' => '' ),
 		'deliverytiger' => array( 'name' => 'Delivery Tiger', 'site' => 'https://deliverytiger.com.bd', 'link' => '' ),
 		'sundarban'   => array( 'name' => 'Sundarban Courier', 'site' => 'https://sundarbancourierltd.com', 'link' => '' ),
@@ -767,6 +774,7 @@ add_action( 'plugins_loaded', function () {
 		}
 		require_once KK_DIR . '/includes/' . $file . '.php';
 	}
+	$GLOBALS['kk_load_ms'] = (int) round( ( microtime( true ) + $GLOBALS['kk_load_ms'] ) * 1000 );
 } );
 
 // Uploads protection (.htaccess) follows the setting on activation and is removed on deactivation.

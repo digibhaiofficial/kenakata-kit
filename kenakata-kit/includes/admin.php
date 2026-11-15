@@ -39,7 +39,7 @@ add_filter( 'option_page_capability_kk_settings_group', function () { return 'ma
 function kk_can_change( $key ) {
 	$key = (string) $key;
 	// Security switches and the courier's API keys: administrators only.
-	$admin_only = 0 === strpos( $key, 'sec_' ) || 0 === strpos( $key, 'turnstile_' ) || 'courier_provider' === $key || 'courier_check_enable' === $key || 'courier_pathao_store_id' === $key || 'courier_pathao_sandbox' === $key || 0 === strpos( $key, 'courier_redx_' ) || (bool) preg_match( '/^courier_[a-z]+_on$/', $key ) || ( function_exists( 'kk_courier_is_secret_key' ) && kk_courier_is_secret_key( $key ) );
+	$admin_only = 0 === strpos( $key, 'sec_' ) || 0 === strpos( $key, 'turnstile_' ) || 'courier_provider' === $key || 'courier_check_enable' === $key || 'courier_pathao_store_id' === $key || 'courier_pathao_sandbox' === $key || 0 === strpos( $key, 'courier_redx_' ) || 0 === strpos( $key, 'courier_ecourier_' ) || (bool) preg_match( '/^courier_[a-z]+_on$/', $key ) || ( function_exists( 'kk_courier_is_secret_key' ) && kk_courier_is_secret_key( $key ) );
 	return ! $admin_only || current_user_can( 'manage_options' );
 }
 
@@ -87,7 +87,7 @@ function kk_sanitize_value( $key, $v ) {
 /** Fields that store a value (not headings / info rows). */
 function kk_value_fields() {
 	return array_filter( kk_fields(), function ( $f ) {
-		return ! in_array( $f['type'], array( 'heading', 'areas', 'courier_test' ), true );
+		return ! in_array( $f['type'], array( 'heading', 'areas', 'courier_test', 'courier_log' ), true );
 	} );
 }
 
@@ -408,6 +408,10 @@ function kk_admin_notice( $msg ) {
 	} elseif ( 0 === strpos( $msg, 'cleaned-' ) ) {
 		/* translators: %d: number of items */
 		echo '<div class="kk-notice-ok" role="status">✓ ' . esc_html( sprintf( __( 'Clean-up done: %d leftovers removed.', 'kenakata-kit' ), absint( substr( $msg, 8 ) ) ) ) . '</div>';
+	} elseif ( 'update-found' === $msg ) {
+		echo '<div class="kk-notice-ok" role="status">' . esc_html__( 'A new version was found: use the box above to update.', 'kenakata-kit' ) . '</div>';
+	} elseif ( 'update-none' === $msg ) {
+		echo '<div class="kk-notice-ok" role="status">✓ ' . esc_html__( 'You have the newest version.', 'kenakata-kit' ) . '</div>';
 	} elseif ( 'license-removed' === $msg ) {
 		echo '<div class="kk-notice-ok" role="status">✓ ' . esc_html__( 'License key removed. The Free features keep working.', 'kenakata-kit' ) . '</div>';
 	}
@@ -501,6 +505,9 @@ function kk_render_field( $key, $f ) {
 			if ( '' !== $hint ) {
 				echo ' <span class="kk-saved">' . esc_html__( 'Saved', 'kenakata-kit' ) . '</span>';
 			}
+			break;
+		case 'courier_log':
+			echo function_exists( 'kk_courier_log_html' ) ? kk_courier_log_html() : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped inside
 			break;
 		case 'courier_pick':
 			$picked = kk_courier_picked();

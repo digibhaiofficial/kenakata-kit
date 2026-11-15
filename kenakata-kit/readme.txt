@@ -3,7 +3,7 @@ Contributors: DigiBhai.com
 Plugin URI: https://digibhai.com/
 Requires at least: 6.3
 Requires PHP: 7.4
-Stable tag: 3.12.0
+Stable tag: 3.12.1
 License: GPLv2 or later
 
 Everything a Bangladeshi WooCommerce store usually needs. Settings: left admin menu → Kenakata Kit.
@@ -29,6 +29,15 @@ Products Grid, Products Carousel, Brands, Categories, Buy Now Button, Live Searc
 Older [ss_…] shortcodes keep working. Options: see the guide or Kenakata Kit → Shortcodes.
 
 == Changelog ==
+= 3.12.1 =
+* New: "Kenakata Kit X is ready" box on the Kenakata Kit screens and the WordPress Dashboard with "Update now", "Download the zip" (for a manual upload) and "What's new"; License → Updates shows the installed and newest version with "Check for updates now".
+* New: Courier log (Courier booking tab): the last 40 calls to couriers with the answer code, time and the courier's or the server's own reason, so a failing courier can be diagnosed. Keys and customer details are never logged.
+* New (Pro): one-tap eCourier booking (API key / secret / user ID, package code; test lists your packages).
+* Fixed: courier calls use IPv4 (on hosts with half-working IPv6, Pathao behind Cloudflare could time out); longer time-out for Pathao / RedX; the Pathao login token is kept apart for the test server and renewed when the login details change; "could not reach" messages now include the server's reason.
+* Faster: live-search answers for visitors can be cached by the browser and LiteSpeed for 10 minutes (product changes clear them).
+* New checks in Speed & health: PHP OPcache, how long the admin page took to build, and how long Kenakata Kit itself takes to load.
+* Tests: the WordPress test now also checks product-card buttons, the update box and the courier log (88 checks).
+
 = 3.12.0 =
 * Fixed: a license key made for another website (or a broken key) is no longer saved. A red message says which website the key is for and which website this is; a key that stopped working shows "License key not working" on the License page.
 * New: "Speed & health" tab: switches for lighter pages (emoji and embed scripts, WooCommerce files only on shop pages, calmer Heartbeat), Cloudflare Turnstile on login / registration / checkout, a site and security checkup with "Fix" links, and a safe database clean-up. Everything is off until turned on.

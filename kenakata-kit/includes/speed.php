@@ -231,6 +231,21 @@ function kk_health_checks() {
 	$c = array();
 	/* translators: %s: PHP version */
 	$c['site'][] = version_compare( PHP_VERSION, '8.1', '>=' ) ? array( true, sprintf( __( 'PHP %s (fast and supported)', 'kenakata-kit' ), PHP_VERSION ) ) : array( false, sprintf( __( 'PHP %s is old: ask your hosting for PHP 8.2 or newer (faster and safer)', 'kenakata-kit' ), PHP_VERSION ) );
+	$opc = false;
+	if ( function_exists( 'opcache_get_status' ) ) {
+		$st  = @opcache_get_status( false ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- some hosts forbid the call
+		$opc = is_array( $st ) ? ! empty( $st['opcache_enabled'] ) : (bool) ini_get( 'opcache.enable' );
+	}
+	$c['site'][] = $opc ? array( true, __( 'PHP OPcache is on', 'kenakata-kit' ) ) : array( false, __( 'PHP OPcache is OFF: every page has to read all of WordPress\'s code again, which can make pages 2–5× slower for logged-in users, the cart and the checkout. Ask your hosting to turn on OPcache (cPanel → Select PHP Version → Extensions → opcache).', 'kenakata-kit' ) );
+	$build = function_exists( 'timer_float' ) ? (int) round( timer_float() * 1000 ) : 0;
+	if ( $build ) {
+		/* translators: %s: milliseconds */
+		$c['site'][] = $build < 1500 ? array( true, sprintf( __( 'This admin page was built in %s ms', 'kenakata-kit' ), number_format_i18n( $build ) ) ) : array( false, sprintf( __( 'This admin page took %s ms to build (good: under 1,500 ms). The server is slow for pages that are not cached: see OPcache / object cache above, or ask your hosting about CPU limits.', 'kenakata-kit' ), number_format_i18n( $build ) ) );
+	}
+	if ( isset( $GLOBALS['kk_load_ms'] ) && $GLOBALS['kk_load_ms'] >= 0 ) {
+		/* translators: %s: milliseconds */
+		$c['site'][] = array( $GLOBALS['kk_load_ms'] < 150, sprintf( __( 'Kenakata Kit itself loads in %s ms', 'kenakata-kit' ), number_format_i18n( (int) $GLOBALS['kk_load_ms'] ) ) );
+	}
 	$c['site'][] = wp_using_ext_object_cache() ? array( true, __( 'Object cache is on (Redis / Memcached / LiteSpeed)', 'kenakata-kit' ) ) : array( false, __( 'No object cache: if your hosting offers Redis or LiteSpeed Object Cache, turn it on (less database work on every page)', 'kenakata-kit' ) );
 	$page_cache = defined( 'LSCWP_V' ) || defined( 'WP_ROCKET_VERSION' ) || defined( 'W3TC' ) || class_exists( 'WpFastestCache' ) || defined( 'WPCACHEHOME' ) || class_exists( 'Swift_Performance' ) || defined( 'BREEZE_VERSION' );
 	$c['site'][] = $page_cache ? array( true, __( 'A page cache plugin is active', 'kenakata-kit' ) ) : array( false, __( 'No page cache plugin found: LiteSpeed Cache (free, on LiteSpeed hosting) makes pages much faster', 'kenakata-kit' ) );

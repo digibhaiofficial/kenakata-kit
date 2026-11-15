@@ -20,6 +20,7 @@ function kk_courier_base_url( $provider ) {
 		'steadfast' => 'https://portal.packzy.com/api/v1',
 		'bdcourier' => 'https://api.bdcourier.com',
 		'pathao'    => kk_opt( 'courier_pathao_sandbox' ) ? 'https://courier-api-sandbox.pathao.com' : 'https://api-hermes.pathao.com',
+		'ecourier'  => kk_opt( 'courier_ecourier_sandbox' ) ? 'https://staging.ecourier.com.bd/api' : 'https://backoffice.ecourier.com.bd/api',
 		'redx'      => kk_opt( 'courier_redx_sandbox' ) ? 'https://sandbox.redx.com.bd/v1.0.0-beta' : 'https://openapi.redx.com.bd/v1.0.0-beta',
 	);
 	$url  = isset( $urls[ $provider ] ) ? $urls[ $provider ] : '';
@@ -34,6 +35,10 @@ function kk_courier_headers( $provider ) {
 		$headers['Secret-Key'] = kk_courier_secret( 'courier_steadfast_secret_key' );
 	} elseif ( 'bdcourier' === $provider ) {
 		$headers['Authorization'] = 'Bearer ' . kk_courier_secret( 'courier_bdcourier_token' );
+	} elseif ( 'ecourier' === $provider ) {
+		$headers['API-KEY']    = kk_courier_secret( 'courier_ecourier_api_key' );
+		$headers['API-SECRET'] = kk_courier_secret( 'courier_ecourier_api_secret' );
+		$headers['USER-ID']    = kk_courier_secret( 'courier_ecourier_user_id' );
 	} elseif ( 'redx' === $provider ) {
 		$token                       = kk_courier_secret( 'courier_redx_token' );
 		$headers['API-ACCESS-TOKEN'] = 0 === stripos( $token, 'Bearer ' ) ? $token : 'Bearer ' . $token; // pasted with or without "Bearer"
@@ -53,24 +58,42 @@ function kk_courier_http( $provider, $method, $path, $body = null, array $extra_
 	}
 	$args = array(
 		'method'  => $method,
-		'timeout' => 'bdcourier' === $provider ? 15 : 12,
+		'timeout' => 'steadfast' === $provider ? 12 : 20, // Pathao / RedX / BD Courier can be slow to answer
+		'user-agent' => 'KenakataKit/' . KK_VERSION . '; ' . home_url( '/' ),
 		'headers' => array_merge( kk_courier_headers( $provider ), $extra_headers ),
 	);
 	if ( null !== $body ) {
 		$args['body'] = wp_json_encode( $body );
 	}
-	$res = wp_remote_request( $base . $path, $args );
+	// IPv4 only: on many shared hosts IPv6 is half-working, and couriers behind Cloudflare (Pathao) have IPv6
+	// addresses, so the call hangs until the time-out. IPv4 always works.
+	$v4 = function ( $handle ) {
+		if ( defined( 'CURLOPT_IPRESOLVE' ) && defined( 'CURL_IPRESOLVE_V4' ) ) {
+			curl_setopt( $handle, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_setopt
+		}
+	};
+	add_action( 'http_api_curl', $v4 );
+	$t0   = microtime( true );
+	$res  = wp_remote_request( $base . $path, $args );
+	remove_action( 'http_api_curl', $v4 );
+	$ms   = (int) round( ( microtime( true ) - $t0 ) * 1000 );
+	$logp = strtok( $path, '?' );
 	if ( is_wp_error( $res ) ) {
+		// The server's own reason (time-out, name not found, blocked by the hosting firewall…) for the log and the message.
+		$why = sanitize_text_field( $res->get_error_message() );
+		kk_courier_log_add( array( 'c' => $provider, 'm' => $method, 'p' => $logp, 'ok' => false, 'ms' => $ms, 'msg' => mb_substr( $why, 0, 200 ) ) );
 		return new WP_Error(
 			'kk_courier_unreachable',
-			/* translators: %s: courier name */
-			sprintf( __( 'Could not reach %s or it did not answer in time. Check your %s account before sending again: the parcel may already have been created.', 'kenakata-kit' ), $label, $label ),
+			/* translators: 1: courier name 2: courier name 3: technical reason from the server */
+			sprintf( __( 'Could not reach %1$s or it did not answer in time. Check your %2$s account before sending again: the parcel may already have been created. (Server says: %3$s)', 'kenakata-kit' ), $label, $label, mb_substr( $why, 0, 160 ) ),
 			array( 'status' => 502 )
 		);
 	}
 	$code = (int) wp_remote_retrieve_response_code( $res );
 	$data = json_decode( wp_remote_retrieve_body( $res ), true );
-	return array( $code, is_array( $data ) ? $data : array() );
+	$data = is_array( $data ) ? $data : array();
+	kk_courier_log_add( array( 'c' => $provider, 'm' => $method, 'p' => $logp, 'ok' => $code >= 200 && $code < 300, 'code' => $code, 'ms' => $ms, 'msg' => mb_substr( kk_courier_error_text( $data ), 0, 200 ) ) );
+	return array( $code, $data );
 }
 
 /** The most useful sentence from a courier's error answer. */
@@ -187,10 +210,15 @@ function kk_courier_steadfast_status( $consignment_id ) {
  * Pathao adapter
  * ====================================================================== */
 
+/** Where the Pathao token is kept: the test server and the real one have different tokens. */
+function kk_courier_pathao_token_key() {
+	return kk_opt( 'courier_pathao_sandbox' ) ? 'kk_pathao_token_sb' : 'kk_pathao_token';
+}
+
 /** A login token for Pathao's API, remembered until shortly before it expires. Returns the token or WP_Error. */
 function kk_courier_pathao_token( $fresh = false ) {
 	if ( ! $fresh ) {
-		$saved = get_transient( 'kk_pathao_token' );
+		$saved = get_transient( kk_courier_pathao_token_key() );
 		if ( is_string( $saved ) && '' !== $saved ) {
 			return $saved;
 		}
@@ -208,10 +236,10 @@ function kk_courier_pathao_token( $fresh = false ) {
 	list( $code, $body ) = $res;
 	if ( $code >= 200 && $code < 300 && ! empty( $body['access_token'] ) ) {
 		$ttl = isset( $body['expires_in'] ) && is_numeric( $body['expires_in'] ) ? max( 120, (int) $body['expires_in'] - 300 ) : HOUR_IN_SECONDS;
-		set_transient( 'kk_pathao_token', (string) $body['access_token'], $ttl );
+		set_transient( kk_courier_pathao_token_key(), (string) $body['access_token'], $ttl );
 		return (string) $body['access_token'];
 	}
-	delete_transient( 'kk_pathao_token' );
+	delete_transient( kk_courier_pathao_token_key() );
 	return new WP_Error( 'kk_courier_auth', __( 'Pathao did not accept the login details. An administrator should check them in Kenakata Kit → Courier booking.', 'kenakata-kit' ), array( 'status' => 502 ) );
 }
 
@@ -543,7 +571,7 @@ function kk_courier_book_order( WC_Order $order, array $over = array() ) {
 	$desc = trim( preg_replace( '/\s+/', ' ', wp_strip_all_tags( implode( ', ', $names ) ) ) );
 	$desc = function_exists( 'mb_substr' ) ? mb_substr( $desc, 0, 100 ) : substr( $desc, 0, 100 );
 	$fn   = 'kk_courier_' . $provider . '_book';
-	$res  = function_exists( $fn ) ? $fn( array( 'invoice' => $invoice, 'name' => $name, 'phone' => $phone, 'address' => $addr, 'cod_amount' => $cod, 'note' => $note, 'item_qty' => $qty, 'item_desc' => $desc ) )
+	$res  = function_exists( $fn ) ? $fn( array( 'invoice' => $invoice, 'name' => $name, 'phone' => $phone, 'address' => $addr, 'cod_amount' => $cod, 'note' => $note, 'item_qty' => $qty, 'item_desc' => $desc, 'order' => $order ) )
 		: new WP_Error( 'kk_courier_unknown', __( 'This courier is not supported.', 'kenakata-kit' ), array( 'status' => 400 ) );
 	if ( is_wp_error( $res ) ) {
 		kk_unlock( $lock );
@@ -745,6 +773,112 @@ function kk_courier_redx_test() {
 }
 
 /* =========================================================================
+ * eCourier adapter (Merchant API v5.1). eCourier needs city, thana, area and postcode: they come from the order's
+ * district, city/area and postcode fields; the package code comes from the settings ("Test connection" lists them).
+ * ====================================================================== */
+
+function kk_courier_ecourier_book( array $d ) {
+	$o = isset( $d['order'] ) && $d['order'] instanceof WC_Order ? $d['order'] : null;
+	if ( '' === trim( (string) kk_opt( 'courier_ecourier_package' ) ) ) {
+		return new WP_Error( 'kk_courier_package', __( 'eCourier needs a package code. Press "Test connection" in Kenakata Kit → Courier booking, copy your package code and save it.', 'kenakata-kit' ), array( 'status' => 422 ) );
+	}
+	$clip     = function ( $s, $n ) { return function_exists( 'mb_substr' ) ? mb_substr( trim( (string) $s ), 0, $n ) : substr( trim( (string) $s ), 0, $n ); };
+	$district = '';
+	$city     = '';
+	$zip      = '';
+	if ( $o ) {
+		$state = $o->get_billing_state();
+		$names = WC()->countries ? WC()->countries->get_states( $o->get_billing_country() ) : array();
+		$district = is_array( $names ) && isset( $names[ $state ] ) ? $names[ $state ] : $state;
+		$city     = $o->get_billing_city();
+		$zip      = $o->get_billing_postcode();
+	}
+	$city_name = '' !== trim( $district ) ? $district : ( '' !== trim( $city ) ? $city : (string) kk_opt( 'courier_ecourier_city' ) );
+	$area      = '' !== trim( $city ) ? $city : $city_name;
+	$payload   = array(
+		'recipient_name'       => $clip( $d['name'], 250 ),
+		'recipient_mobile'     => $d['phone'],
+		'recipient_city'       => $clip( $city_name, 40 ),
+		'recipient_thana'      => $clip( $area, 40 ),
+		'recipient_area'       => $clip( $area, 40 ),
+		'recipient_address'    => $clip( $d['address'], 250 ),
+		'recipient_zip'        => $clip( '' !== trim( $zip ) ? $zip : (string) kk_opt( 'courier_ecourier_zip' ), 10 ),
+		'package_code'         => trim( (string) kk_opt( 'courier_ecourier_package' ) ),
+		'product_price'        => (int) round( $d['cod_amount'] ),
+		'actual_product_price' => (int) round( $d['cod_amount'] ),
+		'payment_method'       => 'COD',
+		'parcel_type'          => 'BOX',
+		'product_id'           => $clip( $d['invoice'], 20 ),
+		'number_of_item'       => max( 1, (int) $d['item_qty'] ),
+		'comments'             => $clip( $d['note'], 255 ),
+		'parcel_detail'        => $clip( $d['item_desc'], 255 ),
+	);
+	$res = kk_courier_http( 'ecourier', 'POST', '/order-place', $payload );
+	if ( is_wp_error( $res ) ) {
+		return $res;
+	}
+	list( $code, $body ) = $res;
+	$id = isset( $body['ID'] ) ? (string) $body['ID'] : ( isset( $body['id'] ) ? (string) $body['id'] : '' );
+	if ( $code >= 200 && $code < 300 && '' !== $id && ( ! isset( $body['success'] ) || false !== $body['success'] ) ) {
+		$id = sanitize_text_field( $id );
+		return array( 'consignment_id' => $id, 'tracking_code' => $id, 'status' => 'initiated' );
+	}
+	if ( 401 === $code || 403 === $code ) {
+		return new WP_Error( 'kk_courier_auth', __( 'eCourier did not accept the API details. An administrator should check them in Kenakata Kit → Courier booking.', 'kenakata-kit' ), array( 'status' => 502 ) );
+	}
+	$why = kk_courier_error_text( $body );
+	if ( '' === $why && isset( $body['message'] ) && is_array( $body['message'] ) ) {
+		$why = sanitize_text_field( implode( ' ', array_map( 'strval', array_filter( $body['message'], 'is_scalar' ) ) ) );
+	}
+	/* translators: 1: courier name 2: reason given by the courier */
+	return new WP_Error( 'kk_courier_rejected', sprintf( __( '%1$s did not accept the order. %2$s', 'kenakata-kit' ), 'eCourier', $why ), array( 'status' => 422 ) );
+}
+
+function kk_courier_ecourier_status( $tracking_id ) {
+	$res = kk_courier_http( 'ecourier', 'POST', '/track', array( 'ecr' => (string) $tracking_id ) );
+	if ( is_wp_error( $res ) ) {
+		return $res;
+	}
+	list( $code, $body ) = $res;
+	$q = isset( $body['query_data'] ) && is_array( $body['query_data'] ) ? $body['query_data'] : array();
+	$q = isset( $q[0] ) && is_array( $q[0] ) ? $q[0] : $q;
+	$st = isset( $q['status'] ) && is_array( $q['status'] ) ? $q['status'] : array();
+	$last = $st ? end( $st ) : null;
+	$name = is_array( $last ) ? (string) ( $last['status'] ?? ( $last[0] ?? '' ) ) : (string) $last;
+	if ( $code >= 200 && $code < 300 && '' !== $name ) {
+		return sanitize_key( str_replace( array( ' ', '-' ), '_', strtolower( $name ) ) );
+	}
+	return new WP_Error( 'kk_courier_no_status', __( 'The courier could not tell the status right now. Please try again later.', 'kenakata-kit' ), array( 'status' => 502 ) );
+}
+
+/** eCourier: check the keys and list the packages (codes to copy into the settings). Books nothing. */
+function kk_courier_ecourier_test() {
+	$res = kk_courier_http( 'ecourier', 'POST', '/packages', array() );
+	if ( is_wp_error( $res ) ) {
+		return $res;
+	}
+	list( $code, $body ) = $res;
+	if ( 401 === $code || 403 === $code || ( isset( $body['success'] ) && false === $body['success'] ) ) {
+		return new WP_Error( 'kk_courier_auth', __( 'eCourier did not accept these API details. Check them and save again.', 'kenakata-kit' ), array( 'status' => 502 ) );
+	}
+	if ( $code < 200 || $code >= 300 ) {
+		return new WP_Error( 'kk_courier_test', __( 'The courier gave an unexpected answer. Please try again in a minute.', 'kenakata-kit' ), array( 'status' => 502 ) );
+	}
+	$list = array();
+	foreach ( isset( $body['data'] ) && is_array( $body['data'] ) ? $body['data'] : $body as $p ) {
+		if ( is_array( $p ) && ! empty( $p['package_code'] ) ) {
+			$list[] = sanitize_text_field( (string) $p['package_code'] ) . ' = ' . sanitize_text_field( (string) ( $p['package_name'] ?? '' ) );
+		}
+	}
+	$msg = __( 'Connected to eCourier.', 'kenakata-kit' );
+	if ( $list ) {
+		/* translators: %s: list of "code = name" */
+		$msg .= ' ' . sprintf( __( 'Your packages: %s', 'kenakata-kit' ), implode( '; ', array_slice( $list, 0, 12 ) ) );
+	}
+	return array( 'ok' => true, 'message' => $msg );
+}
+
+/* =========================================================================
  * Courier check: what this phone number's orders did before
  * ====================================================================== */
 
@@ -911,6 +1045,9 @@ function kk_courier_rest_test( $target = '' ) {
 	}
 	if ( 'redx' === $target ) {
 		return kk_courier_redx_test();
+	}
+	if ( 'ecourier' === $target ) {
+		return kk_courier_ecourier_test();
 	}
 	$res = kk_courier_http( $target, 'GET', '/get_balance' );
 	if ( is_wp_error( $res ) ) {

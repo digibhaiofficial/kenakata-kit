@@ -34,7 +34,7 @@ function kk_search_endpoint( WP_REST_Request $request ) {
 	$cache_key = 'kk_srch_' . md5( strtolower( $q ) . '|' . $limit );
 	$cached    = kk_search_cache_get( $cache_key );
 	if ( false !== $cached ) {
-		return $cached;
+		return kk_search_response( $cached );
 	}
 	$query = new WP_Query( array(
 		'post_type'      => 'product',
@@ -65,8 +65,27 @@ function kk_search_endpoint( WP_REST_Request $request ) {
 		'all'   => add_query_arg( array( 's' => $q, 'post_type' => 'product' ), home_url( '/' ) ),
 	);
 	kk_search_cache_set( $cache_key, $result );
-	return $result;
+	return kk_search_response( $result );
 }
+
+/**
+ * Visitors' search answers may be kept by the browser and by LiteSpeed / Cloudflare for 10 minutes: the same word
+ * then costs the server nothing. (Without this every typed word starts all of WordPress, which takes seconds on
+ * slow hosting.) Product changes clear LiteSpeed's copies.
+ */
+function kk_search_response( $data ) {
+	$res = new WP_REST_Response( $data );
+	if ( ! is_user_logged_in() ) {
+		$res->header( 'Cache-Control', 'public, max-age=300' );
+		$res->header( 'X-LiteSpeed-Cache-Control', 'public,max-age=600' );
+		$res->header( 'X-LiteSpeed-Tag', 'kk_search' );
+	}
+	return $res;
+}
+
+add_action( 'save_post_product', function () {
+	do_action( 'litespeed_purge', 'kk_search' ); // LiteSpeed Cache: forget cached search answers
+} );
 
 /**
  * Search cache. With an object cache (Redis/Memcached/LiteSpeed) every search is cached there. Without one, a

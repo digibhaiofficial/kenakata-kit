@@ -31,13 +31,17 @@ function kk_courier_providers() {
 			'label'   => 'RedX',
 			'secrets' => array( 'courier_redx_token' ),
 		),
+		'ecourier'  => array(
+			'label'   => 'eCourier',
+			'secrets' => array( 'courier_ecourier_api_key', 'courier_ecourier_api_secret', 'courier_ecourier_user_id' ),
+		),
 	) );
 }
 
 /** Is this status one where the courier cancelled the parcel (so the order may be sent again)? */
 function kk_courier_is_cancelled( $provider, $status ) {
 	$status = strtolower( str_replace( '-', '_', (string) $status ) );
-	$list   = array( 'steadfast' => array( 'cancelled' ), 'pathao' => array( 'cancelled', 'pickup_cancelled' ), 'redx' => array( 'cancelled', 'pickup_cancelled', 'rejected' ) );
+	$list   = array( 'steadfast' => array( 'cancelled' ), 'pathao' => array( 'cancelled', 'pickup_cancelled' ), 'redx' => array( 'cancelled', 'pickup_cancelled', 'rejected' ), 'ecourier' => array( 'cancelled', 'canceled', 'order_canceled' ) );
 	return isset( $list[ $provider ] ) && in_array( $status, $list[ $provider ], true );
 }
 
@@ -92,6 +96,10 @@ function kk_courier_save_secret( $key, $value ) {
 	$all = is_array( $all ) ? $all : array();
 	$all[ $key ] = $value;
 	update_option( 'kk_courier_secrets', $all, false );
+	if ( 0 === strpos( $key, 'courier_pathao_' ) ) { // new login details: forget the old Pathao token
+		delete_transient( 'kk_pathao_token' );
+		delete_transient( 'kk_pathao_token_sb' );
+	}
 }
 
 /** "•••• 1234" for a saved credential, '' when nothing is saved. */
@@ -156,6 +164,33 @@ function kk_courier_info() {
 /** Is the "Courier check" switched on? It shows on orders only then. */
 function kk_courier_check_enabled() {
 	return (bool) kk_opt( 'courier_check_enable' );
+}
+
+/**
+ * Courier log: the last 40 calls to couriers (when, which courier, what was asked, answer code, how long, the
+ * courier's or the server's message). Never keys, passwords, tokens or customer details. Not autoloaded.
+ */
+function kk_courier_log_add( array $e ) {
+	$log = get_option( 'kk_courier_log', array() );
+	$log = is_array( $log ) ? $log : array();
+	array_unshift( $log, array_merge( array( 't' => time() ), $e ) );
+	update_option( 'kk_courier_log', array_slice( $log, 0, 40 ), false );
+}
+
+/** The log as a table for the Courier booking tab. */
+function kk_courier_log_html() {
+	$log = get_option( 'kk_courier_log', array() );
+	if ( ! is_array( $log ) || ! $log ) {
+		return '<p class="kk-muted">' . esc_html__( 'Nothing yet. Press "Test connection" above or send an order to a courier: every call is listed here.', 'kenakata-kit' ) . '</p>';
+	}
+	$fmt = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
+	$out = '<div class="kk-clog-wrap"><table class="widefat striped kk-clog"><thead><tr><th>' . esc_html__( 'When', 'kenakata-kit' ) . '</th><th>' . esc_html__( 'Courier', 'kenakata-kit' ) . '</th><th>' . esc_html__( 'Asked for', 'kenakata-kit' ) . '</th><th>' . esc_html__( 'Result', 'kenakata-kit' ) . '</th><th>' . esc_html__( 'Time', 'kenakata-kit' ) . '</th></tr></thead><tbody>';
+	foreach ( $log as $e ) {
+		$ok   = ! empty( $e['ok'] );
+		$out .= '<tr class="' . ( $ok ? 'is-ok' : 'is-bad' ) . '"><td>' . esc_html( date_i18n( $fmt, (int) $e['t'] ) ) . '</td><td>' . esc_html( kk_courier_label( (string) ( $e['c'] ?? '' ) ) ) . '</td><td><code>' . esc_html( (string) ( $e['m'] ?? '' ) . ' ' . (string) ( $e['p'] ?? '' ) ) . '</code></td><td>'
+			. ( $ok ? '✓ ' : '✗ ' ) . esc_html( trim( ( ! empty( $e['code'] ) ? (int) $e['code'] . ' ' : '' ) . (string) ( $e['msg'] ?? '' ) ) ) . '</td><td>' . esc_html( number_format_i18n( (int) ( $e['ms'] ?? 0 ) ) . ' ms' ) . '</td></tr>';
+	}
+	return $out . '</tbody></table></div>';
 }
 
 /** Load the part that talks to couriers (only when a booking, a status check or a history check is asked for). */

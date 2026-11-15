@@ -7890,3 +7890,132 @@ msgstr "সেকশনের ফাঁকা"
 
 msgid "Space around the title and products. It disappears together with them when there is nothing to show, so use it instead of container padding for \"Recently viewed\" and \"Related\"."
 msgstr "শিরোনাম ও প্রোডাক্টের চারপাশের ফাঁকা। দেখানোর কিছু না থাকলে এগুলোর সাথে এটাও মিলিয়ে যায়, তাই \"Recently viewed\" ও \"Related\"-এর জন্য কনটেইনার প্যাডিংয়ের বদলে এটা ব্যবহার করুন।"
+
+msgid "PHP OPcache is on"
+msgstr "PHP OPcache চালু আছে"
+
+msgid "PHP OPcache is OFF: every page has to read all of WordPress's code again, which can make pages 2–5× slower for logged-in users, the cart and the checkout. Ask your hosting to turn on OPcache (cPanel → Select PHP Version → Extensions → opcache)."
+msgstr "PHP OPcache বন্ধ: প্রতিটি পেজে WordPress-এর সব কোড নতুন করে পড়তে হয়, ফলে লগইন করা ইউজার, কার্ট আর চেকআউট ২–৫ গুণ ধীর হতে পারে। হোস্টিংকে OPcache চালু করতে বলুন (cPanel → Select PHP Version → Extensions → opcache)।"
+
+msgid "This admin page was built in %s ms"
+msgstr "এই অ্যাডমিন পেজ তৈরি হয়েছে %s ms-এ"
+
+msgid "This admin page took %s ms to build (good: under 1,500 ms). The server is slow for pages that are not cached: see OPcache / object cache above, or ask your hosting about CPU limits."
+msgstr "এই অ্যাডমিন পেজ তৈরি হতে %s ms লেগেছে (ভালো: ১,৫০০ ms-এর কম)। ক্যাশ না হওয়া পেজে সার্ভার ধীর: উপরের OPcache / অবজেক্ট ক্যাশ দেখুন, অথবা হোস্টিংকে CPU সীমা নিয়ে জিজ্ঞেস করুন।"
+
+msgid "Kenakata Kit itself loads in %s ms"
+msgstr "Kenakata Kit নিজে লোড হয় %s ms-এ"
+
+msgid "eCourier"
+msgstr "eCourier"
+
+msgid "Send orders to eCourier with one tap. New: please send your first parcel while watching your eCourier panel."
+msgstr "এক ট্যাপে eCourier-এ অর্ডার পাঠান। নতুন ফিচার: প্রথম পার্সেলটা eCourier প্যানেল খোলা রেখে পাঠিয়ে মিলিয়ে নিন।"
+
+msgid "Ask eCourier for your API details (API key, API secret, user ID). Kept private. Leave empty to keep the saved value."
+msgstr "eCourier-এর কাছ থেকে API তথ্য নিন (API key, API secret, user ID)। গোপন রাখা হয়। সেভ করা মান রাখতে ফাঁকা রাখুন।"
+
+msgid "API secret"
+msgstr "API secret"
+
+msgid "Leave empty to keep the saved value."
+msgstr "সেভ করা মান রাখতে ফাঁকা রাখুন।"
+
+msgid "User ID"
+msgstr "ইউজার আইডি"
+
+msgid "Package code"
+msgstr "প্যাকেজ কোড"
+
+msgid "For example #2416. \"Test connection\" lists your packages with their codes."
+msgstr "যেমন #2416। \"Test connection\" চাপলে আপনার প্যাকেজগুলো কোডসহ দেখাবে।"
+
+msgid "Postcode when the order has none"
+msgstr "অর্ডারে পোস্টকোড না থাকলে"
+
+msgid "eCourier asks for a postcode. Orders without one use this (for example 1212)."
+msgstr "eCourier পোস্টকোড চায়। যে অর্ডারে নেই, সেখানে এটা ব্যবহার হবে (যেমন 1212)।"
+
+msgid "Use eCourier's test server"
+msgstr "eCourier-এর টেস্ট সার্ভার ব্যবহার করুন"
+
+msgid "Test eCourier"
+msgstr "eCourier পরীক্ষা"
+
+msgid "Save first, then test. It checks the API details and lists your packages: nothing is booked."
+msgstr "আগে সেভ করুন, তারপর পরীক্ষা করুন। এটি API তথ্য যাচাই করে প্যাকেজের তালিকা দেখায়: কিছু বুক হয় না।"
+
+msgid "Courier log"
+msgstr "কুরিয়ার লগ"
+
+msgid "The last 40 calls to couriers with their answer. If sending or testing fails, the reason is here (for example a wrong key, a time-out, or the hosting blocking the connection). Keys and customer details are never written here."
+msgstr "কুরিয়ারের সাথে শেষ ৪০টি যোগাযোগ আর তাদের উত্তর। পাঠানো বা পরীক্ষা ব্যর্থ হলে কারণ এখানে পাবেন (যেমন ভুল কী, সময় শেষ, বা হোস্টিং সংযোগ আটকে দিচ্ছে)। কী বা কাস্টমারের তথ্য এখানে কখনো লেখা হয় না।"
+
+msgid "Nothing yet. Press \"Test connection\" above or send an order to a courier: every call is listed here."
+msgstr "এখনো কিছু নেই। উপরের \"Test connection\" চাপুন বা কুরিয়ারে একটি অর্ডার পাঠান: প্রতিটি যোগাযোগ এখানে দেখাবে।"
+
+msgid "Asked for"
+msgstr "কী চাওয়া হয়েছিল"
+
+msgid "Result"
+msgstr "ফলাফল"
+
+msgid "Time"
+msgstr "সময়"
+
+msgid "Kenakata Kit %1$s is ready (you have %2$s)."
+msgstr "Kenakata Kit %1$s এসে গেছে (আপনার আছে %2$s)।"
+
+msgid "Update to get the newest fixes and features. Your settings stay as they are."
+msgstr "নতুন ঠিক করা জিনিস আর ফিচার পেতে আপডেট করুন। আপনার সেটিংস যেমন আছে তেমনই থাকবে।"
+
+msgid "Update now"
+msgstr "এখনই আপডেট করুন"
+
+msgid "Download the zip"
+msgstr "zip ডাউনলোড করুন"
+
+msgid "What's new (GitHub)"
+msgstr "কী নতুন (GitHub)"
+
+msgid "Later"
+msgstr "পরে"
+
+msgid "Manual update: download the zip, then Plugins → Add New → Upload Plugin → choose the file → \"Replace current with uploaded\"."
+msgstr "হাতে আপডেট: zip ডাউনলোড করুন, তারপর Plugins → Add New → Upload Plugin → ফাইল বাছুন → \"Replace current with uploaded\"।"
+
+msgid "Could not reach %1$s or it did not answer in time. Check your %2$s account before sending again: the parcel may already have been created. (Server says: %3$s)"
+msgstr "%1$s-এর সাথে যোগাযোগ হয়নি বা সময়মতো উত্তর আসেনি। আবার পাঠানোর আগে %2$s অ্যাকাউন্ট দেখে নিন: পার্সেল হয়তো আগেই তৈরি হয়েছে। (সার্ভার বলছে: %3$s)"
+
+msgid "eCourier needs a package code. Press \"Test connection\" in Kenakata Kit → Courier booking, copy your package code and save it."
+msgstr "eCourier প্যাকেজ কোড চায়। Kenakata Kit → Courier booking-এ \"Test connection\" চাপুন, প্যাকেজ কোড কপি করে সেভ করুন।"
+
+msgid "eCourier did not accept the API details. An administrator should check them in Kenakata Kit → Courier booking."
+msgstr "eCourier API তথ্য গ্রহণ করেনি। অ্যাডমিনকে Kenakata Kit → Courier booking-এ দেখতে হবে।"
+
+msgid "eCourier did not accept these API details. Check them and save again."
+msgstr "eCourier এই API তথ্য গ্রহণ করেনি। যাচাই করে আবার সেভ করুন।"
+
+msgid "Connected to eCourier."
+msgstr "eCourier-এর সাথে সংযোগ হয়েছে।"
+
+msgid "Your packages: %s"
+msgstr "আপনার প্যাকেজ: %s"
+
+msgid "Updates"
+msgstr "আপডেট"
+
+msgid "Installed: %s."
+msgstr "ইনস্টল করা: %s।"
+
+msgid "Newest: %s (see the box above to update)."
+msgstr "সর্বশেষ: %s (আপডেট করতে উপরের বক্স দেখুন)।"
+
+msgid "You have the newest version."
+msgstr "আপনার কাছে সর্বশেষ ভার্সন আছে।"
+
+msgid "Check for updates now"
+msgstr "এখনই আপডেট খুঁজুন"
+
+msgid "A new version was found: use the box above to update."
+msgstr "নতুন ভার্সন পাওয়া গেছে: আপডেট করতে উপরের বক্স ব্যবহার করুন।"

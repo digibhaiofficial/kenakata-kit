@@ -965,6 +965,20 @@
 		go.focus();
 	}
 
+	/** Block / unblock the customer's phone number (only while "Blocked numbers" is on: o.blocked is then true or false). */
+	function blockLine(o) {
+		if (o.blocked === null || o.blocked === undefined || !o.phone) { return null; }
+		var btn = button(o.blocked ? t('unblockNumber') : t('blockNumber'), { class: 'sd-btn sd-btn--sm ' + (o.blocked ? 'sd-btn--ghost' : 'sd-btn--danger') }, 'shield');
+		btn.addEventListener('click', function () {
+			if (!o.blocked && !window.confirm(t('blockConfirm'))) { return; }
+			busy(btn, true, t('saving'));
+			api('orders/' + o.id + '/block', { method: 'POST', body: { remove: !!o.blocked } }).then(function () {
+				toast(o.blocked ? t('unblocked') : t('blocked'), 'ok'); route();
+			}, function (e) { busy(btn, false); toast(e.message, 'error'); });
+		});
+		return h('div', { class: 'sd-line sd-blockline' }, o.blocked ? h('strong', { class: 'sd-danger-text', text: t('numberBlocked') }) : null, btn);
+	}
+
 	/** bKash / Nagad / Rocket by hand: what the customer typed, and the two decisions. */
 	function mpayCard(o) {
 		var m = o.mpay;
@@ -1021,6 +1035,7 @@
 				button(t('copy'), { class: 'sd-btn sd-btn--sm sd-btn--ghost', onclick: function () { copyText(addressText); } }, 'copy')) : null,
 			o.email ? h('p', { class: 'sd-muted', text: o.email }) : null,
 			histLine,
+			blockLine(o),
 			o.customer_note ? h('div', { class: 'sd-note-box' }, h('strong', { text: t('customerNote') + ': ' }), o.customer_note) : null
 		]));
 

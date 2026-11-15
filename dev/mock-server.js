@@ -52,6 +52,7 @@ for (let i = 0; i < 27; i++) {
     history: { total: 1 + (i % 4), completed: i % 3, cancelled: i % 4 === 3 ? 1 : 0 }, edit_url: 'http://localhost:' + PORT + '/wp-admin/post.php?post=' + (900 + i),
   });
 }
+orders.forEach((o) => { o.blocked = false; });
 orders[4].payment = 'bKash / Nagad / Rocket'; orders[4].mp_wait = true;
 orders[4].mpay = { wallet: 'bKash', to: '01728366779', sender: '01812345678', trx: 'BK7X9QW2LM', amount: 80, amount_text: money(80), advance: true, shot: '', state: 'wait' };
 const cats = [{ id: 47, name: 'Bedroom & Bedding', depth: 0, count: 12 }, { id: 48, name: 'Bedsheets', depth: 1, count: 9 }, { id: 50, name: 'Cushion Covers', depth: 1, count: 1 }, { id: 52, name: 'Table Linen', depth: 0, count: 3 }];
@@ -123,6 +124,10 @@ function api(req, res, route, q, body) {
   if (route === 'orders' && req.method === 'GET') {
     const st = q.get('status'); const s = (q.get('search') || '').toLowerCase();
     return send(res, 200, page(orders.filter((o) => (!st || o.status === st) && (!s || o.number.includes(s) || o.name.toLowerCase().includes(s) || o.phone.includes(s))), q));
+  }
+  if ((m = route.match(/^orders\/(\d+)\/block$/)) && req.method === 'POST') {
+    const o = orders.find((x) => x.id === Number(m[1])); if (!o) return err(res, 404, 'kk_sd_not_found', 'Not found.');
+    o.blocked = !body.remove; return send(res, 200, o);
   }
   if ((m = route.match(/^orders\/(\d+)\/mpay$/)) && req.method === 'POST') {
     const o = orders.find((x) => x.id === Number(m[1])); if (!o || !o.mpay) return err(res, 400, 'kk_mp_not', 'Not a mobile payment.');

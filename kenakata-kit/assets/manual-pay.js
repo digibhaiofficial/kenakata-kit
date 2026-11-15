@@ -2,6 +2,7 @@
 (function () {
 	'use strict';
 	var T = window.kkMP || {};
+	function refresh() { if (window.jQuery) { window.jQuery(document.body).trigger('update_checkout'); } }
 	function closest(el, sel) { while (el && el.nodeType === 1) { if (el.matches(sel)) { return el; } el = el.parentElement; } return null; }
 
 	document.addEventListener('change', function (e) {
@@ -9,7 +10,9 @@
 		if (t.name === 'kk_mp_wallet') {
 			var box = closest(t, '.kk-mp');
 			if (box) { [].forEach.call(box.querySelectorAll('.kk-mp__how'), function (h) { h.hidden = h.getAttribute('data-wallet') !== t.value; }); }
+			refresh(); // the wallet charge (bKash 1.85%, Nagad …) is worked out again
 		}
+		if (t.name === 'payment_method') { refresh(); }
 		if (t.id === 'kk_mp_file' && t.files && t.files[0]) {
 			var wrap = closest(t, '.kk-mp');
 			var state = wrap.querySelector('.kk-mp__shot-state');

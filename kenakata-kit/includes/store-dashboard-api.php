@@ -216,7 +216,8 @@ function kk_sd_order_full( WC_Order $order ) {
 		'tracking_url'  => (string) kk_order_meta( $order, 'tracking_url' ),
 		'edit_url'      => current_user_can( 'manage_woocommerce' ) ? $order->get_edit_order_url() : '',
 	) );
-	$out['mpay'] = kk_sd_order_mpay( $order );
+	$out['mpay']    = kk_sd_order_mpay( $order );
+	$out['blocked'] = kk_opt( 'gd_blacklist_enable' ) && function_exists( 'kk_is_blacklisted' ) && $order->get_billing_phone() ? kk_is_blacklisted( $order->get_billing_phone() ) : null;
 	// One-tap courier booking: what was booked, or what the confirmation box starts with (courier code loads only here).
 	$out['booking']  = null;
 	$out['dispatch'] = null;
@@ -1520,6 +1521,25 @@ add_action( 'rest_api_init', function () {
 		return is_wp_error( $order ) ? $order : kk_sd_order_full( $order );
 	} );
 	$route( 'orders/' . $id, 'POST', 'edit_shop_orders', 'kk_sd_order_update' );
+	$route( 'orders/' . $id . '/block', 'POST', 'edit_shop_orders', function ( WP_REST_Request $req ) {
+		$order = kk_sd_get_order( $req['id'] );
+		if ( is_wp_error( $order ) ) {
+			return $order;
+		}
+		if ( ! function_exists( 'kk_blacklist_set' ) || ! kk_opt( 'gd_blacklist_enable' ) ) {
+			return new WP_Error( 'kk_sd_no_bl', __( 'Blocked numbers are turned off.', 'kenakata-kit' ), array( 'status' => 400 ) );
+		}
+		$remove = (bool) $req->get_param( 'remove' );
+		/* translators: %s: order number */
+		$res = kk_blacklist_set( $order->get_billing_phone(), sprintf( __( 'Order #%s', 'kenakata-kit' ), $order->get_order_number() ), $remove );
+		if ( is_wp_error( $res ) ) {
+			return $res;
+		}
+		$user = wp_get_current_user();
+		/* translators: %s: user name */
+		$order->add_order_note( sprintf( $remove ? __( 'Phone number unblocked by %s.', 'kenakata-kit' ) : __( 'Phone number blocked by %s.', 'kenakata-kit' ), $user->display_name ) );
+		return kk_sd_order_full( wc_get_order( $order->get_id() ) );
+	} );
 	$route( 'orders/' . $id . '/mpay', 'POST', 'edit_shop_orders', function ( WP_REST_Request $req ) {
 		$order = kk_sd_get_order( $req['id'] );
 		if ( is_wp_error( $order ) ) {

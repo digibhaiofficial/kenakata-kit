@@ -58,14 +58,79 @@ function kk_mp_types() {
 }
 
 /** Amount to pay now for a cart total + delivery charge. */
-function kk_mp_amount_now( $total, $shipping ) {
+function kk_mp_amount_now( $total, $shipping, $fee = 0 ) {
 	if ( 'delivery' === kk_opt( 'mp_amount' ) ) {
-		$fixed = (float) kk_opt( 'mp_advance_fixed' );
-		$now   = $fixed > 0 ? $fixed : (float) $shipping;
-		return min( (float) $total, max( 0, $now ) );
+		return min( (float) $total, max( 0, (float) $shipping + (float) $fee ) );
 	}
 	return (float) $total;
 }
+
+/** Charge (%) added for a wallet: the cash-out charge the shop pays to take the money out. 0 = none. */
+function kk_mp_fee_rate( $wallet ) {
+	$v = str_replace( ',', '.', trim( (string) kk_opt( 'mp_' . sanitize_key( $wallet ) . '_fee' ) ) );
+	return is_numeric( $v ) ? max( 0, min( 10, (float) $v ) ) : 0.0;
+}
+
+/** The wallet the customer picked at checkout (form, then the saved choice, then the first one). */
+function kk_mp_chosen_wallet() {
+	$wallets = kk_mp_wallets();
+	$w       = isset( $_POST['kk_mp_wallet'] ) ? sanitize_key( wp_unslash( $_POST['kk_mp_wallet'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification -- read only
+	if ( ! isset( $wallets[ $w ] ) && function_exists( 'WC' ) && WC()->session ) {
+		$w = (string) WC()->session->get( 'kk_mp_wallet' );
+	}
+	return isset( $wallets[ $w ] ) ? $w : (string) key( $wallets );
+}
+
+/** Charge already on the order (fee lines made by the wallet charge). */
+function kk_mp_order_fee( WC_Order $order ) {
+	$sum = 0;
+	foreach ( $order->get_fees() as $fee ) {
+		if ( $fee->get_meta( '_kk_mp_fee' ) ) {
+			$sum += (float) $fee->get_total();
+		}
+	}
+	return $sum;
+}
+
+// Remember the wallet when the checkout updates (the payment box sends it with the form).
+add_action( 'woocommerce_checkout_update_order_review', function ( $post_data ) {
+	parse_str( (string) $post_data, $form );
+	if ( ! empty( $form['kk_mp_wallet'] ) && function_exists( 'WC' ) && WC()->session ) {
+		WC()->session->set( 'kk_mp_wallet', sanitize_key( $form['kk_mp_wallet'] ) );
+	}
+} );
+
+// The wallet charge as a line in the order ("bKash charge 1.85%"), only at checkout and only with this payment method.
+add_action( 'woocommerce_cart_calculate_fees', function ( $cart ) {
+	if ( ! kk_opt( 'mp_enable' ) || ! ( is_checkout() || ( defined( 'WOOCOMMERCE_CHECKOUT' ) && WOOCOMMERCE_CHECKOUT ) ) ) {
+		return;
+	}
+	$method = isset( $_POST['payment_method'] ) ? sanitize_key( wp_unslash( $_POST['payment_method'] ) ) : ( WC()->session ? (string) WC()->session->get( 'chosen_payment_method' ) : '' ); // phpcs:ignore WordPress.Security.NonceVerification -- read only
+	if ( 'kk_mobile_pay' !== $method ) {
+		return;
+	}
+	$wallets = kk_mp_wallets();
+	$wallet  = kk_mp_chosen_wallet();
+	$rate    = $wallet ? kk_mp_fee_rate( $wallet ) : 0;
+	if ( $rate <= 0 ) {
+		return;
+	}
+	$ship = (float) $cart->get_shipping_total() + (float) $cart->get_shipping_tax();
+	$base = 'delivery' === kk_opt( 'mp_amount' ) ? $ship : (float) $cart->get_cart_contents_total() + (float) $cart->get_cart_contents_tax() + $ship;
+	$fee  = ceil( $base * $rate / 100 );
+	if ( $fee > 0 ) {
+		/* translators: 1: wallet name 2: percent */
+		$cart->add_fee( sprintf( __( '%1$s charge (%2$s%%)', 'kenakata-kit' ), $wallets[ $wallet ]['label'], rtrim( rtrim( number_format( $rate, 2, '.', '' ), '0' ), '.' ) ), $fee, false );
+		$GLOBALS['kk_mp_fee_names'][] = sprintf( __( '%1$s charge (%2$s%%)', 'kenakata-kit' ), $wallets[ $wallet ]['label'], rtrim( rtrim( number_format( $rate, 2, '.', '' ), '0' ), '.' ) );
+	}
+}, 20 );
+
+// Mark the charge line on the order, so the amounts to pay now / collect at the door know it.
+add_action( 'woocommerce_checkout_create_order_fee_item', function ( $item, $fee_key, $fee ) {
+	if ( ! empty( $GLOBALS['kk_mp_fee_names'] ) && in_array( $fee->name, (array) $GLOBALS['kk_mp_fee_names'], true ) ) {
+		$item->add_meta_data( '_kk_mp_fee', 1, true );
+	}
+}, 10, 3 );
 
 /**
  * Money still to collect at the door for an order paid (partly) with mobile payment, or null for other methods.
@@ -245,12 +310,20 @@ add_action( 'plugins_loaded', function () {
 			$cart  = WC()->cart;
 			$total = $cart ? (float) $cart->get_total( 'edit' ) : 0;
 			$ship  = $cart ? (float) $cart->get_shipping_total() + (float) $cart->get_shipping_tax() : 0;
-			return array( $total, kk_mp_amount_now( $total, $ship ) );
+			$fee   = 0;
+			if ( $cart ) {
+				foreach ( $cart->get_fees() as $f ) {
+					if ( ! empty( $GLOBALS['kk_mp_fee_names'] ) && in_array( $f->name, (array) $GLOBALS['kk_mp_fee_names'], true ) ) {
+						$fee += (float) $f->total;
+					}
+				}
+			}
+			return array( $total, kk_mp_amount_now( $total, $ship, $fee ), $fee );
 		}
 
 		public function payment_fields() {
 			$wallets = kk_mp_wallets();
-			list( $total, $now ) = $this->cart_amounts();
+			list( $total, $now, $fee ) = $this->cart_amounts();
 			$advance = 'delivery' === kk_opt( 'mp_amount' ) && $now < $total;
 			$shot    = (string) kk_opt( 'mp_screenshot' );
 			echo '<div class="kk-mp" data-upload="' . esc_url( WC_AJAX::get_endpoint( 'kk_mp_upload' ) ) . '">';
@@ -259,8 +332,12 @@ add_action( 'plugins_loaded', function () {
 				? sprintf( esc_html__( 'Pay %1$s now (delivery charge). The rest, %2$s, is paid in cash on delivery.', 'kenakata-kit' ), '<strong>' . wp_kses_post( wc_price( $now ) ) . '</strong>', '<strong>' . wp_kses_post( wc_price( $total - $now ) ) . '</strong>' )
 				/* translators: %s: amount */
 				: sprintf( esc_html__( 'Pay %s now.', 'kenakata-kit' ), '<strong>' . wp_kses_post( wc_price( $now ) ) . '</strong>' ) ) . '</p>';
+			if ( $fee > 0 ) {
+				/* translators: %s: charge amount */
+				echo '<p class="kk-mp__fee">' . sprintf( esc_html__( 'Includes the cash-out charge of %s.', 'kenakata-kit' ), wp_kses_post( wc_price( $fee ) ) ) . '</p>';
+			}
 			$first = (string) key( $wallets );
-			$pick  = isset( $_POST['kk_mp_wallet'] ) ? sanitize_key( wp_unslash( $_POST['kk_mp_wallet'] ) ) : $first; // phpcs:ignore WordPress.Security.NonceVerification -- redisplay after checkout update
+			$pick  = kk_mp_chosen_wallet();
 			$pick  = isset( $wallets[ $pick ] ) ? $pick : $first;
 			echo '<div class="kk-mp__wallets" role="radiogroup" aria-label="' . esc_attr__( 'Pay with', 'kenakata-kit' ) . '">';
 			foreach ( $wallets as $key => $w ) {
@@ -335,7 +412,7 @@ add_action( 'plugins_loaded', function () {
 			$token   = isset( $_POST['kk_mp_shot'] ) ? sanitize_text_field( wp_unslash( $_POST['kk_mp_shot'] ) ) : '';
 			// phpcs:enable
 			$ship = (float) $order->get_shipping_total() + (float) $order->get_shipping_tax();
-			$now  = kk_mp_amount_now( (float) $order->get_total(), $ship );
+			$now  = kk_mp_amount_now( (float) $order->get_total(), $ship, kk_mp_order_fee( $order ) );
 			$order->update_meta_data( '_kk_mp_wallet', $wallet );
 			$order->update_meta_data( '_kk_mp_to', isset( $wallets[ $wallet ] ) ? $wallets[ $wallet ]['number'] : '' );
 			$order->update_meta_data( '_kk_mp_sender', $sender );

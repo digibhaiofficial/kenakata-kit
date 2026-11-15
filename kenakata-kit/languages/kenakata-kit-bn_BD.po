@@ -8726,3 +8726,144 @@ msgstr "হেডারের কার্ট আইকন থেকেও এ�
 
 msgid "For a header made with Elementor's \"Menu Cart\" widget or a theme cart icon: a click opens this side cart instead of their own cart panel, so there is only one cart. Turn off to get their panel back."
 msgstr "Elementor-এর \"Menu Cart\" উইজেট বা থিমের কার্ট আইকন দিয়ে বানানো হেডারে: ক্লিক করলে তাদের নিজের প্যানেলের বদলে এই সাইড কার্ট খোলে, তাই সাইটে একটাই কার্ট থাকে। তাদের প্যানেল ফেরত চাইলে বন্ধ করুন।"
+
+msgid "This is not a valid Bangladeshi mobile number."
+msgstr "এটা সঠিক বাংলাদেশি মোবাইল নম্বর নয়।"
+
+msgid "Sorry, we cannot take this order online. Please call us."
+msgstr "দুঃখিত, এই অর্ডারটা অনলাইনে নিতে পারছি না। অনুগ্রহ করে আমাদের কল করুন।"
+
+msgid "Please pay in advance with bKash, Nagad or Rocket."
+msgstr "অনুগ্রহ করে bKash, Nagad বা Rocket দিয়ে অগ্রিম পেমেন্ট করুন।"
+
+msgid "This number is blocked."
+msgstr "এই নম্বরটা ব্লক করা আছে।"
+
+msgid "Block this phone number for future orders?"
+msgstr "এই ফোন নম্বর থেকে ভবিষ্যতের অর্ডার ব্লক করবেন?"
+
+msgid "Unblock this number"
+msgstr "নম্বরটা আনব্লক করুন"
+
+msgid "Block this number"
+msgstr "নম্বরটা ব্লক করুন"
+
+msgid "Order #%s"
+msgstr "অর্ডার #%s"
+
+msgid "Phone number unblocked by %s."
+msgstr "%s ফোন নম্বরটা আনব্লক করেছেন।"
+
+msgid "Phone number blocked by %s."
+msgstr "%s ফোন নম্বরটা ব্লক করেছেন।"
+
+msgid "Blocked numbers"
+msgstr "ব্লক করা নম্বর"
+
+msgid "Numbers that sent fake orders or never took their parcel. Block them from an order with one tap (order screen or store dashboard), or type them here."
+msgstr "যেসব নম্বর থেকে ফেক অর্ডার এসেছে বা পার্সেল নেয়নি। অর্ডার থেকে এক চাপে ব্লক করুন (অর্ডারের পাতা বা স্টোর ড্যাশবোর্ড), অথবা এখানে লিখে দিন।"
+
+msgid "Use the blocked numbers list"
+msgstr "ব্লক করা নম্বরের তালিকা চালু"
+
+msgid "One number per line; anything after the number is your note. Numbers blocked from an order are kept separately and are not shown here."
+msgstr "প্রতি লাইনে একটা নম্বর; নম্বরের পরে যা লিখবেন সেটা আপনার নোট। অর্ডার থেকে ব্লক করা নম্বর আলাদা থাকে, এখানে দেখায় না।"
+
+msgid "What happens to a blocked number"
+msgstr "ব্লক করা নম্বরের ক্ষেত্রে কী হবে"
+
+msgid "\"Pay first\" needs bKash / Nagad / Rocket (Mobile payment) to be on; without it the order is refused."
+msgstr "\"আগে পেমেন্ট\"-এর জন্য bKash / Nagad / Rocket (মোবাইল পেমেন্ট) চালু থাকতে হবে; না থাকলে অর্ডার নেওয়া হবে না।"
+
+msgid "Refuse the order"
+msgstr "অর্ডার নেওয়া হবে না"
+
+msgid "Pay first: no cash on delivery"
+msgstr "আগে পেমেন্ট: ক্যাশ অন ডেলিভারি নয়"
+
+msgid "Message for a blocked number"
+msgstr "ব্লক করা নম্বরের জন্য মেসেজ"
+
+msgid "Pay first after many returns"
+msgstr "বারবার ফেরত দিলে আগে পেমেন্ট"
+
+msgid "Looks at this customer's earlier orders in your shop (completed against cancelled / failed / refunded) and the saved Courier check result, if you checked them. Nothing is asked from outside at checkout."
+msgstr "কাস্টমারের আগের অর্ডার দেখে (ডেলিভারি হয়েছে বনাম বাতিল / ব্যর্থ / রিফান্ড), আর আগে কুরিয়ার চেক করে থাকলে তার ফলাফলও। চেকআউটের সময় বাইরে কোথাও কিছু জিজ্ঞেস করা হয় না।"
+
+msgid "Ask customers with many returns to pay first"
+msgstr "বারবার ফেরত দেওয়া কাস্টমারকে আগে পেমেন্ট করতে বলুন"
+
+msgid "Cash on delivery is hidden for them; they pay with bKash / Nagad / Rocket (turn on Mobile payment, e.g. with \"Only the delivery charge\")."
+msgstr "তাদের জন্য ক্যাশ অন ডেলিভারি লুকানো থাকে; তারা bKash / Nagad / Rocket দিয়ে দেয় (মোবাইল পেমেন্ট চালু করুন, যেমন \"শুধু ডেলিভারি চার্জ\" দিয়ে)।"
+
+msgid "Only after this many finished orders"
+msgstr "অন্তত এতগুলো শেষ হওয়া অর্ডারের পর"
+
+msgid "New customers are never affected."
+msgstr "নতুন কাস্টমারের ক্ষেত্রে কখনো প্রযোজ্য নয়।"
+
+msgid "Success rate below"
+msgstr "সফলতার হার এর কম হলে"
+
+msgid "Delivered orders out of all finished ones. Example: 50 = more than half were not received."
+msgstr "শেষ হওয়া সব অর্ডারের মধ্যে কতগুলো ডেলিভারি হয়েছে। যেমন ৫০ = অর্ধেকের বেশি নেয়নি।"
+
+msgid "Message for the customer"
+msgstr "কাস্টমারের জন্য মেসেজ"
+
+msgid "Shown above the payment choices."
+msgstr "পেমেন্ট অপশনের উপরে দেখায়।"
+
+msgid "Never apply to admins / shop managers"
+msgstr "অ্যাডমিন / শপ ম্যানেজারের ক্ষেত্রে কখনো নয়"
+
+msgid "So you can still enter a phone order for any number."
+msgstr "যাতে আপনি যেকোনো নম্বরের ফোন অর্ডার নিজে বসাতে পারেন।"
+
+msgid "Refuse orders from numbers you blocked."
+msgstr "ব্লক করা নম্বরের অর্ডার নেওয়া হয় না।"
+
+msgid "No cash on delivery for customers who often refuse parcels."
+msgstr "যারা প্রায়ই পার্সেল নেয় না, তাদের জন্য ক্যাশ অন ডেলিভারি নয়।"
+
+msgid "Blocked numbers are turned off."
+msgstr "ব্লক করা নম্বরের ফিচার বন্ধ আছে।"
+
+msgid "Number blocked"
+msgstr "নম্বর ব্লক হয়েছে"
+
+msgid "Number unblocked"
+msgstr "নম্বর আনব্লক হয়েছে"
+
+msgid "%1$s charge (%2$s%%)"
+msgstr "%1$s চার্জ (%2$s%%)"
+
+msgid "Includes the cash-out charge of %s."
+msgstr "এর মধ্যে %s ক্যাশ-আউট চার্জ আছে।"
+
+msgid "bKash charge (%)"
+msgstr "bKash চার্জ (%)"
+
+msgid "Nagad charge (%)"
+msgstr "Nagad চার্জ (%)"
+
+msgid "Rocket charge (%)"
+msgstr "Rocket চার্জ (%)"
+
+msgid "Upay charge (%)"
+msgstr "Upay চার্জ (%)"
+
+msgid "Added to what the customer pays with bKash (the cash-out charge). 0 = no charge."
+msgstr "bKash দিয়ে দিলে কাস্টমারের টাকার সাথে যোগ হয় (ক্যাশ-আউট চার্জ)। ০ = কোনো চার্জ নেই।"
+
+msgid "Added to what the customer pays with Nagad (the cash-out charge). 0 = no charge."
+msgstr "Nagad দিয়ে দিলে কাস্টমারের টাকার সাথে যোগ হয় (ক্যাশ-আউট চার্জ)। ০ = কোনো চার্জ নেই।"
+
+msgid "Added to what the customer pays with Rocket (the cash-out charge). 0 = no charge."
+msgstr "Rocket দিয়ে দিলে কাস্টমারের টাকার সাথে যোগ হয় (ক্যাশ-আউট চার্জ)। ০ = কোনো চার্জ নেই।"
+
+msgid "Added to what the customer pays with Upay (the cash-out charge). 0 = no charge."
+msgstr "Upay দিয়ে দিলে কাস্টমারের টাকার সাথে যোগ হয় (ক্যাশ-আউট চার্জ)। ০ = কোনো চার্জ নেই।"
+
+msgid "\"Only the delivery charge\" stops most fake orders: the customer pays the delivery charge now (plus the wallet charge) and the rest in cash on delivery. The courier collect amount and labels use what is left, after you press \"Payment received\"."
+msgstr "\"শুধু ডেলিভারি চার্জ\" দিলে বেশিরভাগ ফেক অর্ডার বন্ধ হয়: কাস্টমার এখন ডেলিভারি চার্জ (সাথে ওয়ালেট চার্জ) দেয়, বাকিটা ক্যাশ অন ডেলিভারি। \"পেমেন্ট পেয়েছি\" চাপার পর কুরিয়ারের কালেক্ট অ্যামাউন্ট আর লেবেলে বাকি টাকাটাই যায়।"

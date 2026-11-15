@@ -92,6 +92,11 @@ check "Buy Now (kk_add buy=1) answers with the checkout address" 'grep -q "redir
 code=$(curl -s -o /dev/null -w "%{http_code}" "$URL/?wc-ajax=kk_add")
 check "kk_add refuses GET (405) → $code" '[ "$code" = 405 ]'
 check "live search REST answers" 'curl -s "$URL/?rest_route=/kenakata/v1/search&q=Saree" | grep -q "Saree"'
+wpc eval 'foreach ( array( array( "Hums Herbal Oil", "", "Nice box" ), array( "Zinc Cream 30g", "", "Use ms twice a day" ), array( "MS Contin 30 mg Tablet", "", "" ), array( "Acne Gel & Wash", "MS-100", "" ) ) as $d ) { $p = new WC_Product_Simple(); $p->set_name( $d[0] ); $p->set_regular_price( 100 ); $p->set_description( $d[2] ); if ( $d[1] ) { $p->set_sku( $d[1] ); } $p->save(); }' >/dev/null
+SR=$(curl -s "$URL/?rest_route=/kenakata/v1/search&q=ms" | php -r '$j = json_decode( stream_get_contents( STDIN ), true ); echo implode( "|", array_column( $j["items"], "name" ) );')
+check "live search: name that starts with the word comes first, then a word inside a name, SKU, description ($SR)" 'IFS="|" read -r a b <<< "$SR"; [ "$a" = "MS Contin 30 mg Tablet" ] && echo "$SR" | grep -q "Acne Gel & Wash" && echo "$SR" | grep -q "Zinc Cream" && [ "$(echo "$SR" | tr "|" "\n" | grep -n "Zinc Cream" | cut -d: -f1)" -gt "$(echo "$SR" | tr "|" "\n" | grep -n "Hums" | cut -d: -f1)" ]'
+SR2=$(curl -s "$URL/?rest_route=/kenakata/v1/search&q=contin%20mg" | php -r '$j = json_decode( stream_get_contents( STDIN ), true ); echo $j["items"][0]["name"] ?? "";')
+check "live search: every word counts, any order ($SR2)" '[ "$SR2" = "MS Contin 30 mg Tablet" ]'
 
 echo "== Admin"
 rm -f "$JAR"
@@ -339,8 +344,8 @@ check "wrong TrxID is refused at checkout" 'grep -q "\"result\":\"failure\"" /tm
 curl -s -o /tmp/body -b /tmp/c3 -c /tmp/c3 -X POST -d "$CO&kk_mp_trx=bk7x-9qw2lm" "$URL/?wc-ajax=checkout"
 check "order placed with bKash TrxID" 'grep -q "\"result\":\"success\"" /tmp/body'
 MPO=$(wpc eval '$o = wc_get_orders( array( "limit" => 1, "payment_method" => "kk_mobile_pay", "orderby" => "date", "order" => "DESC", "return" => "ids" ) ); echo $o ? $o[0] : 0;')
-minfo=$(wpc eval '$o = wc_get_order( '"$MPO"' ); echo $o->get_status(), "|", $o->get_meta( "_kk_mp_trx" ), "|", $o->get_meta( "_kk_mp_sender" ), "|", (float) $o->get_meta( "_kk_mp_amount" ), "|", $o->get_meta( "_kk_mp_shot" ) ? "shot" : "noshot", "|", kk_mp_to_collect( $o ) == $o->get_total() ? "full" : "less";')
-check "order waits On hold with TrxID, sender, delivery charge, screenshot; nothing deducted yet ($minfo)" '[ "$minfo" = "on-hold|BK79QW2LM|01812000222|60|shot|full" ] || [ "$minfo" = "on-hold|BK7X9QW2LM|01812000222|60|shot|full" ]'
+minfo=$(wpc eval '$o = wc_get_order( '"$MPO"' ); echo $o->get_status(), "|", $o->get_meta( "_kk_mp_trx" ), "|", $o->get_meta( "_kk_mp_sender" ), "|", (float) $o->get_meta( "_kk_mp_amount" ), "|", $o->get_meta( "_kk_mp_shot" ) ? "shot" : "noshot", "|", kk_mp_to_collect( $o ) == $o->get_total() ? "full" : "less", "|fee", kk_mp_order_fee( $o );')
+check "order waits On hold with TrxID, sender, delivery charge + bKash 1.85% charge (60+2), screenshot; nothing deducted yet ($minfo)" '[ "$minfo" = "on-hold|BK7X9QW2LM|01812000222|62|shot|full|fee2" ]'
 rm -f /tmp/c4; curl -s -o /dev/null -b /tmp/c4 -c /tmp/c4 -X POST -d "product_id=$PID&quantity=1" "$URL/?wc-ajax=kk_add"; curl -sL -o /tmp/body -b /tmp/c4 -c /tmp/c4 "$URL/?page_id=$(wpc option get woocommerce_checkout_page_id)"
 CN2=$(grep -oP 'name="woocommerce-process-checkout-nonce" value="\K[^"]+' /tmp/body | head -1)
 curl -s -o /tmp/body -b /tmp/c4 -c /tmp/c4 -X POST -d "${CO%%woocommerce-process*}woocommerce-process-checkout-nonce=$CN2&kk_mp_trx=BK7X9QW2LM" "$URL/?wc-ajax=checkout"
@@ -355,7 +360,7 @@ code=$(curl -s -o /tmp/shot.out -w "%{http_code}" -b "$JAR" "$SURL")
 check "staff can open the screenshot ($code)" '[ "$code" = 200 ] && file /tmp/shot.out | grep -q PNG'
 curl -s -o /tmp/body -b "$JAR" -H "X-WP-Nonce: $RN" -H "Content-Type: application/json" -X POST -d '{"decision":"yes"}' "$URL/?rest_route=/kenakata/v1/sd/orders/$MPO/mpay"
 dinfo=$(wpc eval '$o = wc_get_order( '"$MPO"' ); echo $o->get_status(), "|", (float) kk_mp_to_collect( $o ), "|", (float) $o->get_total(), "|", function_exists( "kk_courier_defaults" ) || ( function_exists( "kk_courier_load" ) && ( kk_courier_load() || true ) ) ? kk_courier_defaults( $o )["cod_amount"] : "x";')
-check "Payment received → Processing, courier collects the rest ($dinfo)" 'IFS="|" read st col tot cod <<< "$dinfo"; [ "$st" = processing ] && [ "$(php -r "echo $tot - 60 == $col && $col == $cod ? 1 : 0;")" = 1 ]'
+check "Payment received → Processing, courier collects the rest ($dinfo)" 'IFS="|" read st col tot cod <<< "$dinfo"; [ "$st" = processing ] && [ "$(php -r "echo $tot - 62 == $col && $col == $cod ? 1 : 0;")" = 1 ]'
 wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["mp_enable"] = 0; kk_update_settings( $s );'
 curl -s -o /dev/null -b /tmp/c4 -c /tmp/c4 -X POST -d "product_id=$PID&quantity=1" "$URL/?wc-ajax=kk_add"; curl -sL -o /tmp/body -b /tmp/c4 "$URL/?page_id=$(wpc option get woocommerce_checkout_page_id)"
 check "switched off → not offered at checkout" '! grep -q "payment_method_kk_mobile_pay" /tmp/body && clean /tmp/body'
@@ -380,6 +385,36 @@ check "takeover on: body class, script told, no PHP errors" 'grep -q "kk-drawer-
 wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["cart_drawer_takeover"] = 0; kk_update_settings( $s );'
 curl -sL -o /tmp/body "$URL/?page_id=$CARDS"
 check "takeover off: header carts left alone" '! grep -q "kk-drawer-take" /tmp/body'
+
+echo "== 3.17: fake-order shield (blocked numbers, pay first after many returns)"
+wpc option update woocommerce_cod_settings '{"enabled":"yes","title":"Cash on delivery"}' --format=json >/dev/null
+wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["mp_enable"] = 1; $s["mp_bkash_number"] = "01728366779"; $s["mp_amount"] = "delivery"; $s["gd_risk_enable"] = 1; $s["gd_risk_min"] = 2; $s["gd_risk_rate"] = 50; $s["gd_blacklist_enable"] = 1; $s["gd_blacklist_action"] = "block"; $s["gd_skip_staff"] = 1; $s["co_throttle_enable"] = 0; kk_update_settings( $s ); foreach ( array( "cancelled", "failed", "completed" ) as $st ) { $o = wc_create_order(); $o->set_billing_phone( "01712000333" ); $o->set_status( $st ); $o->save(); }'
+risk=$(wpc eval 'echo implode( "|", kk_shield_verdict( "01712000333" ) ) === "" ? "none" : kk_shield_verdict( "01712000333" )[0], "/", kk_shield_verdict( "01799000444" )[0] === "" ? "fine" : "x";')
+check "2 of 3 orders not received → pay first; a new customer is fine ($risk)" '[ "$risk" = "advance/fine" ]'
+rm -f /tmp/c5; curl -s -o /dev/null -b /tmp/c5 -c /tmp/c5 -X POST -d "product_id=$PID&quantity=1" "$URL/?wc-ajax=kk_add"
+curl -sL -o /tmp/body -b /tmp/c5 -c /tmp/c5 "$URL/?page_id=$(wpc option get woocommerce_checkout_page_id)"
+CN5=$(grep -oP 'name="woocommerce-process-checkout-nonce" value="\K[^"]+' /tmp/body | head -1)
+UN=$(grep -oP '"update_order_review_nonce":"\K[^"]+' /tmp/body | head -1)
+curl -s -o /tmp/body -b /tmp/c5 -c /tmp/c5 -X POST --data-urlencode "security=$UN" --data-urlencode "post_data=billing_phone=01712000333&billing_first_name=Risky" "$URL/?wc-ajax=update_order_review"
+check "risky phone: cash on delivery hidden, bKash shown, note shown" '! grep -q "payment_method_cod" /tmp/body && grep -q "payment_method_kk_mobile_pay" /tmp/body && grep -q "kk-shield-note" /tmp/body'
+curl -s -o /tmp/body -b /tmp/c5 -c /tmp/c5 -X POST --data-urlencode "security=$UN" --data-urlencode "post_data=billing_phone=01799000444&billing_first_name=Good" "$URL/?wc-ajax=update_order_review"
+check "good phone: cash on delivery offered" 'grep -q "payment_method_cod" /tmp/body'
+SM5=$(wpc eval 'foreach ( WC_Shipping_Zones::get_zone( 0 )->get_shipping_methods( true ) as $m ) { echo $m->get_rate_id(); break; }')
+CO5="billing_first_name=Risky&billing_last_name=R&billing_address_1=Road+1&billing_city=Dhaka&billing_state=BD-13&billing_country=BD&shipping_method%5B0%5D=$SM5&billing_delivery_area=$SM5&terms=1&woocommerce-process-checkout-nonce=$CN5"
+curl -s -o /tmp/body -b /tmp/c5 -c /tmp/c5 -X POST -d "$CO5&billing_phone=01712000333&payment_method=cod" "$URL/?wc-ajax=checkout"
+check "risky phone cannot place a cash on delivery order (even sent by hand)" 'grep -q "\"result\":\"failure\"" /tmp/body && grep -q "earlier orders\|Invalid payment method" /tmp/body'
+BLO=$(wpc eval '$o = wc_create_order(); $o->set_billing_phone( "01711000555" ); $o->set_status( "processing" ); $o->save(); echo $o->get_id();')
+curl -s -o /tmp/body -b "$JAR" -H "X-WP-Nonce: $RN" -H "Content-Type: application/json" -X POST -d '{}' "$URL/?rest_route=/kenakata/v1/sd/orders/$BLO/block"
+check "store dashboard: block this number" 'grep -q "\"blocked\":true" /tmp/body && [ "$(wpc eval "echo kk_is_blacklisted( \"+8801711000555\" ) ? 1 : 0;")" = 1 ]'
+curl -s -o /tmp/body -b /tmp/c5 -c /tmp/c5 -X POST -d "$CO5&billing_phone=01711000555&payment_method=cod" "$URL/?wc-ajax=checkout"
+check "blocked number is refused at checkout" 'grep -q "\"result\":\"failure\"" /tmp/body && grep -q "cannot take orders from this number" /tmp/body'
+curl -s -o /tmp/body -b "$JAR" -H "X-WP-Nonce: $RN" -H "Content-Type: application/json" -X POST -d '{"remove":true}' "$URL/?rest_route=/kenakata/v1/sd/orders/$BLO/block"
+check "unblock works" 'grep -q "\"blocked\":false" /tmp/body'
+wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["gd_blacklist_text"] = "01711000666 sent 3 fake orders"; kk_update_settings( $s );'
+check "numbers typed in the settings are blocked too" '[ "$(wpc eval "echo kk_is_blacklisted( \"01711000666\" ) ? 1 : 0;")" = 1 ]'
+wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["gd_risk_enable"] = 0; $s["gd_blacklist_enable"] = 0; $s["mp_enable"] = 0; kk_update_settings( $s );'
+curl -s -o /tmp/body -b /tmp/c5 -c /tmp/c5 -X POST --data-urlencode "security=$UN" --data-urlencode "post_data=billing_phone=01712000333" "$URL/?wc-ajax=update_order_review"
+check "switched off → cash on delivery for everyone" 'grep -q "payment_method_cod" /tmp/body'
 
 echo "== Bots"
 wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["speed_robots_shop"] = 1; $s["speed_bot_block"] = 1; $s["speed_ai_block"] = 1; kk_update_settings( $s );'

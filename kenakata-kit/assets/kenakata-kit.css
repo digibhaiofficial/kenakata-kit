@@ -421,6 +421,9 @@ body a.kk-cart:focus-visible { outline: 3px solid var(--kk-primary); outline-off
 .kk-cart__total { font-size: 15px; font-weight: 700; }
 .kk-drawer { position: fixed; inset: 0; z-index: 99998; }
 .kk-drawer[hidden] { display: none; }
+/* Logged-in staff: the WordPress admin bar stays visible above the side cart. */
+.admin-bar .kk-drawer:not(.kk-drawer--preview) { top: 32px; }
+@media (max-width: 782px) { .admin-bar .kk-drawer:not(.kk-drawer--preview) { top: 46px; } }
 .kk-drawer__backdrop { position: absolute; inset: 0; background: rgba(16, 23, 20, .5); opacity: 0; transition: opacity .25s; }
 .kk-drawer__panel { position: absolute; top: 0; right: 0; bottom: 0; display: flex; flex-direction: column; width: min(var(--kk-drawer-w, 420px), 92vw); background: #fff; font-family: var(--kk-font); transform: translateX(100%); transition: transform .25s ease; box-shadow: -16px 0 40px -20px rgba(16, 23, 20, .5); }
 .kk-drawer.is-open .kk-drawer__backdrop { opacity: 1; }

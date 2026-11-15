@@ -250,6 +250,14 @@ function check(name, ok, info) { if (ok) { pass++; console.log('  ✓ ' + name);
   await waitFor(`return [...document.querySelectorAll('.sd-card h2, .sd-card h3')].some(x=>/bKash · received/.test(x.textContent))`);
   check('payment received → order moves on', (await ev(`return document.querySelector('.sd-badge').textContent`)) === 'Processing');
 
+  console.log('Block a number');
+  await hash('#/orders/903');
+  await waitFor(`return [...document.querySelectorAll('.sd-btn')].some(b=>b.textContent==='Block this number')`);
+  dialogAnswer = true;
+  await ev(`[...document.querySelectorAll('.sd-btn')].find(b=>b.textContent==='Block this number').click();return 1`);
+  await waitFor(`return document.querySelector('.sd-danger-text')`);
+  check('number blocked from the order', (await ev(`return [...document.querySelectorAll('.sd-btn')].some(b=>b.textContent==='Unblock this number')`)) === true);
+
   console.log('Sales report periods');
   await hash('#/');
   await waitFor(`return document.querySelector('.sd-insight, .sd-insights, [class*=insight]')`);

@@ -44,6 +44,22 @@ function kk_update_latest( $force = false ) {
 			);
 		}
 	}
+	if ( ! $info['v'] ) {
+		// GitHub's API allows only 60 questions an hour per server address, and on shared hosting many sites share
+		// one address, so it often says no. The normal release page is not limited that way: its "latest" address
+		// redirects to the newest tag, and the zip's address follows from the tag.
+		$page = wp_remote_head( 'https://github.com/' . KK_GH_REPO . '/releases/latest', array( 'timeout' => 8, 'redirection' => 0, 'headers' => array( 'User-Agent' => 'Kenakata-Kit/' . KK_VERSION ) ) );
+		$loc  = is_wp_error( $page ) ? '' : (string) wp_remote_retrieve_header( $page, 'location' );
+		if ( preg_match( '#/releases/tag/(v?(\d+\.\d+(?:\.\d+)?))$#', $loc, $m ) ) {
+			$info = array(
+				'v'         => $m[2],
+				'zip'       => 'https://github.com/' . KK_GH_REPO . '/releases/download/' . $m[1] . '/kenakata-kit-' . $m[2] . '.zip',
+				'url'       => 'https://github.com/' . KK_GH_REPO . '/releases/tag/' . $m[1],
+				'notes'     => '',
+				'published' => '',
+			);
+		}
+	}
 	set_site_transient( 'kk_update_latest', $info, ( $info['v'] ? 6 : 1 ) * HOUR_IN_SECONDS );
 	return $info['v'] ? $info : null;
 }

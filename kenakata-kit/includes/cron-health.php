@@ -7,14 +7,15 @@
 
 defined( 'ABSPATH' ) || exit;
 
-add_filter( 'cron_schedules', function ( $schedules ) {
-	$schedules['kk_5min'] = array( 'interval' => 5 * MINUTE_IN_SECONDS, 'display' => 'Every 5 minutes (Kenakata Kit health check)' );
-	return $schedules;
-} );
-
+// Health check of WP-Cron: once an hour is enough (a 5-minute event made WordPress call itself every 5 minutes).
 add_action( 'init', function () {
-	if ( ! wp_next_scheduled( 'kk_cron_heartbeat' ) ) {
-		wp_schedule_event( time() + MINUTE_IN_SECONDS, 'kk_5min', 'kk_cron_heartbeat' );
+	$next = wp_get_scheduled_event( 'kk_cron_heartbeat' );
+	if ( $next && 'hourly' !== $next->schedule ) {
+		wp_clear_scheduled_hook( 'kk_cron_heartbeat' ); // older versions: every 5 minutes
+		$next = false;
+	}
+	if ( ! $next ) {
+		wp_schedule_event( time() + MINUTE_IN_SECONDS, 'hourly', 'kk_cron_heartbeat' );
 	}
 } );
 
@@ -40,7 +41,7 @@ function kk_cron_status() {
 		'minutes_since_last' => $last ? (int) floor( ( $now - $last ) / 60 ) : null,
 		'overdue_tasks'      => $overdue,
 		'oldest_overdue'     => $oldest ? gmdate( 'c', $oldest ) : null,
-		'healthy'            => $last && ( $now - $last ) < 20 * MINUTE_IN_SECONDS,
+		'healthy'            => $last && ( $now - $last ) < 90 * MINUTE_IN_SECONDS,
 	);
 }
 
@@ -52,4 +53,13 @@ add_action( 'rest_api_init', function () {
 			return array( 'version' => KK_VERSION, 'cron' => kk_cron_status() );
 		},
 	) );
+} );
+
+// 3.12: two small options that are read on every request are now autoloaded (one query less each, per page).
+add_action( 'admin_init', function () {
+	if ( '312' === get_option( 'kk_autoload_fix' ) || ! function_exists( 'wp_set_option_autoload_values' ) ) {
+		return;
+	}
+	wp_set_option_autoload_values( array( 'kk_sd_role_version' => true, 'kk_license_revoked' => true ) );
+	update_option( 'kk_autoload_fix', '312', true );
 } );

@@ -38,6 +38,7 @@ function kk_incomplete_install() {
 		city varchar(100) NOT NULL DEFAULT '',
 		cart longtext NULL,
 		cart_total decimal(14,2) NOT NULL DEFAULT 0,
+		ship varchar(255) NOT NULL DEFAULT '',
 		status varchar(12) NOT NULL DEFAULT 'open',
 		order_id bigint(20) unsigned NOT NULL DEFAULT 0,
 		note text NULL,
@@ -48,13 +49,18 @@ function kk_incomplete_install() {
 		KEY status_updated (status,updated),
 		KEY phone (phone)
 	) {$charset};" );
-	update_option( 'kk_incomplete_db', '1', true );
+	update_option( 'kk_incomplete_db', '2', true );
+}
+
+/** The table exists (any version). */
+function kk_incomplete_db_ready() {
+	return in_array( get_option( 'kk_incomplete_db' ), array( '1', '2' ), true );
 }
 
 add_action( 'init', function () {
 	if ( kk_incomplete_enabled() ) {
-		if ( '1' !== get_option( 'kk_incomplete_db' ) ) {
-			kk_incomplete_install();
+		if ( '2' !== get_option( 'kk_incomplete_db' ) ) {
+			kk_incomplete_install(); // 2: + delivery charge column (dbDelta adds it to an existing table)
 		}
 		if ( ! wp_next_scheduled( 'kk_incomplete_cleanup' ) ) {
 			wp_schedule_event( time() + HOUR_IN_SECONDS, 'daily', 'kk_incomplete_cleanup' );
@@ -66,7 +72,7 @@ add_action( 'kk_incomplete_cleanup', 'kk_incomplete_cleanup' );
 /** Delete old rows: anything untouched for the keep-days setting, and finished (recovered / dismissed) rows after a week. */
 function kk_incomplete_cleanup() {
 	global $wpdb;
-	if ( '1' !== get_option( 'kk_incomplete_db' ) ) {
+	if ( ! kk_incomplete_db_ready() ) {
 		return;
 	}
 	$t    = kk_incomplete_table();
@@ -86,7 +92,7 @@ add_action( 'wp_enqueue_scripts', function () {
 	if ( current_user_can( 'edit_shop_orders' ) ) {
 		return; // the team testing the checkout must not fill the list
 	}
-	wp_enqueue_script( 'kenakata-kit-incomplete', KK_URL . 'assets/kenakata-kit-incomplete.js', array(), KK_VERSION, true );
+	wp_enqueue_script( 'kenakata-kit-incomplete', kk_asset( 'kenakata-kit-incomplete.js' ), array(), KK_VERSION, true );
 	wp_add_inline_script( 'kenakata-kit-incomplete', 'window.kkIC=' . wp_json_encode( array( 'url' => esc_url_raw( rest_url( 'kenakata/v1/incomplete' ) ) ) ) . ';', 'before' );
 } );
 
@@ -96,7 +102,8 @@ add_action( 'wp_enqueue_scripts', function () {
 
 /** Best guess of the visitor's address, only used to limit how fast one visitor can write. */
 function kk_incomplete_visitor_key() {
-	$ip = class_exists( 'WC_Geolocation' ) ? WC_Geolocation::get_ip_address() : ( isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '' );
+	// kk_client_ip() ignores X-Forwarded-For (anyone can send it), so the limit cannot be dodged with a fake header.
+	$ip = function_exists( 'kk_client_ip' ) ? kk_client_ip() : ( isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '' );
 	return 'kk_ic_rl_' . md5( (string) $ip );
 }
 
@@ -123,7 +130,22 @@ function kk_incomplete_cart_snapshot() {
 			'total' => round( (float) ( $row['line_total'] ?? 0 ), 2 ),
 		);
 	}
-	return array( 'items' => $items, 'total' => round( (float) $cart->get_total( 'edit' ), 2 ) );
+	// The delivery charge the customer saw (chosen delivery area), so "Make order" can add the same charge.
+	$ship = array();
+	if ( WC()->session && $cart->needs_shipping() ) {
+		$chosen = (array) WC()->session->get( 'chosen_shipping_methods', array() );
+		$id     = isset( $chosen[0] ) ? (string) $chosen[0] : '';
+		$title  = '';
+		foreach ( (array) WC()->shipping()->get_packages() as $pkg ) {
+			if ( $id && isset( $pkg['rates'][ $id ] ) ) {
+				$title = wp_strip_all_tags( $pkg['rates'][ $id ]->get_label() );
+			}
+		}
+		if ( '' !== $id ) {
+			$ship = array( 'id' => kk_incomplete_clip( $id, 60 ), 'title' => kk_incomplete_clip( $title, 100 ), 'cost' => round( (float) $cart->get_shipping_total(), 2 ) );
+		}
+	}
+	return array( 'items' => $items, 'total' => round( (float) $cart->get_total( 'edit' ), 2 ), 'ship' => $ship );
 }
 
 function kk_incomplete_clip( $s, $n ) {
@@ -165,6 +187,9 @@ function kk_incomplete_rest_capture( WP_REST_Request $req ) {
 		'cart'       => wp_json_encode( $cart['items'] ),
 		'cart_total' => $cart['total'],
 	);
+	if ( '2' === get_option( 'kk_incomplete_db' ) ) {
+		$row['ship'] = $cart['ship'] ? (string) wp_json_encode( $cart['ship'] ) : '';
+	}
 	$t     = kk_incomplete_table();
 	$now   = gmdate( 'Y-m-d H:i:s' );
 	$token = isset( $p['token'] ) && preg_match( '/^[a-f0-9]{32}$/', (string) $p['token'] ) ? (string) $p['token'] : '';
@@ -173,8 +198,19 @@ function kk_incomplete_rest_capture( WP_REST_Request $req ) {
 		$found = $wpdb->get_row( $wpdb->prepare( "SELECT id, status, token FROM {$t} WHERE token = %s", $token ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 	}
 	if ( ! $found ) {
-		// Cleared browser data: the same phone within a day is still the same checkout.
-		$found = $wpdb->get_row( $wpdb->prepare( "SELECT id, status, token FROM {$t} WHERE phone = %s AND status IN ('open','called') AND updated > %s ORDER BY updated DESC LIMIT 1", $phone, gmdate( 'Y-m-d H:i:s', time() - DAY_IN_SECONDS ) ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// Cleared browser data: the same phone within a day is still the same checkout. Anyone can type any phone
+		// number, so here we only fill in what is still empty, and the row's token is never handed out.
+		$same = $wpdb->get_row( $wpdb->prepare( "SELECT id, status, name, email, address, city FROM {$t} WHERE phone = %s AND status IN ('open','called') AND updated > %s ORDER BY updated DESC LIMIT 1", $phone, gmdate( 'Y-m-d H:i:s', time() - DAY_IN_SECONDS ) ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		if ( $same ) {
+			$fill = array( 'updated' => $now );
+			foreach ( array( 'name', 'email', 'address', 'city' ) as $k ) {
+				if ( '' === (string) $same->$k && '' !== $row[ $k ] ) {
+					$fill[ $k ] = $row[ $k ];
+				}
+			}
+			$wpdb->update( $t, $fill, array( 'id' => (int) $same->id ) );
+			return array( 'ok' => true, 'token' => '' );
+		}
 	}
 	if ( $found && 'dismissed' === $found->status ) {
 		return array( 'ok' => true, 'token' => (string) $found->token ); // the shop dismissed it: do not bring it back
@@ -228,7 +264,7 @@ function kk_incomplete_wait() {
 /** How many open checkouts are waiting for a call (cached with the dashboard summary). */
 function kk_incomplete_count_open() {
 	global $wpdb;
-	if ( ! kk_incomplete_enabled() || '1' !== get_option( 'kk_incomplete_db' ) ) {
+	if ( ! kk_incomplete_enabled() || ! kk_incomplete_db_ready() ) {
 		return 0;
 	}
 	$t = kk_incomplete_table();
@@ -344,27 +380,29 @@ function kk_incomplete_rest_order( WP_REST_Request $req ) {
 		return new WP_Error( 'kk_incomplete_done', __( 'An order was already made from this.', 'kenakata-kit' ), array( 'status' => 409 ) );
 	}
 	$lock = 'kk_ic_mk_' . (int) $row->id;
-	if ( get_transient( $lock ) ) {
+	if ( ! kk_lock( $lock, 30 ) ) {
 		return new WP_Error( 'kk_incomplete_busy', __( 'This order is being created right now. Please wait a few seconds.', 'kenakata-kit' ), array( 'status' => 409 ) );
 	}
-	set_transient( $lock, 1, 30 );
 	$items = json_decode( (string) $row->cart, true );
 	$order = wc_create_order( array( 'status' => 'pending' ) );
 	if ( is_wp_error( $order ) ) {
-		delete_transient( $lock );
+		kk_unlock( $lock );
 		return $order;
 	}
 	$added = 0;
 	foreach ( is_array( $items ) ? $items : array() as $it ) {
 		$product = wc_get_product( ! empty( $it['vid'] ) ? (int) $it['vid'] : (int) ( $it['pid'] ?? 0 ) );
 		if ( $product && 'publish' === $product->get_status() && $product->is_purchasable() ) {
-			$order->add_product( $product, max( 1, (int) ( $it['qty'] ?? 1 ) ) );
+			$qty  = max( 1, (int) ( $it['qty'] ?? 1 ) );
+			$line = isset( $it['total'] ) && (float) $it['total'] > 0 ? (float) $it['total'] : null;
+			// The price the customer saw in the cart (with any discount), not today's price.
+			$order->add_product( $product, $qty, null === $line ? array() : array( 'subtotal' => $line, 'total' => $line ) );
 			$added++;
 		}
 	}
 	if ( 0 === $added ) {
 		$order->delete( true );
-		delete_transient( $lock );
+		kk_unlock( $lock );
 		return new WP_Error( 'kk_incomplete_nostock', __( 'None of these products can be ordered any more.', 'kenakata-kit' ), array( 'status' => 422 ) );
 	}
 	$parts = preg_split( '/\s+/', trim( (string) $row->name ), 2 );
@@ -377,6 +415,16 @@ function kk_incomplete_rest_order( WP_REST_Request $req ) {
 		'city'       => (string) $row->city,
 		'country'    => function_exists( 'WC' ) && WC()->countries ? WC()->countries->get_base_country() : 'BD',
 	), 'billing' );
+	$ship = isset( $row->ship ) ? json_decode( (string) $row->ship, true ) : null;
+	if ( is_array( $ship ) && isset( $ship['cost'] ) ) {
+		$si = new WC_Order_Item_Shipping();
+		$si->set_method_title( ! empty( $ship['title'] ) ? (string) $ship['title'] : __( 'Delivery charge', 'kenakata-kit' ) );
+		$parts_id = explode( ':', (string) ( $ship['id'] ?? '' ) );
+		$si->set_method_id( sanitize_key( $parts_id[0] ) );
+		$si->set_instance_id( isset( $parts_id[1] ) ? absint( $parts_id[1] ) : 0 );
+		$si->set_total( wc_format_decimal( max( 0, (float) $ship['cost'] ) ) );
+		$order->add_item( $si );
+	}
 	$order->set_payment_method( 'cod' );
 	$order->set_payment_method_title( __( 'Cash on delivery', 'kenakata-kit' ) );
 	$order->calculate_totals();
@@ -386,7 +434,7 @@ function kk_incomplete_rest_order( WP_REST_Request $req ) {
 	$order->update_status( 'processing' );
 	$order->save();
 	$wpdb->update( kk_incomplete_table(), array( 'status' => 'recovered', 'order_id' => $order->get_id(), 'updated' => gmdate( 'Y-m-d H:i:s' ) ), array( 'id' => (int) $row->id ) );
-	delete_transient( $lock );
+	kk_unlock( $lock );
 	if ( function_exists( 'kk_sd_flush_summary' ) ) {
 		kk_sd_flush_summary();
 	}
@@ -440,7 +488,7 @@ add_action( 'admin_menu', function () {
 } );
 
 /* =========================================================================
- * Privacy: policy text, export and erase (by email)
+ * Privacy: policy text, export and erase (by email, and the phone numbers that email used)
  * ====================================================================== */
 
 add_action( 'admin_init', function () {
@@ -448,13 +496,36 @@ add_action( 'admin_init', function () {
 		wp_add_privacy_policy_content( 'Kenakata Kit', wp_kses_post( '<p>' . __( 'When a visitor types a phone number on the checkout page, the shop may keep the name, phone number, email, address and cart so that the shop can contact them about the unfinished order. These details are removed automatically after the number of days set by the shop, or when asked.', 'kenakata-kit' ) . '</p>' ) );
 	}
 } );
+/**
+ * WordPress privacy requests come by email, but most rows here have only a phone number: also match the phone
+ * saved on that customer's account and on their orders.
+ */
+function kk_incomplete_privacy_where( $email ) {
+	global $wpdb;
+	$phones = array();
+	$user   = get_user_by( 'email', $email );
+	if ( $user ) {
+		$phones[] = kk_normalize_phone( (string) get_user_meta( $user->ID, 'billing_phone', true ) );
+	}
+	foreach ( wc_get_orders( array( 'billing_email' => $email, 'limit' => 20, 'return' => 'objects' ) ) as $o ) {
+		$phones[] = kk_normalize_phone( (string) $o->get_billing_phone() );
+	}
+	$phones = array_values( array_unique( array_filter( $phones ) ) );
+	$sql    = $wpdb->prepare( 'email = %s', $email );
+	foreach ( $phones as $ph ) {
+		$sql .= $wpdb->prepare( ' OR phone = %s', $ph );
+	}
+	return '(' . $sql . ')';
+}
+
 add_filter( 'wp_privacy_personal_data_exporters', function ( $e ) {
 	$e['kenakata-kit-incomplete'] = array( 'exporter_friendly_name' => __( 'Incomplete checkouts', 'kenakata-kit' ), 'callback' => function ( $email ) {
 		global $wpdb;
 		$out = array();
-		if ( '1' === get_option( 'kk_incomplete_db' ) && is_email( $email ) ) {
+		if ( kk_incomplete_db_ready() && is_email( $email ) ) {
 			$t = kk_incomplete_table();
-			foreach ( (array) $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$t} WHERE email = %s", $email ) ) as $r ) { // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$where = kk_incomplete_privacy_where( $email );
+			foreach ( (array) $wpdb->get_results( "SELECT * FROM {$t} WHERE {$where}" ) as $r ) { // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $where is prepared
 				$out[] = array( 'group_id' => 'kk-incomplete', 'group_label' => __( 'Incomplete checkouts', 'kenakata-kit' ), 'item_id' => 'kk-incomplete-' . $r->id, 'data' => array(
 					array( 'name' => __( 'Name', 'kenakata-kit' ), 'value' => $r->name ),
 					array( 'name' => __( 'Phone', 'kenakata-kit' ), 'value' => $r->phone ),
@@ -471,8 +542,10 @@ add_filter( 'wp_privacy_personal_data_erasers', function ( $e ) {
 	$e['kenakata-kit-incomplete'] = array( 'eraser_friendly_name' => __( 'Incomplete checkouts', 'kenakata-kit' ), 'callback' => function ( $email ) {
 		global $wpdb;
 		$n = 0;
-		if ( '1' === get_option( 'kk_incomplete_db' ) && is_email( $email ) ) {
-			$n = (int) $wpdb->delete( kk_incomplete_table(), array( 'email' => $email ) );
+		if ( kk_incomplete_db_ready() && is_email( $email ) ) {
+			$t     = kk_incomplete_table();
+			$where = kk_incomplete_privacy_where( $email );
+			$n     = (int) $wpdb->query( "DELETE FROM {$t} WHERE {$where}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $where is prepared
 		}
 		return array( 'items_removed' => $n > 0, 'items_retained' => false, 'messages' => array(), 'done' => true );
 	} );

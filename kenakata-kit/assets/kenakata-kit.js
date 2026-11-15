@@ -184,13 +184,16 @@
 		document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !panel.hidden) close(); });
 	}
 
+	/** Bengali digits ০-৯ to 0-9 (customers often type their number with a Bengali keyboard). */
+	function enDigits(v) { return String(v).replace(/[\u09E6-\u09EF]/g, function (c) { return String(c.charCodeAt(0) - 0x09E6); }); }
+
 	/* ------------------------------------------------------------------
 	 * Phone inputs (11-digit mode): digits only, max 11, live hint
 	 * ---------------------------------------------------------------- */
 	document.addEventListener('input', function (e) {
 		var el = e.target;
 		if (!el.matches || !el.matches('input[data-kk-phone="bd11"]')) return;
-		var digits = el.value.replace(/\D+/g, '').slice(0, 11);
+		var digits = enDigits(el.value).replace(/\D+/g, '').slice(0, 11);
 		if (el.value !== digits) el.value = digits;
 		var ok = /^01[3-9]\d{8}$/.test(digits);
 		el.setCustomValidity(digits.length && !ok ? (D.i18n.phone11 || 'Please enter an 11-digit mobile number, e.g. 01712345678.') : '');
@@ -256,21 +259,52 @@
 			if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
 			else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
 		});
+		// Cloudflare Turnstile: its script loads only when the popup is opened (not on every page view).
+		var tsLoaded = false;
+		function loadTurnstile() {
+			if (tsLoaded || !window.kkAuth.ts) return;
+			tsLoaded = true;
+			window.kkTsReady = function () {
+				modal.querySelectorAll('[data-kk-ts]').forEach(function (el) {
+					el.setAttribute('data-ts-id', window.turnstile.render(el, { sitekey: window.kkAuth.ts, size: 'flexible' }));
+				});
+			};
+			var sc = document.createElement('script');
+			sc.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=kkTsReady';
+			sc.async = true; sc.defer = true;
+			document.head.appendChild(sc);
+		}
+		new MutationObserver(function () { if (!modal.hidden) loadTurnstile(); }).observe(modal, { attributes: true, attributeFilter: ['hidden'] });
 		modal.querySelectorAll('.kk-auth-form').forEach(function (form) {
 			form.addEventListener('submit', function (e) {
 				e.preventDefault();
 				var msg = form.querySelector('.kk-form-msg');
 				var btn = form.querySelector('button[type=submit]');
-				var body = new FormData(form);
-				body.append('action', form.getAttribute('data-action'));
-				body.append('nonce', window.kkAuth.nonce);
+				function send() {
+					var body = new FormData(form);
+					body.append('action', form.getAttribute('data-action'));
+					body.append('nonce', window.kkAuth.nonce);
+					return fetch(D.ajax, { method: 'POST', body: body, credentials: 'same-origin' });
+				}
 				msg.textContent = ''; msg.classList.remove('is-ok');
 				btn.disabled = true; btn.classList.add('is-loading');
-				fetch(D.ajax, { method: 'POST', body: body, credentials: 'same-origin' })
+				send()
+					.then(function (r) {
+						if (r.status !== 403) return r;
+						// The page came from a cache and its security code is too old: get a fresh one and try once more.
+						var b = new FormData(); b.append('action', 'kk_auth_nonce');
+						return fetch(D.ajax, { method: 'POST', body: b, credentials: 'same-origin' })
+							.then(function (n) { return n.json(); })
+							.then(function (n) { if (n && n.success) window.kkAuth.nonce = n.data.nonce; return send(); });
+					})
 					.then(function (r) { return r.json(); })
 					.then(function (res) {
 						if (res && res.success) { msg.classList.add('is-ok'); msg.textContent = T('success'); window.location.reload(); }
-						else { msg.textContent = (res && res.data && res.data.message) || T('failed'); btn.disabled = false; }
+						else {
+							msg.textContent = (res && res.data && res.data.message) || T('failed'); btn.disabled = false;
+							var ts = form.querySelector('[data-ts-id]'); // a Turnstile answer works once: get a new one
+							if (ts && window.turnstile) window.turnstile.reset(ts.getAttribute('data-ts-id'));
+						}
 					})
 					.catch(function () { msg.textContent = T('network'); btn.disabled = false; })
 					.then(function () { btn.classList.remove('is-loading'); });

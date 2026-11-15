@@ -27,13 +27,17 @@ function kk_courier_providers() {
 			'secrets' => array( 'courier_pathao_client_id', 'courier_pathao_client_secret', 'courier_pathao_username', 'courier_pathao_password' ),
 			'options' => array( 'courier_pathao_store_id' ), // plain settings this courier also needs
 		),
+		'redx'      => array(
+			'label'   => 'RedX',
+			'secrets' => array( 'courier_redx_token' ),
+		),
 	) );
 }
 
 /** Is this status one where the courier cancelled the parcel (so the order may be sent again)? */
 function kk_courier_is_cancelled( $provider, $status ) {
 	$status = strtolower( str_replace( '-', '_', (string) $status ) );
-	$list   = array( 'steadfast' => array( 'cancelled' ), 'pathao' => array( 'cancelled', 'pickup_cancelled' ) );
+	$list   = array( 'steadfast' => array( 'cancelled' ), 'pathao' => array( 'cancelled', 'pickup_cancelled' ), 'redx' => array( 'cancelled', 'pickup_cancelled', 'rejected' ) );
 	return isset( $list[ $provider ] ) && in_array( $status, $list[ $provider ], true );
 }
 
@@ -78,7 +82,9 @@ function kk_courier_secret( $key ) {
 
 /** Save one credential. Empty input keeps the saved one. Not autoloaded, never part of the settings export. */
 function kk_courier_save_secret( $key, $value ) {
-	$value = trim( sanitize_text_field( (string) $value ) );
+	// Not sanitize_text_field(): it removes things like "%ab" or "<" that can be part of a real password or API key.
+	// The value is stored only, never printed (the admin shows the last 4 characters, escaped).
+	$value = trim( preg_replace( '/[\x00-\x1F\x7F]/', '', wp_check_invalid_utf8( (string) $value ) ) );
 	if ( '' === $value || ! kk_courier_is_secret_key( $key ) ) {
 		return;
 	}

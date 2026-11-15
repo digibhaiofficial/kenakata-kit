@@ -70,9 +70,17 @@ node dev/lint.js
 node dev/calls.js includes/store-dashboard.php includes/store-dashboard-api.php   # review the list
 node dev/e2e-dashboard.js - <outDir>          # starts its own mock server; expect "48 passed, 0 failed"
 node dev/shots-dashboard.js <outDir> bn       # look at the screenshots (phone + desktop, Bengali)
+sh dev/minify.sh                              # after any CSS/JS change: regenerates assets/*.min.* (CI checks they match)
 python dev/build-zip.py                       # local zip for testing; releases come from the tag
 ```
-There is no PHP on this computer: PHP is checked by syntax lint + careful review + the live test site.
+Real WordPress test: `dev/ci/smoke.sh` installs WordPress + WooCommerce + the plugin and checks shop pages, instant
+add to cart / Buy Now, the bot guard, every settings tab, license save (wrong domain refused), courier tick list,
+incomplete order → order with delivery charge, tracking with order number, speed switches, Turnstile, uninstall and
+the PHP log (expect "0 failed"). GitHub runs it on every push (.github/workflows/wp-test.yml, PHP 7.4 + 8.3).
+Without MySQL / wordpress.org it also runs on SQLite:
+`LOCAL_WP=<WordPress git checkout> LOCAL_WC_ZIP=<woocommerce.zip> LOCAL_SQLITE=<sqlite-database-integration/packages/plugin-sqlite-database-integration> bash dev/ci/smoke.sh`
+(WordPress: `git clone --depth 1 --branch <ver> https://github.com/WordPress/WordPress`; WooCommerce zip from its GitHub releases).
+The owner's Windows PC has no PHP: there PHP is checked by syntax lint + careful review + the live test site.
 After the owner uploads a zip, test on the live site with real data (see HANDOFF.md → Live test).
 
 ## Live site used for testing

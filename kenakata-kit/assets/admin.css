@@ -206,3 +206,20 @@ p .kk-copy { display: inline-flex; width: auto; }
 .kk-lic-grid div { background: var(--a-tint); border: 1px solid var(--a-line); border-radius: 10px; padding: 10px 12px; }
 .kk-lic-grid span { display: block; color: var(--a-muted); font-size: 12px; }
 .kk-lic-grid b { font-size: 14px; word-break: break-word; }
+.kk-lic-hero--bad { background: #fdecea; border-color: #f3b8b1; color: #8a1c1c; }
+.kk-lic-hero--bad h3 { color: #8a1c1c; }
+
+/* Speed & health tab: checkups under the form */
+.kk-health { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 18px; }
+.kk-health .kk-card { margin: 0; }
+.kk-health__score { display: inline-block; margin-left: 6px; padding: 1px 9px; border-radius: 99px; font-size: 12px; background: #e7f6ec; color: #116329; vertical-align: middle; }
+.kk-health__score.is-bad { background: #fcf0e3; color: #8a4b00; }
+
+/* Couriers I use: tick list with tracking link */
+.kk-cpick { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 8px; max-width: 980px; }
+.kk-cpick__row { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border: 1px solid #dcdcde; border-radius: 10px; background: #fff; transition: border-color .15s, background .15s; }
+.kk-cpick__row.is-on, .kk-cpick__row:has(input:checked) { border-color: var(--a-green, #0a7d3b); background: #f3fbf6; }
+.kk-cpick__name { display: flex; align-items: center; gap: 6px; font-weight: 600; }
+.kk-cpick__tag { margin-left: auto; padding: 1px 8px; border-radius: 99px; background: #e8f0fe; color: #1a4fb4; font-size: 11px; font-weight: 600; }
+.kk-cpick__link { width: 100%; font-size: 12px; display: none; }
+.kk-cpick__row:has(input:checked) .kk-cpick__link { display: block; }

@@ -128,20 +128,39 @@ function kk_login_lock_key() {
 	return 'kk_lock_' . md5( kk_client_ip() );
 }
 
+/** Counter of wrong passwords for one account from all addresses (a botnet tries one password per IP). */
+function kk_login_user_key( $username ) {
+	$username = trim( (string) $username );
+	if ( is_email( $username ) && ( $u = get_user_by( 'email', $username ) ) ) { // phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.Found
+		$username = $u->user_login; // email and username count as the same account
+	}
+	return 'kk_ulock_' . md5( strtolower( $username ) );
+}
+
 if ( kk_opt( 'sec_limit_login' ) ) {
-	add_action( 'wp_login_failed', function () {
+	add_action( 'wp_login_failed', function ( $username = '' ) {
 		$key = kk_login_lock_key();
 		set_transient( $key, (int) get_transient( $key ) + 1, 15 * MINUTE_IN_SECONDS );
+		if ( '' !== (string) $username && ( username_exists( $username ) || ( is_email( $username ) && email_exists( $username ) ) ) ) { // only real accounts: no rows for made-up names
+			$ukey = kk_login_user_key( $username );
+			set_transient( $ukey, (int) get_transient( $ukey ) + 1, HOUR_IN_SECONDS );
+		}
 	} );
-	add_filter( 'authenticate', function ( $user ) {
+	add_filter( 'authenticate', function ( $user, $username = '' ) {
+		$limit = max( 3, absint( kk_opt( 'sec_login_attempts' ) ) );
 		$tries = (int) get_transient( kk_login_lock_key() );
-		if ( $tries >= max( 3, absint( kk_opt( 'sec_login_attempts' ) ) ) ) {
+		// One account: a much higher limit over an hour, so a real owner is rarely affected but a spread-out attack stops.
+		$utries = '' !== (string) $username ? (int) get_transient( kk_login_user_key( $username ) ) : 0;
+		if ( $tries >= $limit || $utries >= max( 20, $limit * 5 ) ) {
 			return new WP_Error( 'kk_login_locked', __( 'Too many wrong passwords. For your security, login is paused for 15 minutes.', 'kenakata-kit' ) );
 		}
 		return $user;
-	}, 99 );
-	add_action( 'wp_login', function () {
+	}, 99, 3 );
+	add_action( 'wp_login', function ( $login = '' ) {
 		delete_transient( kk_login_lock_key() );
+		if ( $login ) {
+			delete_transient( kk_login_user_key( $login ) );
+		}
 	} );
 }
 

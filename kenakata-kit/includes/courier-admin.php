@@ -110,8 +110,8 @@ add_action( 'admin_enqueue_scripts', function () {
 	if ( ! $screen || ! in_array( $screen->id, $ids, true ) || ! kk_courier_check_enabled() ) {
 		return;
 	}
-	wp_enqueue_style( 'kenakata-kit-cc', KK_URL . 'assets/courier-check.css', array(), KK_VERSION );
-	wp_enqueue_script( 'kenakata-kit-cc', KK_URL . 'assets/courier-check.js', array(), KK_VERSION, true );
+	wp_enqueue_style( 'kenakata-kit-cc', kk_asset( 'courier-check.css' ), array(), KK_VERSION );
+	wp_enqueue_script( 'kenakata-kit-cc', kk_asset( 'courier-check.js' ), array(), KK_VERSION, true );
 	wp_localize_script( 'kenakata-kit-cc', 'kkCC', array(
 		'url'   => esc_url_raw( rest_url( 'kenakata/v1/courier/checkup/' ) ),
 		'nonce' => wp_create_nonce( 'wp_rest' ),

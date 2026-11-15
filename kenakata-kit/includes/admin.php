@@ -39,7 +39,7 @@ add_filter( 'option_page_capability_kk_settings_group', function () { return 'ma
 function kk_can_change( $key ) {
 	$key = (string) $key;
 	// Security switches and the courier's API keys: administrators only.
-	$admin_only = 0 === strpos( $key, 'sec_' ) || 'courier_provider' === $key || 'courier_check_enable' === $key || 'courier_pathao_store_id' === $key || 'courier_pathao_sandbox' === $key || (bool) preg_match( '/^courier_[a-z]+_on$/', $key ) || ( function_exists( 'kk_courier_is_secret_key' ) && kk_courier_is_secret_key( $key ) );
+	$admin_only = 0 === strpos( $key, 'sec_' ) || 0 === strpos( $key, 'turnstile_' ) || 'courier_provider' === $key || 'courier_check_enable' === $key || 'courier_pathao_store_id' === $key || 'courier_pathao_sandbox' === $key || 0 === strpos( $key, 'courier_redx_' ) || (bool) preg_match( '/^courier_[a-z]+_on$/', $key ) || ( function_exists( 'kk_courier_is_secret_key' ) && kk_courier_is_secret_key( $key ) );
 	return ! $admin_only || current_user_can( 'manage_options' );
 }
 
@@ -69,6 +69,8 @@ function kk_sanitize_value( $key, $v ) {
 			return sanitize_textarea_field( (string) $v );
 		case 'bbar_items':
 			return wp_json_encode( kk_bbar_sanitize_items( (string) $v ) );
+		case 'courier_pick':
+			return (string) wp_json_encode( (object) kk_courier_pick_sanitize( $v ) );
 		case 'select':
 		case 'choice':
 		case 'theme':
@@ -91,8 +93,15 @@ function kk_value_fields() {
 
 /** Settings API callback: sanitise only the submitted tab and merge into the stored settings. */
 function kk_sanitize_settings( $input ) {
+	if ( ! empty( $GLOBALS['kk_settings_internal'] ) ) {
+		return is_array( $input ) ? $input : array(); // internal update (reset / import / dashboard switch), see kk_update_settings()
+	}
+	static $done = null; // WordPress runs this twice when the option is first created (update_option → add_option)
+	if ( null !== $done && $input === $done ) {
+		return $done;
+	}
 	if ( ! is_array( $input ) || ! isset( $input['__tab'] ) ) {
-		return is_array( $input ) ? $input : array(); // internal update (reset / import / dashboard switch)
+		return (array) get_option( 'kk_settings', array() ); // a form post without its tab changes nothing
 	}
 	$stored = (array) get_option( 'kk_settings', array() );
 	$tab    = sanitize_key( $input['__tab'] );
@@ -102,8 +111,11 @@ function kk_sanitize_settings( $input ) {
 		}
 		if ( 'secret' === $f['type'] ) {
 			// API keys never go into the (autoloaded, exportable) settings: they have their own private option.
-			if ( function_exists( 'kk_courier_save_secret' ) ) {
-				kk_courier_save_secret( $key, isset( $input[ $key ] ) ? wp_unslash( $input[ $key ] ) : '' );
+			$val = isset( $input[ $key ] ) ? wp_unslash( $input[ $key ] ) : '';
+			if ( in_array( $key, kk_core_secret_keys(), true ) ) {
+				kk_save_secret( $key, $val );
+			} elseif ( function_exists( 'kk_courier_save_secret' ) ) {
+				kk_courier_save_secret( $key, $val );
 			}
 			continue;
 		}
@@ -116,8 +128,26 @@ function kk_sanitize_settings( $input ) {
 		$stored['sec_force_https'] = 0;
 		add_settings_error( 'kk_settings', 'kk_https', __( 'Could not turn on https: you are in the admin over http right now. Log in again with https://… and try again.', 'kenakata-kit' ) );
 	}
+	$done = $stored;
 	return $stored;
 }
+
+/** Save settings from our own code (already checked): skips the form sanitizer. */
+function kk_update_settings( $stored ) {
+	$GLOBALS['kk_settings_internal'] = true;
+	update_option( 'kk_settings', $stored );
+	$GLOBALS['kk_settings_internal'] = false;
+}
+
+add_action( 'admin_post_kk_uninstall_wipe', function () {
+	check_admin_referer( 'kk_uninstall_wipe' );
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die( esc_html__( 'You are not allowed to do this.', 'kenakata-kit' ), 403 );
+	}
+	update_option( 'kk_uninstall_wipe', empty( $_POST['wipe'] ) ? 0 : 1, false );
+	wp_safe_redirect( admin_url( 'admin.php?page=kenakata-kit&tab=tools&settings-updated=1' ) );
+	exit;
+} );
 
 /** Dashboard switches (AJAX). */
 add_action( 'wp_ajax_kk_toggle', function () {
@@ -138,7 +168,7 @@ add_action( 'wp_ajax_kk_toggle', function () {
 	}
 	$stored         = (array) get_option( 'kk_settings', array() );
 	$stored[ $key ] = $on;
-	update_option( 'kk_settings', $stored );
+	kk_update_settings( $stored );
 	wp_send_json_success( array( 'on' => $on ) );
 } );
 
@@ -151,7 +181,7 @@ add_action( 'wp_ajax_kk_set_lang', function () {
 	$lang = isset( $_POST['lang'] ) ? sanitize_key( wp_unslash( $_POST['lang'] ) ) : 'auto';
 	$stored               = (array) get_option( 'kk_settings', array() );
 	$stored['admin_lang'] = in_array( $lang, array( 'auto', 'en', 'bn' ), true ) ? $lang : 'auto';
-	update_option( 'kk_settings', $stored );
+	kk_update_settings( $stored );
 	wp_send_json_success();
 } );
 
@@ -172,7 +202,7 @@ add_action( 'admin_post_kk_reset_tab', function () {
 		$keep = array_filter( $stored, function ( $k ) { return 'admin_lang' === $k || ! kk_can_change( $k ); }, ARRAY_FILTER_USE_KEY );
 		$stored = $keep;
 	}
-	update_option( 'kk_settings', $stored );
+	kk_update_settings( $stored );
 	wp_safe_redirect( admin_url( 'admin.php?page=kenakata-kit&tab=' . ( 'all' === $tab ? 'tools' : $tab ) . '&kk_msg=reset' ) );
 	exit;
 } );
@@ -206,7 +236,7 @@ function kk_import_settings( array $data ) {
 	if ( ! empty( $stored['sec_force_https'] ) && ! is_ssl() ) {
 		$stored['sec_force_https'] = 0;
 	}
-	update_option( 'kk_settings', $stored );
+	kk_update_settings( $stored );
 	return $count;
 }
 
@@ -233,10 +263,10 @@ add_action( 'admin_enqueue_scripts', function ( $hook ) {
 		return;
 	}
 	wp_enqueue_style( 'wp-color-picker' );
-	wp_enqueue_style( 'kenakata-kit', KK_URL . 'assets/kenakata-kit.css', array(), KK_VERSION );
+	wp_enqueue_style( 'kenakata-kit', kk_asset( 'kenakata-kit.css' ), array(), KK_VERSION );
 	wp_add_inline_style( 'kenakata-kit', kk_css_vars( '.kk-preview' ) . kk_bbar_css() );
-	wp_enqueue_style( 'kenakata-kit-admin', KK_URL . 'assets/admin.css', array( 'kenakata-kit' ), KK_VERSION );
-	wp_enqueue_script( 'kenakata-kit-admin', KK_URL . 'assets/admin.js', array( 'jquery', 'jquery-ui-sortable', 'wp-color-picker' ), KK_VERSION, true );
+	wp_enqueue_style( 'kenakata-kit-admin', kk_asset( 'admin.css' ), array( 'kenakata-kit' ), KK_VERSION );
+	wp_enqueue_script( 'kenakata-kit-admin', kk_asset( 'admin.js' ), array( 'jquery', 'jquery-ui-sortable', 'wp-color-picker' ), KK_VERSION, true );
 	wp_localize_script( 'kenakata-kit-admin', 'kkAdmin', array(
 		'ajax'   => admin_url( 'admin-ajax.php' ),
 		'nonce'  => wp_create_nonce( 'kk_admin' ),
@@ -343,6 +373,9 @@ function kk_render_settings() {
 							break;
 						}
 						kk_render_form( $tab, ! empty( $t['preview'] ) );
+						if ( 'speed' === $tab && function_exists( 'kk_render_health' ) ) {
+							kk_render_health();
+						}
 				}
 				?>
 			</main>
@@ -362,7 +395,19 @@ function kk_admin_notice( $msg ) {
 		echo '<div class="kk-notice-ok" role="status">✓ ' . esc_html( sprintf( __( '%d settings imported.', 'kenakata-kit' ), absint( substr( $msg, 9 ) ) ) ) . '</div>';
 	} elseif ( 'import-failed' === $msg ) {
 		echo '<div class="kk-notice-err" role="alert">' . esc_html__( 'Could not read that file. Use a .json file exported from Kenakata Kit.', 'kenakata-kit' ) . '</div>';	} elseif ( 'license-saved' === $msg ) {
-		echo '<div class="kk-notice-ok" role="status">✓ ' . esc_html__( 'License key saved.', 'kenakata-kit' ) . '</div>';
+		echo '<div class="kk-notice-ok" role="status">✓ ' . esc_html__( 'License key saved. Pro is active on this site.', 'kenakata-kit' ) . '</div>';
+	} elseif ( 'license-bad' === $msg && function_exists( 'kk_license_message' ) ) {
+		$code = isset( $_GET['kk_code'] ) ? sanitize_key( wp_unslash( $_GET['kk_code'] ) ) : 'format'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$for  = isset( $_GET['kk_for'] ) ? sanitize_text_field( rawurldecode( wp_unslash( $_GET['kk_for'] ) ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		echo '<div class="kk-notice-err" role="alert">✗ ' . esc_html__( 'The key was NOT saved.', 'kenakata-kit' ) . ' ' . esc_html( kk_license_message( $code ) );
+		if ( 'domain' === $code && '' !== $for ) {
+			/* translators: 1: website(s) the key was made for 2: this website */
+			echo '<br>' . esc_html( sprintf( __( 'This key is for: %1$s. This website is: %2$s.', 'kenakata-kit' ), $for, function_exists( 'kk_license_host' ) ? kk_license_host() : '' ) );
+		}
+		echo '</div>';
+	} elseif ( 0 === strpos( $msg, 'cleaned-' ) ) {
+		/* translators: %d: number of items */
+		echo '<div class="kk-notice-ok" role="status">✓ ' . esc_html( sprintf( __( 'Clean-up done: %d leftovers removed.', 'kenakata-kit' ), absint( substr( $msg, 8 ) ) ) ) . '</div>';
 	} elseif ( 'license-removed' === $msg ) {
 		echo '<div class="kk-notice-ok" role="status">✓ ' . esc_html__( 'License key removed. The Free features keep working.', 'kenakata-kit' ) . '</div>';
 	}
@@ -451,11 +496,27 @@ function kk_render_field( $key, $f ) {
 			echo '</select>';
 			break;
 		case 'secret':
-			$hint = function_exists( 'kk_courier_secret_hint' ) ? kk_courier_secret_hint( $key ) : '';
+			$hint = kk_secret_hint( $key );
 			echo '<input type="password" class="regular-text" autocomplete="new-password" id="' . esc_attr( $id ) . '" name="' . esc_attr( $name ) . '" value="" placeholder="' . esc_attr( '' !== $hint ? $hint : __( 'Paste the key here', 'kenakata-kit' ) ) . '"' . $describe . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped above
 			if ( '' !== $hint ) {
 				echo ' <span class="kk-saved">' . esc_html__( 'Saved', 'kenakata-kit' ) . '</span>';
 			}
+			break;
+		case 'courier_pick':
+			$picked = kk_courier_picked();
+			$api    = function_exists( 'kk_courier_providers' ) ? kk_courier_providers() : array();
+			echo '<div class="kk-cpick" role="group" aria-labelledby="' . esc_attr( $id ) . '-l"' . $describe . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped above
+			foreach ( kk_courier_catalog() as $ck => $c ) {
+				$on  = array_key_exists( $ck, $picked );
+				$cid = $id . '_' . $ck;
+				echo '<div class="kk-cpick__row' . ( $on ? ' is-on' : '' ) . '">'
+					. '<label class="kk-cpick__name" for="' . esc_attr( $cid ) . '"><input type="checkbox" id="' . esc_attr( $cid ) . '" name="' . esc_attr( $name . '[' . $ck . '][on]' ) . '" value="1"' . checked( $on, true, false ) . '> ' . esc_html( $c['name'] )
+					. ( ! empty( $c['api'] ) ? ' <span class="kk-cpick__tag" title="' . esc_attr__( 'Can also send parcels with one tap (Courier booking)', 'kenakata-kit' ) . '">' . ( isset( $api[ $ck ] ) ? esc_html__( 'One-tap booking', 'kenakata-kit' ) : esc_html__( 'API', 'kenakata-kit' ) ) . '</span>' : '' )
+					. '</label>'
+					. '<input type="text" class="kk-cpick__link" aria-label="' . esc_attr( sprintf( /* translators: %s: courier name */ __( 'Tracking link for %s', 'kenakata-kit' ), $c['name'] ) ) . '" name="' . esc_attr( $name . '[' . $ck . '][link]' ) . '" value="' . esc_attr( isset( $picked[ $ck ] ) ? $picked[ $ck ] : '' ) . '" placeholder="' . esc_attr( '' !== $c['link'] ? $c['link'] : __( 'No tracking page: the customer gets the tracking ID', 'kenakata-kit' ) ) . '" spellcheck="false">'
+					. '</div>';
+			}
+			echo '</div><span id="' . esc_attr( $id ) . '-l" class="screen-reader-text">' . esc_html( $f['label'] ) . '</span>';
 			break;
 		case 'courier_test':
 			echo '<button type="button" class="button" data-kk-courier-test="' . esc_url( add_query_arg( 'target', isset( $f['target'] ) ? sanitize_key( $f['target'] ) : 'booking', rest_url( 'kenakata/v1/courier/test' ) ) ) . '" data-nonce="' . esc_attr( wp_create_nonce( 'wp_rest' ) ) . '">' . esc_html__( 'Test connection', 'kenakata-kit' ) . '</button> <span class="kk-test-result" role="status" aria-live="polite"></span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped above
@@ -613,7 +674,7 @@ function kk_render_dashboard() {
 			/* translators: %d: minutes */
 			$checks[] = array( true, sprintf( __( 'Scheduled tasks (cron) run normally: last run %d minutes ago', 'kenakata-kit' ), $cron['minutes_since_last'] ) );
 		} elseif ( null === $cron['last_run'] ) {
-			$checks[] = array( false, __( 'Scheduled tasks (cron): waiting for the first run. Check again in 10 minutes.', 'kenakata-kit' ) );
+			$checks[] = array( false, __( 'Scheduled tasks (cron): waiting for the first run. Check again in an hour.', 'kenakata-kit' ) );
 		} else {
 			/* translators: %d: minutes */
 			$checks[] = array( false, sprintf( __( 'Scheduled tasks (cron) are not running: last run %d minutes ago. Backups, scheduled sales and emails may not run. Add a server cron job (hosting panel → Cron Jobs, every 5 minutes) that opens your-site/wp-cron.php.', 'kenakata-kit' ), $cron['minutes_since_last'] ) );
@@ -780,6 +841,15 @@ function kk_render_tools() {
 				<p><input type="file" name="kk_import_file" accept=".json,application/json" aria-label="<?php esc_attr_e( 'Settings file', 'kenakata-kit' ); ?>"></p>
 				<p><textarea name="kk_import_json" rows="4" class="large-text code" placeholder='{"plugin":"kenakata-kit", ...}' aria-label="<?php esc_attr_e( 'Settings text', 'kenakata-kit' ); ?>"></textarea></p>
 				<button type="submit" class="button"><?php esc_html_e( 'Import', 'kenakata-kit' ); ?></button>
+			</form>
+		</section>
+		<section class="kk-card">
+			<h3 class="kk-card__title"><?php esc_html_e( 'When the plugin is deleted', 'kenakata-kit' ); ?></h3>
+			<p class="kk-card__desc"><?php esc_html_e( 'Normally the settings and license stay in the database, so reinstalling brings everything back. Tick this only if you are removing Kenakata Kit for good. Orders and products are never deleted.', 'kenakata-kit' ); ?></p>
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+				<input type="hidden" name="action" value="kk_uninstall_wipe"><?php wp_nonce_field( 'kk_uninstall_wipe' ); ?>
+				<p><label><input type="checkbox" name="wipe" value="1" <?php checked( (bool) get_option( 'kk_uninstall_wipe' ) ); ?>> <?php esc_html_e( 'Delete all Kenakata Kit data when the plugin is deleted (settings, license key, API keys, incomplete orders)', 'kenakata-kit' ); ?></label></p>
+				<button type="submit" class="button"><?php esc_html_e( 'Save', 'kenakata-kit' ); ?></button>
 			</form>
 		</section>
 		<section class="kk-card kk-card--danger">

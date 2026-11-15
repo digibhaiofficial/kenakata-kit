@@ -368,7 +368,13 @@ footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border
 		</ul>
 	</li>
 </ol>
-<p>কুরিয়ারের তালিকা বদলাতে <strong>Couriers</strong> ঘরে প্রতি লাইনে <code>key|নাম</code> লিখুন।</p>
+<h4>Couriers I use (যেসব কুরিয়ার ব্যবহার করি)</h4>
+<p>বাংলাদেশের ১৮টি কুরিয়ারের তালিকা আছে (Steadfast, Pathao, RedX, Paperfly, eCourier, CarryBee, Delivery Tiger, Sundarban, SA Paribahan, Karatoa, Janani, Continental, AFS, Sheba, Navana, বাংলাদেশ পোস্ট, নিজের ডেলিভারি ম্যান, অন্যান্য)। যেগুলো ব্যবহার করেন সেগুলোতে টিক দিন: অর্ডারে শুধু এগুলোই আসবে।</p>
+<ul>
+	<li>ট্র্যাকিং আইডি লিখলে লিংক <strong>নিজে থেকে তৈরি</strong> হয় (Steadfast, Pathao, RedX)। অন্য কুরিয়ারের ঘরে নিজের লিংক দিতে পারেন, আইডির জায়গায় <code>{id}</code> লিখে।</li>
+	<li>তালিকায় নেই? <strong>Other couriers</strong> ঘরে প্রতি লাইনে <code>key|নাম|লিংক</code> লিখুন।</li>
+	<li><strong>Also ask for the order number</strong> চালু করলে শুধু ফোন নম্বর জেনে কেউ অন্যের অর্ডার দেখতে পারবে না: ফোন + অর্ডার নম্বর দুটোই লাগবে।</li>
+</ul>
 
 <h3 id="s-storedash">Store dashboard (স্টোর ড্যাশবোর্ড)</h3>
 <p>দোকান চালানোর জন্য আলাদা, হালকা একটা পাতা: <code>yoursite.com/dashboard</code>। wp-admin খুলতে হয় না, ফোনে সহজে চলে। এখানে থিম, Elementor বা অন্য প্লাগিনের ফাইল লোড হয় না, তাই খুব দ্রুত খোলে। দোকানের সাধারণ পাতায় এর কোনো ফাইল যায় না।</p>
@@ -690,6 +696,15 @@ footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border
 	</ul>
 </div>
 
+<h3 id="s-speed">Speed &amp; health (স্পিড ও হেলথ)</h3>
+<p>সব সুইচ শুরুতে বন্ধ। একটা চালু করার পর হোম, একটা প্রোডাক্ট, কার্ট আর চেকআউট একবার খুলে দেখুন, ক্যাশ প্লাগইন থাকলে ক্যাশ মুছুন।</p>
+<ul>
+	<li><strong>হালকা পেজ:</strong> ইমোজি ও এমবেড স্ক্রিপ্ট সরানো, ব্লগ/সাধারণ পেজে WooCommerce-এর ফাইল না লোড করা, শান্ত Heartbeat।</li>
+	<li><strong>Cloudflare Turnstile:</strong> লগইন, রেজিস্ট্রেশন আর চেকআউটে ফ্রি বট-যাচাই। dash.cloudflare.com → Turnstile থেকে দুটি কী এনে বসান। Cloudflare বন্ধ থাকলেও অর্ডার আটকায় না।</li>
+	<li><strong>সাইট ও নিরাপত্তা চেকআপ:</strong> PHP ভার্সন, ক্যাশ, প্রতি পেজে লোড হওয়া সেটিংসের সাইজ, cron, https, "admin" ইউজার, ফাইল এডিটর, XML-RPC, প্লাগইন আপডেট। সমস্যা থাকলে পাশে "Fix →" লিংক।</li>
+	<li><strong>ডাটাবেস পরিষ্কার:</strong> শুধু মেয়াদ শেষ অস্থায়ী ডাটা, পুরোনো কার্ট সেশন আর ৩০ দিনের পুরোনো স্প্যাম কমেন্ট মোছে। প্রোডাক্ট, অর্ডার, পেজ, পোস্টে হাত দেয় না।</li>
+</ul>
+
 <h3 id="s-tools">Tools (Export / Import)</h3>
 <ul>
 	<li><strong>Export:</strong> সব সেটিং একটা .json ফাইলে ডাউনলোড হয়।</li>
@@ -997,6 +1012,17 @@ footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border
 
 <section id="changelog">
 <h2>১১. পরিবর্তনের তালিকা</h2>
+<h4>৩.১২.০</h4>
+<ul>
+	<li><strong>ঠিক করা হয়েছে:</strong> অন্য সাইটের বা ভুল লাইসেন্স কী এখন সেভ হয় না। লাল বার্তায় দেখায় কী-টি কোন সাইটের আর আপনার সাইট কোনটি।</li>
+	<li><strong>নতুন:</strong> Speed &amp; health ট্যাব: হালকা পেজের সুইচ, Cloudflare Turnstile, সাইট ও নিরাপত্তা চেকআপ, নিরাপদ ডাটাবেস পরিষ্কার।</li>
+	<li><strong>নতুন:</strong> বাংলাদেশের ১৮টি কুরিয়ারের টিক-তালিকা, ট্র্যাকিং লিংক নিজে থেকে তৈরি। RedX দিয়ে এক চাপে পার্সেল বুক (Pro)।</li>
+	<li><strong>নতুন:</strong> অর্ডার ট্র্যাকিংয়ে চাইলে অর্ডার নম্বরও চাওয়া যায়। Incomplete order থেকে অর্ডার বানালে কাস্টমারের দেখা ডেলিভারি চার্জ আর কার্টের দাম বসে।</li>
+	<li><strong>দ্রুত:</strong> ছোট (minified) CSS/JS, প্রথম সারির প্রোডাক্ট ছবি আগে লোড হয়, সার্চের ক্যাশ ডাটাবেস ভরায় না, cron প্রতি ৫ মিনিটের বদলে প্রতি ঘণ্টায়।</li>
+	<li><strong>নিরাপত্তা:</strong> একই অ্যাকাউন্টে অনেক জায়গা থেকে ভুল পাসওয়ার্ড দিলেও লগইন থামে; পুরোনো ক্যাশ করা পেজেও লগইন পপআপ কাজ করে; কুরিয়ারে দুবার চাপলেও পার্সেল একটাই হয়; অন্য কেউ একই ফোন নম্বর লিখে incomplete order বদলাতে পারে না।</li>
+	<li><strong>ঠিক করা হয়েছে:</strong> বাংলা অংকে (০১৭…) ফোন নম্বর লিখলে এখন সব জায়গায় কাজ করে।</li>
+	<li><strong>নতুন:</strong> Tools-এ "প্লাগইন মুছলে সব ডাটা মুছুন" অপশন (ডিফল্টে বন্ধ, তাই আবার ইনস্টল করলে সব ফিরে আসে)।</li>
+</ul>
 <h4>৩.১০.০</h4>
 <ul>
 	<li><strong>নতুন:</strong> Incomplete orders: চেকআউটে ফোন নম্বর দিয়ে অর্ডার না করা ক্রেতাদের তালিকা, Call/WhatsApp, "ফোন করা হয়েছে", "অর্ডার তৈরি করুন" আর "বাদ দিন"। ডিফল্টে বন্ধ।</li>

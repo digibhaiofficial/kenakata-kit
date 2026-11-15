@@ -44,7 +44,7 @@ add_action( 'init', function () {
 			$role->add_cap( KK_SD_CAP );
 		}
 	}
-	update_option( 'kk_sd_role_version', KK_SD_ROLE_VERSION, false );
+	update_option( 'kk_sd_role_version', KK_SD_ROLE_VERSION, true ); // read on every request: autoload (no extra query)
 }, 5 );
 
 /** Dashboard slug ("dashboard" unless changed in settings). */
@@ -607,14 +607,14 @@ function kk_sd_render_page() {
 <meta name="theme-color" content="<?php echo esc_attr( $color ); ?>">
 <title><?php echo esc_html( $title . ' · ' . wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES ) ); ?></title>
 <?php $icon = get_site_icon_url( 192 ); if ( $icon ) : ?><link rel="icon" href="<?php echo esc_url( $icon ); ?>"><link rel="apple-touch-icon" href="<?php echo esc_url( $icon ); ?>"><?php endif; ?>
-<link rel="stylesheet" href="<?php echo esc_url( KK_URL . 'assets/store-dashboard.css?ver=' . $ver ); ?>">
+<link rel="stylesheet" href="<?php echo esc_url( kk_asset( 'store-dashboard.css' ) . '?ver=' . $ver ); ?>">
 <style><?php echo esc_html( kk_sd_theme_css() ); ?></style>
 </head>
 <body>
 <div id="sd-app" class="sd" aria-live="polite"><p class="sd-boot"><?php esc_html_e( 'Loading…', 'kenakata-kit' ); ?></p></div>
 <noscript><p class="sd-boot"><?php esc_html_e( 'Please turn on JavaScript to use the store dashboard.', 'kenakata-kit' ); ?></p></noscript>
 <script>window.kkSD = <?php echo wp_json_encode( kk_sd_config(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE ); ?>;</script>
-<script src="<?php echo esc_url( KK_URL . 'assets/store-dashboard.js?ver=' . $ver ); ?>" defer></script>
+<script src="<?php echo esc_url( kk_asset( 'store-dashboard.js' ) . '?ver=' . $ver ); ?>" defer></script>
 </body>
 </html>
 	<?php

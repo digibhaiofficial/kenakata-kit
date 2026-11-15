@@ -26,6 +26,8 @@ jobs:
           test "v$V" = "$GITHUB_REF_NAME" || { echo "Tag $GITHUB_REF_NAME does not match version $V"; exit 1; }
           if grep -q "__KK_PUBKEY__" kenakata-kit/includes/license.php; then echo "License public key missing"; exit 1; fi
           echo "V=$V" >> "$GITHUB_ENV"
+      - name: Minify assets
+        run: sh dev/minify.sh
       - name: Build zip
         run: python3 dev/build-zip.py
       - name: Release notes from readme.txt

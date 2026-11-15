@@ -20,6 +20,7 @@ function kk_courier_base_url( $provider ) {
 		'steadfast' => 'https://portal.packzy.com/api/v1',
 		'bdcourier' => 'https://api.bdcourier.com',
 		'pathao'    => kk_opt( 'courier_pathao_sandbox' ) ? 'https://courier-api-sandbox.pathao.com' : 'https://api-hermes.pathao.com',
+		'redx'      => kk_opt( 'courier_redx_sandbox' ) ? 'https://sandbox.redx.com.bd/v1.0.0-beta' : 'https://openapi.redx.com.bd/v1.0.0-beta',
 	);
 	$url  = isset( $urls[ $provider ] ) ? $urls[ $provider ] : '';
 	return untrailingslashit( (string) apply_filters( 'kk_courier_base_url', $url, $provider ) );
@@ -33,6 +34,9 @@ function kk_courier_headers( $provider ) {
 		$headers['Secret-Key'] = kk_courier_secret( 'courier_steadfast_secret_key' );
 	} elseif ( 'bdcourier' === $provider ) {
 		$headers['Authorization'] = 'Bearer ' . kk_courier_secret( 'courier_bdcourier_token' );
+	} elseif ( 'redx' === $provider ) {
+		$token                       = kk_courier_secret( 'courier_redx_token' );
+		$headers['API-ACCESS-TOKEN'] = 0 === stripos( $token, 'Bearer ' ) ? $token : 'Bearer ' . $token; // pasted with or without "Bearer"
 	}
 	return $headers;
 }
@@ -122,6 +126,8 @@ function kk_courier_tracking_url( $provider, $tracking_code, $phone = '' ) {
 		$url = 'https://steadfast.com.bd/t/' . rawurlencode( $tracking_code );
 	} elseif ( 'pathao' === $provider && '' !== $tracking_code ) {
 		$url = add_query_arg( array( 'consignment_id' => $tracking_code, 'phone' => $phone ), 'https://merchant.pathao.com/tracking' );
+	} elseif ( '' !== $tracking_code && function_exists( 'kk_courier_track_link' ) ) {
+		$url = kk_courier_track_link( $provider, $tracking_code, $phone ); // RedX and the tick list's own links
 	}
 	return (string) apply_filters( 'kk_courier_tracking_url', $url, $provider, $tracking_code, $phone );
 }
@@ -520,10 +526,9 @@ function kk_courier_book_order( WC_Order $order, array $over = array() ) {
 
 	// One send at a time per order: a double tap must never create two parcels.
 	$lock = 'kk_cb_' . $order->get_id();
-	if ( get_transient( $lock ) ) {
+	if ( ! kk_lock( $lock, 30 ) ) {
 		return new WP_Error( 'kk_courier_busy', __( 'This order is being sent right now. Please wait a few seconds.', 'kenakata-kit' ), array( 'status' => 409 ) );
 	}
-	set_transient( $lock, 1, 30 );
 
 	$attempt = (int) $order->get_meta( '_kk_courier_attempts' );
 	$invoice = preg_replace( '/[^A-Za-z0-9_-]/', '', (string) $order->get_order_number() );
@@ -541,7 +546,7 @@ function kk_courier_book_order( WC_Order $order, array $over = array() ) {
 	$res  = function_exists( $fn ) ? $fn( array( 'invoice' => $invoice, 'name' => $name, 'phone' => $phone, 'address' => $addr, 'cod_amount' => $cod, 'note' => $note, 'item_qty' => $qty, 'item_desc' => $desc ) )
 		: new WP_Error( 'kk_courier_unknown', __( 'This courier is not supported.', 'kenakata-kit' ), array( 'status' => 400 ) );
 	if ( is_wp_error( $res ) ) {
-		delete_transient( $lock );
+		kk_unlock( $lock );
 		return $res;
 	}
 
@@ -568,7 +573,7 @@ function kk_courier_book_order( WC_Order $order, array $over = array() ) {
 		$order->update_status( 'shipped', __( 'Sent to the courier.', 'kenakata-kit' ) );
 	}
 	$order->save();
-	delete_transient( $lock );
+	kk_unlock( $lock );
 	if ( function_exists( 'kk_sd_flush_summary' ) ) {
 		kk_sd_flush_summary();
 	}
@@ -594,6 +599,149 @@ function kk_courier_refresh_status( WC_Order $order ) {
 	$order->update_meta_data( '_kk_courier_booking', $b );
 	$order->save();
 	return kk_courier_booking_view( $order );
+}
+
+/* =========================================================================
+ * RedX adapter (OpenAPI v1.0.0-beta). RedX needs a delivery area for every parcel: it is found from the
+ * address (area names RedX knows), or the "default delivery area" setting is used.
+ * ====================================================================== */
+
+/** RedX delivery areas (id, name, district), remembered for a week. Returns the list or WP_Error. */
+function kk_courier_redx_areas( $fresh = false ) {
+	$saved = $fresh ? false : get_transient( 'kk_redx_areas' );
+	if ( is_array( $saved ) && $saved ) {
+		return $saved;
+	}
+	$res = kk_courier_http( 'redx', 'GET', '/areas' );
+	if ( is_wp_error( $res ) ) {
+		return $res;
+	}
+	list( $code, $body ) = $res;
+	if ( 401 === $code || 403 === $code ) {
+		return new WP_Error( 'kk_courier_auth', __( 'RedX did not accept the API token. An administrator should check it in Kenakata Kit → Courier booking.', 'kenakata-kit' ), array( 'status' => 502 ) );
+	}
+	$out = array();
+	foreach ( isset( $body['areas'] ) && is_array( $body['areas'] ) ? $body['areas'] : array() as $a ) {
+		if ( ! empty( $a['id'] ) && ! empty( $a['name'] ) ) {
+			$out[] = array( 'id' => (int) $a['id'], 'name' => sanitize_text_field( (string) $a['name'] ), 'district' => sanitize_text_field( (string) ( $a['district_name'] ?? '' ) ) );
+		}
+	}
+	if ( ! $out ) {
+		return new WP_Error( 'kk_courier_no_areas', __( 'RedX did not send its list of delivery areas. Please try again in a minute.', 'kenakata-kit' ), array( 'status' => 502 ) );
+	}
+	set_transient( 'kk_redx_areas', $out, WEEK_IN_SECONDS );
+	return $out;
+}
+
+/** The RedX area for an address: the longest area name found in it, else the default area. array( id, name ) or WP_Error. */
+function kk_courier_redx_area( $text ) {
+	$areas = kk_courier_redx_areas();
+	if ( is_wp_error( $areas ) ) {
+		return $areas;
+	}
+	$hay  = ' ' . strtolower( preg_replace( '/[^\p{L}\p{N}]+/u', ' ', (string) $text ) ) . ' ';
+	$best = null;
+	foreach ( $areas as $a ) {
+		$needle = ' ' . strtolower( trim( preg_replace( '/[^\p{L}\p{N}]+/u', ' ', $a['name'] ) ) ) . ' ';
+		if ( strlen( $needle ) > 3 && false !== strpos( $hay, $needle ) && ( ! $best || strlen( $a['name'] ) > strlen( $best['name'] ) ) ) {
+			$best = $a;
+		}
+	}
+	if ( ! $best ) {
+		$def = absint( kk_opt( 'courier_redx_area_id' ) );
+		foreach ( $def ? $areas : array() as $a ) {
+			if ( $a['id'] === $def ) {
+				$best = $a;
+			}
+		}
+	}
+	return $best ? $best : new WP_Error( 'kk_courier_area', __( 'RedX needs the delivery area (for example "Mirpur 10" or "Uttara Sector 7"). Add the area to the address, or set a default delivery area in Kenakata Kit → Courier booking.', 'kenakata-kit' ), array( 'status' => 422 ) );
+}
+
+function kk_courier_redx_book( array $d ) {
+	$area = kk_courier_redx_area( $d['address'] );
+	if ( is_wp_error( $area ) ) {
+		return $area;
+	}
+	$weight  = (int) round( max( 0.5, min( 10, (float) kk_opt( 'courier_default_weight' ) ) ) * 1000 ); // grams
+	$payload = array(
+		'customer_name'          => $d['name'],
+		'customer_phone'         => $d['phone'],
+		'delivery_area'          => $area['name'],
+		'delivery_area_id'       => $area['id'],
+		'customer_address'       => $d['address'],
+		'merchant_invoice_id'    => $d['invoice'],
+		'cash_collection_amount' => (string) round( $d['cod_amount'] ),
+		'parcel_weight'          => $weight,
+		'instruction'            => $d['note'],
+		'value'                  => (int) round( $d['cod_amount'] ),
+	);
+	$store = absint( kk_opt( 'courier_redx_store_id' ) );
+	if ( $store ) {
+		$payload['pickup_store_id'] = $store;
+	}
+	$res = kk_courier_http( 'redx', 'POST', '/parcel', $payload );
+	if ( is_wp_error( $res ) ) {
+		return $res;
+	}
+	list( $code, $body ) = $res;
+	if ( $code >= 200 && $code < 300 && ! empty( $body['tracking_id'] ) ) {
+		$tid = sanitize_text_field( (string) $body['tracking_id'] );
+		return array( 'consignment_id' => $tid, 'tracking_code' => $tid, 'status' => 'pickup_pending' );
+	}
+	if ( $code >= 200 && $code < 300 ) {
+		return new WP_Error( 'kk_courier_bad_answer', __( 'RedX sent an answer we could not read. Check your RedX account before sending again: the parcel may already have been created.', 'kenakata-kit' ), array( 'status' => 502 ) );
+	}
+	if ( 401 === $code || 403 === $code ) {
+		return new WP_Error( 'kk_courier_auth', __( 'RedX did not accept the API token. An administrator should check it in Kenakata Kit → Courier booking.', 'kenakata-kit' ), array( 'status' => 502 ) );
+	}
+	/* translators: 1: courier name 2: reason given by the courier */
+	return new WP_Error( 'kk_courier_rejected', sprintf( __( '%1$s did not accept the order. %2$s', 'kenakata-kit' ), 'RedX', kk_courier_error_text( $body ) ), array( 'status' => 422 ) );
+}
+
+function kk_courier_redx_status( $tracking_id ) {
+	$res = kk_courier_http( 'redx', 'GET', '/parcel/info/' . rawurlencode( (string) $tracking_id ) );
+	if ( is_wp_error( $res ) ) {
+		return $res;
+	}
+	list( $code, $body ) = $res;
+	$p = isset( $body['parcel'] ) && is_array( $body['parcel'] ) ? $body['parcel'] : array();
+	if ( $code >= 200 && $code < 300 && ! empty( $p['status'] ) ) {
+		return sanitize_key( str_replace( array( ' ', '-' ), '_', strtolower( (string) $p['status'] ) ) );
+	}
+	return new WP_Error( 'kk_courier_no_status', __( 'The courier could not tell the status right now. Please try again later.', 'kenakata-kit' ), array( 'status' => 502 ) );
+}
+
+/** RedX: check the token and list pickup stores (with numbers), without booking anything. */
+function kk_courier_redx_test() {
+	$res = kk_courier_http( 'redx', 'GET', '/pickup/stores' );
+	if ( is_wp_error( $res ) ) {
+		return $res;
+	}
+	list( $code, $body ) = $res;
+	if ( 401 === $code || 403 === $code ) {
+		return new WP_Error( 'kk_courier_auth', __( 'RedX did not accept this API token. Check it and save again.', 'kenakata-kit' ), array( 'status' => 502 ) );
+	}
+	if ( $code < 200 || $code >= 300 ) {
+		return new WP_Error( 'kk_courier_test', __( 'The courier gave an unexpected answer. Please try again in a minute.', 'kenakata-kit' ), array( 'status' => 502 ) );
+	}
+	$stores = array();
+	foreach ( isset( $body['pickup_stores'] ) && is_array( $body['pickup_stores'] ) ? $body['pickup_stores'] : array() as $st ) {
+		if ( isset( $st['id'], $st['name'] ) ) {
+			$stores[] = sanitize_text_field( $st['name'] ) . ' = ' . (int) $st['id'];
+		}
+	}
+	$areas = kk_courier_redx_areas( true );
+	$msg   = __( 'Connected to RedX.', 'kenakata-kit' );
+	if ( $stores ) {
+		/* translators: %s: list of "store name = number" */
+		$msg .= ' ' . sprintf( __( 'Pickup stores: %s', 'kenakata-kit' ), implode( ', ', $stores ) );
+	}
+	if ( ! is_wp_error( $areas ) ) {
+		/* translators: %d: number of areas */
+		$msg .= ' ' . sprintf( __( '%d delivery areas loaded.', 'kenakata-kit' ), count( $areas ) );
+	}
+	return array( 'ok' => true, 'message' => $msg );
 }
 
 /* =========================================================================
@@ -760,6 +908,9 @@ function kk_courier_rest_test( $target = '' ) {
 	}
 	if ( 'pathao' === $target ) {
 		return kk_courier_pathao_test();
+	}
+	if ( 'redx' === $target ) {
+		return kk_courier_redx_test();
 	}
 	$res = kk_courier_http( $target, 'GET', '/get_balance' );
 	if ( is_wp_error( $res ) ) {

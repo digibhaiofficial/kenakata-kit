@@ -3,7 +3,7 @@ Contributors: DigiBhai.com
 Plugin URI: https://digibhai.com/
 Requires at least: 6.3
 Requires PHP: 7.4
-Stable tag: 3.11.1
+Stable tag: 3.12.0
 License: GPLv2 or later
 
 Everything a Bangladeshi WooCommerce store usually needs. Settings: left admin menu → Kenakata Kit.
@@ -29,6 +29,19 @@ Products Grid, Products Carousel, Brands, Categories, Buy Now Button, Live Searc
 Older [ss_…] shortcodes keep working. Options: see the guide or Kenakata Kit → Shortcodes.
 
 == Changelog ==
+= 3.12.0 =
+* Fixed: a license key made for another website (or a broken key) is no longer saved. A red message says which website the key is for and which website this is; a key that stopped working shows "License key not working" on the License page.
+* New: "Speed & health" tab: switches for lighter pages (emoji and embed scripts, WooCommerce files only on shop pages, calmer Heartbeat), Cloudflare Turnstile on login / registration / checkout, a site and security checkup with "Fix" links, and a safe database clean-up. Everything is off until turned on.
+* New: "Couriers I use": a tick list of 18 couriers of Bangladesh. The tracking link is made from the tracking ID automatically (Steadfast, Pathao, RedX, or your own link with {id}). Older courier lists are moved over automatically.
+* New (Pro): one-tap RedX booking (API token, optional pickup store, delivery area found from the address).
+* New: order tracking can also ask for the order number, so a phone number alone shows nothing.
+* New: "Make order" from an incomplete checkout adds the delivery charge the customer saw and keeps the cart prices.
+* New: Tools → "Delete all data when the plugin is deleted" (off by default) and a proper uninstall that always removes scheduled tasks and temporary data.
+* Faster: minified CSS/JS (smaller downloads), the first product images load at once with high priority and the rest lazily, the search cache can no longer fill the database, the health check runs hourly instead of every 5 minutes, two small settings are no longer read from the database on every page.
+* Security: login attempts are also limited per account (stops attacks spread over many addresses); the login popup works on pages cached for more than a day; courier booking and "Make order" use a real lock, so a double tap never creates two parcels or orders; another visitor typing the same phone number can no longer overwrite or take over a saved incomplete checkout; the address limits and Q&A / wishlist use the real visitor address behind Cloudflare; a settings form sent without its tab changes nothing; API keys are no longer altered when saved (passwords with % or < work).
+* Fixed: phone numbers typed with Bengali digits (০১৭…) work everywhere (checkout, popup, tracking, incomplete orders).
+* Translations: about 330 missing Bengali texts added (Q&A, My account, wishlist, Elementor widgets, new features).
+
 = 3.11.1 =
 * New: Kenakata Kit logo in the admin menu and on the settings screens.
 * Changed: with a Pro license, the settings header shows "Kenakata Kit PRO" and "Pro activated"; the small PRO tags on the store dashboard, incomplete orders and courier tabs only show while there is no license. The License page has a clear Pro / Free card.

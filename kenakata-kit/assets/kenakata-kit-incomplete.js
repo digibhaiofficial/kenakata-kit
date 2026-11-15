@@ -22,7 +22,7 @@
 			city: q(['#billing_city', '#billing-city', '#shipping-city', '#billing_delivery_area'])
 		};
 	}
-	function valid(p) { return /^(?:\+?88)?01[3-9]\d{8}$/.test(String(p).replace(/[\s-]/g, '')); }
+	function valid(p) { return /^(?:\+?88)?01[3-9]\d{8}$/.test(String(p).replace(/[\u09E6-\u09EF]/g, function (c) { return String(c.charCodeAt(0) - 0x09E6); }).replace(/[\s-]/g, '')); }
 	function send() {
 		var d = collect();
 		if (!valid(d.phone)) { return; }

@@ -93,14 +93,14 @@ function kk_body_classes( $classes ) {
 }
 
 add_action( 'wp_enqueue_scripts', function () {
-	wp_enqueue_style( 'kenakata-kit', KK_URL . 'assets/kenakata-kit.css', array(), KK_VERSION );
+	wp_enqueue_style( 'kenakata-kit', kk_asset( 'kenakata-kit.css' ), array(), KK_VERSION );
 	wp_add_inline_style( 'kenakata-kit', kk_css_vars() );
 	if ( kk_opt( 'compat_strong' ) ) {
-		wp_enqueue_style( 'kenakata-kit-compat', KK_URL . 'assets/kenakata-kit-compat.css', array( 'kenakata-kit' ), KK_VERSION );
+		wp_enqueue_style( 'kenakata-kit-compat', kk_asset( 'kenakata-kit-compat.css' ), array( 'kenakata-kit' ), KK_VERSION );
 	}
 	add_filter( 'body_class', 'kk_body_classes' );
 
-	wp_register_script( 'kenakata-kit', KK_URL . 'assets/kenakata-kit.js', array(), KK_VERSION, array( 'in_footer' => true, 'strategy' => 'defer' ) );
+	wp_register_script( 'kenakata-kit', kk_asset( 'kenakata-kit.js' ), array(), KK_VERSION, array( 'in_footer' => true, 'strategy' => 'defer' ) );
 	wp_localize_script( 'kenakata-kit', 'kkData', array(
 		'searchUrl'  => esc_url_raw( rest_url( 'kenakata/v1/search' ) ),
 		'minChars'   => max( 1, absint( kk_opt( 'search_min_chars' ) ) ),

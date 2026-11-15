@@ -6909,3 +6909,984 @@ msgstr "Kenakata Kit Free"
 
 msgid "Moving to another website? Remove the key here, then ask us to move it to the new address."
 msgstr "অন্য ওয়েবসাইটে নিতে চান? এখানে কী সরিয়ে দিন, তারপর নতুন ঠিকানার জন্য আমাদের জানান।"
+
+msgid "%d administrator"
+msgid_plural "%d administrators"
+msgstr[0] "%d জন অ্যাডমিন"
+msgstr[1] "%d জন অ্যাডমিন"
+
+msgid "%d plugin has an update: old plugins are the most common way sites get hacked"
+msgid_plural "%d plugins have updates: old plugins are the most common way sites get hacked"
+msgstr[0] "%dটি প্লাগইনের আপডেট আছে: পুরোনো প্লাগইনই সাইট হ্যাক হওয়ার সবচেয়ে সাধারণ কারণ"
+msgstr[1] "%dটি প্লাগইনের আপডেট আছে: পুরোনো প্লাগইনই সাইট হ্যাক হওয়ার সবচেয়ে সাধারণ কারণ"
+
+msgid "%s order"
+msgid_plural "%s orders"
+msgstr[0] "%sটি অর্ডার"
+msgstr[1] "%sটি অর্ডার"
+
+msgid "Please complete the security check (the box above the button) and try again."
+msgstr "নিরাপত্তা যাচাই (বোতামের উপরের বক্স) সম্পন্ন করে আবার চেষ্টা করুন।"
+
+msgid "PHP %s (fast and supported)"
+msgstr "PHP %s (দ্রুত ও সাপোর্টেড)"
+
+msgid "PHP %s is old: ask your hosting for PHP 8.2 or newer (faster and safer)"
+msgstr "PHP %s পুরোনো: হোস্টিংকে PHP 8.2 বা নতুন ভার্সন দিতে বলুন (দ্রুত ও নিরাপদ)"
+
+msgid "Object cache is on (Redis / Memcached / LiteSpeed)"
+msgstr "অবজেক্ট ক্যাশ চালু আছে (Redis / Memcached / LiteSpeed)"
+
+msgid "No object cache: if your hosting offers Redis or LiteSpeed Object Cache, turn it on (less database work on every page)"
+msgstr "অবজেক্ট ক্যাশ নেই: হোস্টিংয়ে Redis বা LiteSpeed Object Cache থাকলে চালু করুন (প্রতিটি পেজে ডাটাবেসের কাজ কমে)"
+
+msgid "A page cache plugin is active"
+msgstr "পেজ ক্যাশ প্লাগইন চালু আছে"
+
+msgid "No page cache plugin found: LiteSpeed Cache (free, on LiteSpeed hosting) makes pages much faster"
+msgstr "কোনো পেজ ক্যাশ প্লাগইন পাওয়া যায়নি: LiteSpeed Cache (ফ্রি, LiteSpeed হোস্টিংয়ে) পেজ অনেক দ্রুত করে"
+
+msgid "Settings loaded on every page: %d KB (good)"
+msgstr "প্রতিটি পেজে লোড হওয়া সেটিংস: %d KB (ভালো)"
+
+msgid "Settings loaded on every page: %d KB. Over 800 KB slows every page: remove plugins you no longer use, then run the clean-up below."
+msgstr "প্রতিটি পেজে লোড হওয়া সেটিংস: %d KB। ৮০০ KB-র বেশি হলে প্রতিটি পেজ ধীর হয়: অপ্রয়োজনীয় প্লাগইন সরান, তারপর নিচের ক্লিন-আপ চালান।"
+
+msgid "Scheduled tasks (cron): first check within an hour"
+msgstr "নির্ধারিত কাজ (cron): এক ঘণ্টার মধ্যে প্রথম যাচাই হবে"
+
+msgid "Scheduled tasks (cron) run normally"
+msgstr "নির্ধারিত কাজ (cron) ঠিকমতো চলছে"
+
+msgid "Scheduled tasks (cron) are not running regularly: add a server cron job that opens your-site/wp-cron.php every 5 minutes"
+msgstr "নির্ধারিত কাজ (cron) নিয়মিত চলছে না: সার্ভারে একটি cron job দিন যা প্রতি ৫ মিনিটে your-site/wp-cron.php খোলে"
+
+msgid "Errors are shown to visitors (WP_DEBUG on): turn it off in wp-config.php"
+msgstr "ভিজিটররা এরর দেখতে পাচ্ছে (WP_DEBUG চালু): wp-config.php-তে বন্ধ করুন"
+
+msgid "Errors are not shown to visitors"
+msgstr "ভিজিটরদের এরর দেখানো হয় না"
+
+msgid "A user called \"admin\" exists: bots try this name first. Make a new administrator with another name and delete \"admin\" (move its posts to the new user)."
+msgstr "\"admin\" নামে একজন ইউজার আছে: বট প্রথমে এই নামটাই চেষ্টা করে। অন্য নামে নতুন অ্যাডমিন বানিয়ে \"admin\" মুছে দিন (তার পোস্ট নতুন ইউজারে সরিয়ে দিন)।"
+
+msgid "No user called \"admin\""
+msgstr "\"admin\" নামে কোনো ইউজার নেই"
+
+msgid "Wrong-password limit is on"
+msgstr "ভুল পাসওয়ার্ডের সীমা চালু আছে"
+
+msgid "Wrong-password limit is off"
+msgstr "ভুল পাসওয়ার্ডের সীমা বন্ধ আছে"
+
+msgid "Theme / plugin file editor is off"
+msgstr "থিম / প্লাগইন ফাইল এডিটর বন্ধ আছে"
+
+msgid "The theme / plugin file editor is on: a stolen password could change your site's code"
+msgstr "থিম / প্লাগইন ফাইল এডিটর চালু: পাসওয়ার্ড চুরি হলে কেউ সাইটের কোড বদলে দিতে পারে"
+
+msgid "XML-RPC (old remote login, a common attack door) is off"
+msgstr "XML-RPC (পুরোনো রিমোট লগইন, হামলার একটা সাধারণ দরজা) বন্ধ আছে"
+
+msgid "XML-RPC is on: turn it off unless you use the old WordPress app or Jetpack"
+msgstr "XML-RPC চালু: পুরোনো WordPress অ্যাপ বা Jetpack ব্যবহার না করলে বন্ধ করুন"
+
+msgid "Cloudflare Turnstile protects the login"
+msgstr "লগইন Cloudflare Turnstile দিয়ে সুরক্ষিত"
+
+msgid "Login has no bot check: turn on Cloudflare Turnstile on this page (free)"
+msgstr "লগইনে বট যাচাই নেই: এই পেজেই Cloudflare Turnstile চালু করুন (ফ্রি)"
+
+msgid "%d administrators: give staff the \"Store Manager\" or \"Shop manager\" role instead"
+msgstr "%d জন অ্যাডমিন: স্টাফদের বরং \"Store Manager\" বা \"Shop manager\" রোল দিন"
+
+msgid "All plugins are up to date"
+msgstr "সব প্লাগইন আপডেট করা আছে"
+
+msgid "Site checkup"
+msgstr "সাইট চেকআপ"
+
+msgid "Security checkup"
+msgstr "নিরাপত্তা চেকআপ"
+
+msgid "Database clean-up"
+msgstr "ডাটাবেস পরিষ্কার"
+
+msgid "Removes only leftovers that WordPress no longer needs. Products, orders, pages, posts and revisions are never touched."
+msgstr "শুধু WordPress-এর আর দরকার নেই এমন বাড়তি জিনিস মোছে। প্রোডাক্ট, অর্ডার, পেজ, পোস্ট ও রিভিশনে কখনো হাত দেয় না।"
+
+msgid "Expired temporary data: %d"
+msgstr "মেয়াদ শেষ অস্থায়ী ডাটা: %d"
+
+msgid "Expired cart sessions: %d"
+msgstr "মেয়াদ শেষ কার্ট সেশন: %d"
+
+msgid "Spam comments older than 30 days: %d"
+msgstr "৩০ দিনের পুরোনো স্প্যাম কমেন্ট: %d"
+
+msgid "Clean up now"
+msgstr "এখনই পরিষ্কার করুন"
+
+msgid "Speed & health"
+msgstr "স্পিড ও হেলথ"
+
+msgid "Make the site lighter, stop login bots, and see a checkup of speed and security with what to fix. Every switch is off until you turn it on."
+msgstr "সাইট হালকা করুন, লগইন বট থামান, আর স্পিড ও নিরাপত্তার চেকআপে দেখুন কী ঠিক করতে হবে। আপনি চালু না করা পর্যন্ত সব সুইচ বন্ধ থাকে।"
+
+msgid "Also ask for the order number"
+msgstr "অর্ডার নম্বরও চাইবে"
+
+msgid "More private: someone who only knows a phone number cannot see that person's orders. The customer finds the order number on the thank-you page and in the order SMS/email."
+msgstr "বেশি গোপনীয়: শুধু ফোন নম্বর জানলেই কেউ ওই ব্যক্তির অর্ডার দেখতে পারবে না। কাস্টমার অর্ডার নম্বর পাবেন থ্যাংক-ইউ পেজে এবং অর্ডারের SMS/ইমেইলে।"
+
+msgid "Couriers I use"
+msgstr "আমি যেসব কুরিয়ার ব্যবহার করি"
+
+msgid "Tick the couriers you send parcels with: only these appear in the order's courier list. When you type a tracking ID, the tracking link is made automatically (where the courier has a tracking page). You can paste your own link with {id} where the tracking ID goes."
+msgstr "যেসব কুরিয়ারে পার্সেল পাঠান সেগুলোতে টিক দিন: অর্ডারের কুরিয়ার তালিকায় শুধু এগুলোই আসবে। ট্র্যাকিং আইডি লিখলে ট্র্যাকিং লিংক নিজে থেকে তৈরি হবে (যে কুরিয়ারের ট্র্যাকিং পেজ আছে)। চাইলে নিজের লিংক দিতে পারেন, ট্র্যাকিং আইডির জায়গায় {id} লিখে।"
+
+msgid "Other couriers"
+msgstr "অন্যান্য কুরিয়ার"
+
+msgid "Not in the list above? One per line: key|Name|tracking link (the link is optional; put {id} where the tracking ID goes). Example: fastx|FastX Courier|https://fastx.example/track/{id}"
+msgstr "উপরের তালিকায় নেই? প্রতি লাইনে একটি: key|নাম|ট্র্যাকিং লিংক (লিংক না দিলেও চলে; ট্র্যাকিং আইডির জায়গায় {id} লিখুন)। উদাহরণ: fastx|FastX Courier|https://fastx.example/track/{id}"
+
+msgid "RedX"
+msgstr "RedX"
+
+msgid "Send orders to RedX with one tap. New: please send your first parcel while watching your RedX panel."
+msgstr "এক ট্যাপে RedX-এ অর্ডার পাঠান। নতুন ফিচার: প্রথম পার্সেলটা RedX প্যানেল খোলা রেখে পাঠিয়ে মিলিয়ে নিন।"
+
+msgid "API access token"
+msgstr "API অ্যাক্সেস টোকেন"
+
+msgid "From RedX (redx.com.bd → Developer API, or ask your RedX contact). Kept private. Leave empty to keep the saved token."
+msgstr "RedX থেকে নিন (redx.com.bd → Developer API, অথবা আপনার RedX প্রতিনিধিকে বলুন)। গোপন রাখা হয়। সেভ করা টোকেন রাখতে ফাঁকা রাখুন।"
+
+msgid "Pickup store ID (optional)"
+msgstr "পিকআপ স্টোর আইডি (ঐচ্ছিক)"
+
+msgid "Empty = your default RedX pickup store. \"Test connection\" lists your stores with their numbers."
+msgstr "ফাঁকা = আপনার ডিফল্ট RedX পিকআপ স্টোর। \"Test connection\" চাপলে স্টোরগুলোর নম্বরসহ তালিকা দেখাবে।"
+
+msgid "Default delivery area ID (optional)"
+msgstr "ডিফল্ট ডেলিভারি এরিয়া আইডি (ঐচ্ছিক)"
+
+msgid "RedX needs an area for every parcel. It is found from the address; when no area name is in the address, this one is used."
+msgstr "RedX প্রতিটি পার্সেলের জন্য এরিয়া চায়। ঠিকানা থেকে এরিয়া খুঁজে নেওয়া হয়; ঠিকানায় এরিয়ার নাম না থাকলে এটি ব্যবহার হবে।"
+
+msgid "Use RedX's test server"
+msgstr "RedX-এর টেস্ট সার্ভার ব্যবহার করুন"
+
+msgid "Only for trying things out: parcels are not real."
+msgstr "শুধু পরীক্ষার জন্য: পার্সেল আসল নয়।"
+
+msgid "Test RedX"
+msgstr "RedX পরীক্ষা"
+
+msgid "Save first, then test. It checks the token and lists your pickup stores: nothing is booked."
+msgstr "আগে সেভ করুন, তারপর পরীক্ষা করুন। এটি টোকেন যাচাই করে পিকআপ স্টোরের তালিকা দেখায়: কিছু বুক হয় না।"
+
+msgid "Lighter pages"
+msgstr "হালকা পেজ"
+
+msgid "After turning a switch on, open your home page, a product, the cart and the checkout once to check, and clear the cache if you use a cache plugin."
+msgstr "কোনো সুইচ চালু করার পর একবার হোম পেজ, একটি প্রোডাক্ট, কার্ট ও চেকআউট খুলে দেখুন, আর ক্যাশ প্লাগইন থাকলে ক্যাশ মুছে দিন।"
+
+msgid "Remove the emoji script"
+msgstr "ইমোজি স্ক্রিপ্ট সরান"
+
+msgid "WordPress adds a script to every page for emoji on very old browsers. Phones and new browsers show emoji without it."
+msgstr "খুব পুরোনো ব্রাউজারে ইমোজি দেখাতে WordPress প্রতিটি পেজে একটি স্ক্রিপ্ট যোগ করে। ফোন ও নতুন ব্রাউজার এটা ছাড়াই ইমোজি দেখায়।"
+
+msgid "Remove the embed script"
+msgstr "এমবেড স্ক্রিপ্ট সরান"
+
+msgid "Only needed to show your posts as cards inside other WordPress sites."
+msgstr "শুধু অন্য WordPress সাইটে আপনার পোস্ট কার্ড আকারে দেখাতে লাগে।"
+
+msgid "WooCommerce files only on shop pages"
+msgstr "WooCommerce ফাইল শুধু শপের পেজে"
+
+msgid "Blog posts and plain pages load without WooCommerce's styles and scripts. Shop, product, cart, checkout, account, the home page and pages with product widgets keep them."
+msgstr "ব্লগ পোস্ট ও সাধারণ পেজ WooCommerce-এর স্টাইল ও স্ক্রিপ্ট ছাড়া লোড হবে। শপ, প্রোডাক্ট, কার্ট, চেকআউট, অ্যাকাউন্ট, হোম পেজ আর প্রোডাক্ট উইজেট থাকা পেজে এগুলো থাকবে।"
+
+msgid "Calmer \"Heartbeat\""
+msgstr "শান্ত \"Heartbeat\""
+
+msgid "An open admin tab asks the server every 15–60 seconds. This makes it every 2 minutes (the post editor keeps its normal speed for auto-save) and turns it off for shop visitors."
+msgstr "খোলা অ্যাডমিন ট্যাব প্রতি ১৫–৬০ সেকেন্ডে সার্ভারে অনুরোধ পাঠায়। এটা চালু করলে প্রতি ২ মিনিটে পাঠাবে (অটো-সেভের জন্য পোস্ট এডিটরে আগের মতোই থাকবে) আর শপের ভিজিটরদের জন্য বন্ধ থাকবে।"
+
+msgid "Stop bots: Cloudflare Turnstile"
+msgstr "বট থামান: Cloudflare Turnstile"
+
+msgid "A free check from Cloudflare that real people usually do not even notice. Get the two keys at dash.cloudflare.com → Turnstile → Add site (your site does not need to use Cloudflare)."
+msgstr "Cloudflare-এর ফ্রি যাচাই, আসল মানুষ সাধারণত টেরও পান না। দুটি কী নিন dash.cloudflare.com → Turnstile → Add site থেকে (আপনার সাইট Cloudflare-এ না থাকলেও চলবে)।"
+
+msgid "Use Cloudflare Turnstile"
+msgstr "Cloudflare Turnstile ব্যবহার করুন"
+
+msgid "Site key"
+msgstr "সাইট কী"
+
+msgid "Kept private: only the last 4 characters are ever shown. Leave empty to keep the saved key."
+msgstr "গোপন রাখা হয়: শুধু শেষ ৪টি অক্ষর দেখানো হয়। সেভ করা কী রাখতে ফাঁকা রাখুন।"
+
+msgid "On login and registration"
+msgstr "লগইন ও রেজিস্ট্রেশনে"
+
+msgid "wp-login.php, My Account and the login popup. If your site uses another login form (for example the Elementor \"Login\" widget), log out and test it once."
+msgstr "wp-login.php, My Account আর লগইন পপআপ। সাইটে অন্য কোনো লগইন ফর্ম থাকলে (যেমন Elementor-এর \"Login\" উইজেট) লগআউট করে একবার পরীক্ষা করে নিন।"
+
+msgid "On checkout"
+msgstr "চেকআউটে"
+
+msgid "Stops bots placing fake orders. If Cloudflare cannot be reached, the order still goes through."
+msgstr "বটের ভুয়া অর্ডার আটকায়। Cloudflare-এ যোগাযোগ না হলেও অর্ডার ঠিকই হবে।"
+
+msgid "Add to wishlist"
+msgstr "উইশলিস্টে যোগ করুন"
+
+msgid "In wishlist"
+msgstr "উইশলিস্টে আছে"
+
+msgid "%d saved products"
+msgstr "%dটি সেভ করা প্রোডাক্ট"
+
+msgid "1 saved product"
+msgstr "১টি সেভ করা প্রোডাক্ট"
+
+msgid "Saved to your wishlist"
+msgstr "উইশলিস্টে সেভ হয়েছে"
+
+msgid "Removed from your wishlist"
+msgstr "উইশলিস্ট থেকে সরানো হয়েছে"
+
+msgid "My wishlist at %s:"
+msgstr "%s-এ আমার উইশলিস্ট:"
+
+msgid "Show less"
+msgstr "কম দেখান"
+
+msgid "RedX did not accept the API token. An administrator should check it in Kenakata Kit → Courier booking."
+msgstr "RedX API টোকেন গ্রহণ করেনি। অ্যাডমিনকে Kenakata Kit → Courier booking-এ টোকেনটি দেখতে হবে।"
+
+msgid "RedX did not send its list of delivery areas. Please try again in a minute."
+msgstr "RedX ডেলিভারি এরিয়ার তালিকা পাঠায়নি। এক মিনিট পরে আবার চেষ্টা করুন।"
+
+msgid "RedX needs the delivery area (for example \"Mirpur 10\" or \"Uttara Sector 7\"). Add the area to the address, or set a default delivery area in Kenakata Kit → Courier booking."
+msgstr "RedX ডেলিভারি এরিয়া চায় (যেমন \"Mirpur 10\" বা \"Uttara Sector 7\")। ঠিকানায় এরিয়া লিখুন, অথবা Kenakata Kit → Courier booking-এ একটি ডিফল্ট ডেলিভারি এরিয়া দিন।"
+
+msgid "RedX sent an answer we could not read. Check your RedX account before sending again: the parcel may already have been created."
+msgstr "RedX এমন উত্তর পাঠিয়েছে যা পড়া যায়নি। আবার পাঠানোর আগে RedX অ্যাকাউন্ট দেখে নিন: পার্সেল হয়তো আগেই তৈরি হয়ে গেছে।"
+
+msgid "RedX did not accept this API token. Check it and save again."
+msgstr "RedX এই API টোকেন গ্রহণ করেনি। যাচাই করে আবার সেভ করুন।"
+
+msgid "Connected to RedX."
+msgstr "RedX-এর সাথে সংযোগ হয়েছে।"
+
+msgid "Pickup stores: %s"
+msgstr "পিকআপ স্টোর: %s"
+
+msgid "%d delivery areas loaded."
+msgstr "%dটি ডেলিভারি এরিয়া লোড হয়েছে।"
+
+msgid "Customers who reached the checkout and typed their phone number but did not place the order. Call them: many only needed a nudge."
+msgstr "যে কাস্টমাররা চেকআউটে এসে ফোন নম্বর লিখেছেন কিন্তু অর্ডার করেননি। তাঁদের কল করুন: অনেকের শুধু একটু মনে করিয়ে দেওয়া দরকার ছিল।"
+
+msgid "ago"
+msgstr "আগে"
+
+msgid "Brand:"
+msgstr "ব্র্যান্ড:"
+
+msgid "Cream"
+msgstr "ক্রিম"
+
+msgid "shown when the cart is empty"
+msgstr "কার্ট খালি থাকলে দেখায়"
+
+msgid "The saved key is for: %s."
+msgstr "সেভ করা কী-টি এই সাইটের জন্য: %s।"
+
+msgid "License key not working"
+msgstr "লাইসেন্স কী কাজ করছে না"
+
+msgid "License key saved. Pro is active on this site."
+msgstr "লাইসেন্স কী সেভ হয়েছে। এই সাইটে Pro চালু আছে।"
+
+msgid "The key was NOT saved."
+msgstr "কী সেভ হয়নি।"
+
+msgid "This key is for: %1$s. This website is: %2$s."
+msgstr "এই কী-টি এই সাইটের জন্য: %1$s। আপনার ওয়েবসাইট: %2$s।"
+
+msgid "Clean-up done: %d leftovers removed."
+msgstr "পরিষ্কার হয়েছে: %dটি বাড়তি জিনিস মোছা হয়েছে।"
+
+msgid "Can also send parcels with one tap (Courier booking)"
+msgstr "এক ট্যাপে পার্সেলও পাঠানো যায় (Courier booking)"
+
+msgid "One-tap booking"
+msgstr "এক ট্যাপে বুকিং"
+
+msgid "API"
+msgstr "API"
+
+msgid "Tracking link for %s"
+msgstr "%s-এর ট্র্যাকিং লিংক"
+
+msgid "No tracking page: the customer gets the tracking ID"
+msgstr "ট্র্যাকিং পেজ নেই: কাস্টমার ট্র্যাকিং আইডি পাবেন"
+
+msgid "Scheduled tasks (cron): waiting for the first run. Check again in an hour."
+msgstr "নির্ধারিত কাজ (cron): প্রথমবার চলার অপেক্ষায়। এক ঘণ্টা পরে আবার দেখুন।"
+
+msgid "When the plugin is deleted"
+msgstr "প্লাগইন মুছে ফেললে"
+
+msgid "Normally the settings and license stay in the database, so reinstalling brings everything back. Tick this only if you are removing Kenakata Kit for good. Orders and products are never deleted."
+msgstr "সাধারণত সেটিংস ও লাইসেন্স ডাটাবেসে থেকে যায়, তাই আবার ইনস্টল করলে সব ফিরে আসে। শুধু Kenakata Kit একেবারে বাদ দিলে এখানে টিক দিন। অর্ডার ও প্রোডাক্ট কখনো মোছা হয় না।"
+
+msgid "Delete all Kenakata Kit data when the plugin is deleted (settings, license key, API keys, incomplete orders)"
+msgstr "প্লাগইন মুছলে Kenakata Kit-এর সব ডাটা মুছে ফেলুন (সেটিংস, লাইসেন্স কী, API কী, অসম্পূর্ণ অর্ডার)"
+
+msgid "Questions"
+msgstr "প্রশ্নোত্তর"
+
+msgid "%s team"
+msgstr "%s টিম"
+
+msgid "Search questions"
+msgstr "প্রশ্ন খুঁজুন"
+
+msgid "Search questions…"
+msgstr "প্রশ্ন খুঁজুন…"
+
+msgid "Asked by %1$s · %2$s"
+msgstr "প্রশ্ন করেছেন %1$s · %2$s"
+
+msgid "No question matches your search."
+msgstr "আপনার খোঁজার সাথে কোনো প্রশ্ন মেলেনি।"
+
+msgid "No questions yet. Be the first to ask!"
+msgstr "এখনো কোনো প্রশ্ন নেই। প্রথম প্রশ্নটি আপনিই করুন!"
+
+msgid "Ask a question"
+msgstr "প্রশ্ন করুন"
+
+msgid "Leave this empty"
+msgstr "এটি ফাঁকা রাখুন"
+
+msgid "Your question"
+msgstr "আপনার প্রশ্ন"
+
+msgid "e.g. Is this suitable for oily skin?"
+msgstr "যেমন: এটা কি তৈলাক্ত ত্বকের জন্য উপযুক্ত?"
+
+msgid "Phone number"
+msgstr "ফোন নম্বর"
+
+msgid "Not shown on the site. We may call you about your question."
+msgstr "সাইটে দেখানো হবে না। প্রশ্নের বিষয়ে আমরা আপনাকে কল করতে পারি।"
+
+msgid "Send question"
+msgstr "প্রশ্ন পাঠান"
+
+msgid "Questions are switched off."
+msgstr "প্রশ্নোত্তর বন্ধ আছে।"
+
+msgid "Product not found."
+msgstr "প্রোডাক্ট পাওয়া যায়নি।"
+
+msgid "Please enter your name."
+msgstr "আপনার নাম লিখুন।"
+
+msgid "Please write your question."
+msgstr "আপনার প্রশ্ন লিখুন।"
+
+msgid "Please enter a valid 11-digit mobile number."
+msgstr "সঠিক ১১ সংখ্যার মোবাইল নম্বর দিন।"
+
+msgid "Please wait a minute before sending another question."
+msgstr "আরেকটি প্রশ্ন পাঠানোর আগে এক মিনিট অপেক্ষা করুন।"
+
+msgid "You have sent several questions today. Please call or WhatsApp us instead."
+msgstr "আজ আপনি কয়েকটি প্রশ্ন পাঠিয়েছেন। দয়া করে কল বা WhatsApp করুন।"
+
+msgid "New product question: %s"
+msgstr "নতুন প্রোডাক্ট প্রশ্ন: %s"
+
+msgid "Answer it here"
+msgstr "এখানে উত্তর দিন"
+
+msgid "Thank you! Your question was sent. We will answer it soon."
+msgstr "ধন্যবাদ! আপনার প্রশ্ন পাঠানো হয়েছে। শিগগিরই উত্তর দেব।"
+
+msgid "Product questions"
+msgstr "প্রোডাক্টের প্রশ্ন"
+
+msgid "Not allowed."
+msgstr "অনুমতি নেই।"
+
+msgid "Question not found."
+msgstr "প্রশ্ন পাওয়া যায়নি।"
+
+msgid "Waiting for an answer"
+msgstr "উত্তরের অপেক্ষায়"
+
+msgid "Answered"
+msgstr "উত্তর দেওয়া হয়েছে"
+
+msgid "Write an answer and click \"Publish answer\": the question and answer then appear in the product's Questions tab. Questions without an answer are never shown on the site."
+msgstr "উত্তর লিখে \"Publish answer\" চাপুন: তখন প্রশ্ন ও উত্তর প্রোডাক্টের প্রশ্নোত্তর ট্যাবে দেখাবে। উত্তর ছাড়া প্রশ্ন কখনো সাইটে দেখানো হয় না।"
+
+msgid "Saved."
+msgstr "সেভ হয়েছে।"
+
+msgid "Nothing here."
+msgstr "এখানে কিছু নেই।"
+
+msgid "Waiting"
+msgstr "অপেক্ষায়"
+
+msgid "Question"
+msgstr "প্রশ্ন"
+
+msgid "Answer"
+msgstr "উত্তর"
+
+msgid "Write the answer customers will see…"
+msgstr "কাস্টমাররা যে উত্তর দেখবেন তা লিখুন…"
+
+msgid "Update answer"
+msgstr "উত্তর আপডেট করুন"
+
+msgid "Publish answer"
+msgstr "উত্তর প্রকাশ করুন"
+
+msgid "Hide from site"
+msgstr "সাইট থেকে লুকান"
+
+msgid "Move this question to the bin?"
+msgstr "প্রশ্নটি ট্র্যাশে পাঠাবেন?"
+
+msgid "Move to bin"
+msgstr "ট্র্যাশে পাঠান"
+
+msgid "Sign in with your phone number or email and your password."
+msgstr "ফোন নম্বর বা ইমেইল আর পাসওয়ার্ড দিয়ে লগইন করুন।"
+
+msgid "Downloads"
+msgstr "ডাউনলোড"
+
+msgid "Addresses"
+msgstr "ঠিকানা"
+
+msgid "Payment methods"
+msgstr "পেমেন্ট মেথড"
+
+msgid "Account details"
+msgstr "অ্যাকাউন্টের তথ্য"
+
+msgid "Back to login"
+msgstr "লগইনে ফিরে যান"
+
+msgid "Forgot your password?"
+msgstr "পাসওয়ার্ড ভুলে গেছেন?"
+
+msgid "Enter the email address or username of your account. We will email you a link to set a new password."
+msgstr "আপনার অ্যাকাউন্টের ইমেইল বা ইউজারনেম লিখুন। নতুন পাসওয়ার্ড দেওয়ার লিংক ইমেইলে পাঠাব।"
+
+msgid "Check your email"
+msgstr "ইমেইল দেখুন"
+
+msgid "No email after a few minutes? Check your spam folder."
+msgstr "কয়েক মিনিটেও ইমেইল আসেনি? স্প্যাম ফোল্ডার দেখুন।"
+
+msgid "Or message us on WhatsApp."
+msgstr "অথবা আমাদের WhatsApp-এ মেসেজ দিন।"
+
+msgid "Set a new password"
+msgstr "নতুন পাসওয়ার্ড দিন"
+
+msgid "Hello, %s"
+msgstr "হ্যালো, %s"
+
+msgid "Welcome back! Your orders, addresses and account details are all here."
+msgstr "আবার স্বাগতম! আপনার অর্ডার, ঠিকানা আর অ্যাকাউন্টের তথ্য সব এখানে।"
+
+msgid "Latest order"
+msgstr "সর্বশেষ অর্ডার"
+
+msgid "View order"
+msgstr "অর্ডার দেখুন"
+
+msgid "Track order"
+msgstr "অর্ডার ট্র্যাক করুন"
+
+msgid "My orders"
+msgstr "আমার অর্ডার"
+
+msgid "No orders yet"
+msgstr "এখনো কোনো অর্ডার নেই"
+
+msgid "Track an order"
+msgstr "অর্ডার ট্র্যাক করুন"
+
+msgid "See where your parcel is"
+msgstr "আপনার পার্সেল কোথায় দেখুন"
+
+msgid "Delivery address for checkout"
+msgstr "চেকআউটের ডেলিভারি ঠিকানা"
+
+msgid "Name, email and password"
+msgstr "নাম, ইমেইল ও পাসওয়ার্ড"
+
+msgid "Continue shopping"
+msgstr "কেনাকাটা চালিয়ে যান"
+
+msgid "Find your next favourite"
+msgstr "পরের পছন্দের জিনিসটি খুঁজুন"
+
+msgid "Need help?"
+msgstr "সাহায্য দরকার?"
+
+msgid "Chat with us on WhatsApp"
+msgstr "WhatsApp-এ কথা বলুন"
+
+msgid "Your wishlist is empty. Tap ♡ on any product to save it here."
+msgstr "আপনার উইশলিস্ট খালি। যেকোনো প্রোডাক্টে ♡ চাপলে এখানে সেভ হবে।"
+
+msgid "Share on WhatsApp"
+msgstr "WhatsApp-এ শেয়ার করুন"
+
+msgid "A wishlist shared with you:"
+msgstr "আপনার সাথে শেয়ার করা একটি উইশলিস্ট:"
+
+msgid "Added to wishlists"
+msgstr "উইশলিস্টে যোগ হয়েছে"
+
+msgid "Who can see this · Kenakata Kit"
+msgstr "কে দেখতে পাবে · Kenakata Kit"
+
+msgid "Show to"
+msgstr "কাকে দেখাবে"
+
+msgid "Everyone"
+msgstr "সবাই"
+
+msgid "Visitors who are not logged in"
+msgstr "লগইন না করা ভিজিটর"
+
+msgid "Logged-in customers only"
+msgstr "শুধু লগইন করা কাস্টমার"
+
+msgid "The editor always shows it. Check the live page logged in and logged out."
+msgstr "এডিটরে সবসময় দেখায়। লাইভ পেজে লগইন করে ও লগআউট করে দেখে নিন।"
+
+msgid "Login"
+msgstr "লগইন"
+
+msgid "Username or email address"
+msgstr "ইউজারনেম বা ইমেইল"
+
+msgid "Lost your password?"
+msgstr "পাসওয়ার্ড ভুলে গেছেন?"
+
+msgid "Hello, Rahima"
+msgstr "হ্যালো, রহিমা"
+
+msgid "3 orders"
+msgstr "৩টি অর্ডার"
+
+msgid "Hello Rahima (not Rahima? Log out)"
+msgstr "হ্যালো রহিমা (রহিমা নন? লগআউট)"
+
+msgid "Phone number field"
+msgstr "ফোন নম্বরের ঘর"
+
+msgid "Brand"
+msgstr "ব্র্যান্ড"
+
+msgid "Side cart (applies to the whole site)"
+msgstr "সাইড কার্ট (পুরো সাইটে প্রযোজ্য)"
+
+msgid "The sections below style the side cart that opens from this icon. Turn the side cart on and choose what it shows (pictures, remove button, button texts) in Kenakata Kit → Side cart."
+msgstr "নিচের অংশগুলো এই আইকন থেকে খোলা সাইড কার্টের ডিজাইন ঠিক করে। সাইড কার্ট চালু করা আর কী দেখাবে (ছবি, রিমুভ বোতাম, বোতামের লেখা) ঠিক করা যায় Kenakata Kit → Side cart-এ।"
+
+msgid "Preview side cart in the editor"
+msgstr "এডিটরে সাইড কার্টের প্রিভিউ"
+
+msgid "Shows an open side cart with sample products below the icon while you edit, so you can see every style change. Turn it off again when you are done. Visitors never see this preview."
+msgstr "এডিট করার সময় আইকনের নিচে নমুনা প্রোডাক্টসহ খোলা সাইড কার্ট দেখায়, যাতে প্রতিটি পরিবর্তন দেখতে পান। কাজ শেষে আবার বন্ধ করুন। ভিজিটররা এই প্রিভিউ কখনো দেখেন না।"
+
+msgid "Page overlay colour"
+msgstr "পেজের ওপরের ছায়ার রং"
+
+msgid "Side cart: panel"
+msgstr "সাইড কার্ট: প্যানেল"
+
+msgid "Side cart: header"
+msgstr "সাইড কার্ট: হেডার"
+
+msgid "Side cart: title"
+msgstr "সাইড কার্ট: শিরোনাম"
+
+msgid "Side cart: close (×) button"
+msgstr "সাইড কার্ট: বন্ধ (×) বোতাম"
+
+msgid "Side cart: products"
+msgstr "সাইড কার্ট: প্রোডাক্ট"
+
+msgid "Picture size"
+msgstr "ছবির সাইজ"
+
+msgid "Picture fit"
+msgstr "ছবি কীভাবে বসবে"
+
+msgid "Default (whole picture)"
+msgstr "ডিফল্ট (পুরো ছবি)"
+
+msgid "Fill (crop)"
+msgstr "ভরাট (কাটা পড়তে পারে)"
+
+msgid "Whole picture"
+msgstr "পুরো ছবি"
+
+msgid "Picture corner radius"
+msgstr "ছবির কোণের গোলভাব"
+
+msgid "Picture background"
+msgstr "ছবির ব্যাকগ্রাউন্ড"
+
+msgid "Space above / below each product"
+msgstr "প্রতিটি প্রোডাক্টের উপরে / নিচে ফাঁকা"
+
+msgid "Line between products"
+msgstr "প্রোডাক্টের মাঝের দাগ"
+
+msgid "Side cart: product name"
+msgstr "সাইড কার্ট: প্রোডাক্টের নাম"
+
+msgid "Side cart: options (size, colour)"
+msgstr "সাইড কার্ট: অপশন (সাইজ, রং)"
+
+msgid "Side cart: quantity × price"
+msgstr "সাইড কার্ট: পরিমাণ × দাম"
+
+msgid "Side cart: remove (×) button"
+msgstr "সাইড কার্ট: সরান (×) বোতাম"
+
+msgid "Side cart: subtotal row"
+msgstr "সাইড কার্ট: সাবটোটাল সারি"
+
+msgid "Side cart: subtotal text"
+msgstr "সাইড কার্ট: সাবটোটালের লেখা"
+
+msgid "Side cart: View cart button"
+msgstr "সাইড কার্ট: View cart বোতাম"
+
+msgid "Side cart: Checkout button"
+msgstr "সাইড কার্ট: Checkout বোতাম"
+
+msgid "Side cart: empty-cart message"
+msgstr "সাইড কার্ট: খালি কার্টের বার্তা"
+
+msgid "Free Delivery Bar"
+msgstr "ফ্রি ডেলিভারি বার"
+
+msgid "Shows how much more the customer needs to buy for free delivery. Turn the feature on and set the amount in Kenakata Kit → Checkout → Free delivery. The bar updates by itself when products are added."
+msgstr "ফ্রি ডেলিভারির জন্য কাস্টমারকে আর কত টাকার কিনতে হবে তা দেখায়। ফিচার চালু করুন ও টাকার পরিমাণ দিন Kenakata Kit → Checkout → Free delivery-তে। প্রোডাক্ট যোগ হলে বার নিজে থেকে আপডেট হয়।"
+
+msgid "Progress bar"
+msgstr "প্রগ্রেস বার"
+
+msgid "Bar colour"
+msgstr "বারের রং"
+
+msgid "Track colour"
+msgstr "পেছনের দাগের রং"
+
+msgid "Free delivery is switched off in Kenakata Kit → Checkout, so visitors will not see this bar yet."
+msgstr "Kenakata Kit → Checkout-এ ফ্রি ডেলিভারি বন্ধ আছে, তাই ভিজিটররা এখনো এই বার দেখবেন না।"
+
+msgid "Cart Page"
+msgstr "কার্ট পেজ"
+
+msgid "Use on the Cart page only. It shows the products in the cart, quantities and totals. The editor shows a short note instead of the real cart."
+msgstr "শুধু কার্ট পেজে ব্যবহার করুন। কার্টের প্রোডাক্ট, পরিমাণ ও মোট দেখায়। এডিটরে আসল কার্টের বদলে ছোট একটি নোট দেখায়।"
+
+msgid "Boxes (product list and totals)"
+msgstr "বক্স (প্রোডাক্ট তালিকা ও মোট)"
+
+msgid "Totals title"
+msgstr "মোটের শিরোনাম"
+
+msgid "Checkout button"
+msgstr "চেকআউট বোতাম"
+
+msgid "The customer's cart appears here on the live page."
+msgstr "লাইভ পেজে এখানে কাস্টমারের কার্ট দেখাবে।"
+
+msgid "My Account"
+msgstr "আমার অ্যাকাউন্ট"
+
+msgid "Use on the My account page. Visitors see the login card; customers see their dashboard, orders and details. Change colours and sizes in the Style tab. Use \"Preview in the editor\" to style both views."
+msgstr "My account পেজে ব্যবহার করুন। ভিজিটররা লগইন কার্ড দেখবেন; কাস্টমাররা দেখবেন তাঁদের ড্যাশবোর্ড, অর্ডার ও তথ্য। রং ও সাইজ বদলান Style ট্যাবে। দুই ভিউ সাজাতে \"Preview in the editor\" ব্যবহার করুন।"
+
+msgid "Preview in the editor"
+msgstr "এডিটরে প্রিভিউ"
+
+msgid "Login card (visitor)"
+msgstr "লগইন কার্ড (ভিজিটর)"
+
+msgid "Dashboard (customer)"
+msgstr "ড্যাশবোর্ড (কাস্টমার)"
+
+msgid "Line under the login title"
+msgstr "লগইন শিরোনামের নিচের দাগ"
+
+msgid "Dashboard: greeting, latest order and quick links"
+msgstr "ড্যাশবোর্ড: শুভেচ্ছা, সর্বশেষ অর্ডার ও দ্রুত লিংক"
+
+msgid "Account menu"
+msgstr "অ্যাকাউন্ট মেনু"
+
+msgid "At the side"
+msgstr "পাশে"
+
+msgid "On top (tabs)"
+msgstr "উপরে (ট্যাব)"
+
+msgid "Icons in the menu"
+msgstr "মেনুতে আইকন"
+
+msgid "Hide these menu items"
+msgstr "এই মেনু আইটেমগুলো লুকান"
+
+msgid "Login card"
+msgstr "লগইন কার্ড"
+
+msgid "Titles"
+msgstr "শিরোনাম"
+
+msgid "Menu box"
+msgstr "মেনু বক্স"
+
+msgid "Active / hover: text"
+msgstr "সক্রিয় / হোভার: লেখা"
+
+msgid "Active / hover: background"
+msgstr "সক্রিয় / হোভার: ব্যাকগ্রাউন্ড"
+
+msgid "Log out colour"
+msgstr "লগআউটের রং"
+
+msgid "Content box"
+msgstr "কনটেন্ট বক্স"
+
+msgid "Dashboard cards"
+msgstr "ড্যাশবোর্ড কার্ড"
+
+msgid "Dashboard card icons"
+msgstr "ড্যাশবোর্ড কার্ডের আইকন"
+
+msgid "Icon background"
+msgstr "আইকনের ব্যাকগ্রাউন্ড"
+
+msgid "Greeting background"
+msgstr "শুভেচ্ছার ব্যাকগ্রাউন্ড"
+
+msgid "Greeting text"
+msgstr "শুভেচ্ছার লেখা"
+
+msgid "With a light greeting background choose a dark text colour; it is also used for the round initial and the \"Log out\" button."
+msgstr "শুভেচ্ছার ব্যাকগ্রাউন্ড হালকা হলে লেখার রং গাঢ় দিন; গোল আদ্যক্ষর আর \"Log out\" বোতামেও এই রং ব্যবহার হয়।"
+
+msgid "Initial circle background"
+msgstr "আদ্যক্ষরের বৃত্তের ব্যাকগ্রাউন্ড"
+
+msgid "\"Log out\" hover background"
+msgstr "\"Log out\" হোভার ব্যাকগ্রাউন্ড"
+
+msgid "Wishlist Icon"
+msgstr "উইশলিস্ট আইকন"
+
+msgid "A ♡ link to the wishlist page with the number of saved products. Put it in the header next to the cart."
+msgstr "উইশলিস্ট পেজের ♡ লিংক, সেভ করা প্রোডাক্টের সংখ্যাসহ। হেডারে কার্টের পাশে বসান।"
+
+msgid "Text next to the icon (optional)"
+msgstr "আইকনের পাশের লেখা (ঐচ্ছিক)"
+
+msgid "Count background"
+msgstr "সংখ্যার ব্যাকগ্রাউন্ড"
+
+msgid "Count text"
+msgstr "সংখ্যার লেখা"
+
+msgid "Wishlist is off: turn it on in Kenakata Kit → Wishlist."
+msgstr "উইশলিস্ট বন্ধ: Kenakata Kit → Wishlist-এ চালু করুন।"
+
+msgid "Wishlist Page"
+msgstr "উইশলিস্ট পেজ"
+
+msgid "Shows the products the visitor saved with ♡, as product cards. Use it on the page with the slug \"wishlist\" (or choose the page in Kenakata Kit → Wishlist). The cards look like your other product lists."
+msgstr "ভিজিটর ♡ দিয়ে যেসব প্রোডাক্ট সেভ করেছেন, সেগুলো প্রোডাক্ট কার্ডে দেখায়। \"wishlist\" স্লাগের পেজে ব্যবহার করুন (অথবা Kenakata Kit → Wishlist-এ পেজ বেছে নিন)। কার্ডগুলো আপনার অন্য প্রোডাক্ট তালিকার মতোই দেখাবে।"
+
+msgid "Products per row"
+msgstr "প্রতি সারিতে প্রোডাক্ট"
+
+msgid "Count text (\"3 saved products\")"
+msgstr "সংখ্যার লেখা (\"৩টি সেভ করা প্রোডাক্ট\")"
+
+msgid "Empty-list box"
+msgstr "খালি তালিকার বক্স"
+
+msgid "The visitor's saved products appear here as product cards on the live page."
+msgstr "লাইভ পেজে এখানে ভিজিটরের সেভ করা প্রোডাক্ট কার্ড আকারে দেখাবে।"
+
+msgid "Border colour when typing"
+msgstr "লেখার সময় বর্ডারের রং"
+
+msgid "Order status and steps"
+msgstr "অর্ডারের অবস্থা ও ধাপ"
+
+msgid "Status label text"
+msgstr "অবস্থার লেবেলের লেখা"
+
+msgid "Status label background"
+msgstr "অবস্থার লেবেলের ব্যাকগ্রাউন্ড"
+
+msgid "Step text"
+msgstr "ধাপের লেখা"
+
+msgid "Completed / current step colour"
+msgstr "সম্পন্ন / চলমান ধাপের রং"
+
+msgid "Step typography"
+msgstr "ধাপের টাইপোগ্রাফি"
+
+msgid "Tick icon"
+msgstr "টিক আইকন"
+
+msgid "Top box (thank-you message)"
+msgstr "উপরের বক্স (ধন্যবাদ বার্তা)"
+
+msgid "Order number, date and total"
+msgstr "অর্ডার নম্বর, তারিখ ও মোট"
+
+msgid "Products list"
+msgstr "প্রোডাক্ট তালিকা"
+
+msgid "Totals"
+msgstr "মোট"
+
+msgid "Second button (Continue shopping)"
+msgstr "দ্বিতীয় বোতাম (কেনাকাটা চালিয়ে যান)"
+
+msgid "Product Brand"
+msgstr "প্রোডাক্ট ব্র্যান্ড"
+
+msgid "Shows the brand of the product with its small logo, e.g. \"Brand: [logo] COSRX\". Logos come from Products → Brands → Thumbnail; brands without one show their first letter."
+msgstr "প্রোডাক্টের ব্র্যান্ড ছোট লোগোসহ দেখায়, যেমন \"Brand: [লোগো] COSRX\"। লোগো আসে Products → Brands → Thumbnail থেকে; লোগো না থাকলে প্রথম অক্ষর দেখায়।"
+
+msgid "Text before"
+msgstr "আগের লেখা"
+
+msgid "Show logo"
+msgstr "লোগো দেখান"
+
+msgid "When a brand has no logo"
+msgstr "ব্র্যান্ডের লোগো না থাকলে"
+
+msgid "Show its first letter"
+msgstr "প্রথম অক্ষর দেখান"
+
+msgid "Show only the name"
+msgstr "শুধু নাম দেখান"
+
+msgid "Link to the brand page"
+msgstr "ব্র্যান্ড পেজের লিংক"
+
+msgid "Logo"
+msgstr "লোগো"
+
+msgid "Space inside"
+msgstr "ভেতরের ফাঁকা"
+
+msgid "Letter colour (no logo)"
+msgstr "অক্ষরের রং (লোগো না থাকলে)"
+
+msgid "This product has no brand. Choose one in the product edit screen (Brands box)."
+msgstr "এই প্রোডাক্টের কোনো ব্র্যান্ড নেই। প্রোডাক্ট এডিট পেজে (Brands বক্স) একটি বেছে নিন।"
+
+msgid "\"Add to wishlist\" button"
+msgstr "\"উইশলিস্টে যোগ করুন\" বোতাম"
+
+msgid "Hide it here and add the \"Wishlist Button\" widget anywhere else on the page to place it yourself."
+msgstr "এখানে লুকিয়ে রাখুন, আর নিজে বসাতে পেজের যেকোনো জায়গায় \"Wishlist Button\" উইজেট যোগ করুন।"
+
+msgid "\"Add to wishlist\": saved state & icon"
+msgstr "\"উইশলিস্টে যোগ করুন\": সেভ অবস্থা ও আইকন"
+
+msgid "Text colour when saved"
+msgstr "সেভ হলে লেখার রং"
+
+msgid "Background when saved"
+msgstr "সেভ হলে ব্যাকগ্রাউন্ড"
+
+msgid "Border colour when saved"
+msgstr "সেভ হলে বর্ডারের রং"
+
+msgid "Space above"
+msgstr "উপরে ফাঁকা"
+
+msgid "Wishlist Button"
+msgstr "উইশলিস্ট বোতাম"
+
+msgid "\"Add to wishlist\" for one product, anywhere on the page. On a product page template it uses the product of the page. Tip: hide the button in the \"Add to Cart Form\" widget so it does not show twice."
+msgstr "একটি প্রোডাক্টের জন্য \"উইশলিস্টে যোগ করুন\", পেজের যেকোনো জায়গায়। প্রোডাক্ট পেজ টেমপ্লেটে ওই পেজের প্রোডাক্ট নেয়। টিপ: \"Add to Cart Form\" উইজেটের বোতামটি লুকিয়ে দিন, যাতে দুবার না দেখায়।"
+
+msgid "Empty = text from Kenakata Kit → Wishlist."
+msgstr "ফাঁকা = Kenakata Kit → Wishlist-এর লেখা।"
+
+msgid "Text when saved"
+msgstr "সেভ হলে লেখা"
+
+msgid "Show text"
+msgstr "লেখা দেখান"
+
+msgid "Off = heart icon only."
+msgstr "বন্ধ = শুধু হার্ট আইকন।"
+
+msgid "Show heart icon"
+msgstr "হার্ট আইকন দেখান"
+
+msgid "Icon position"
+msgstr "আইকনের অবস্থান"
+
+msgid "Before text"
+msgstr "লেখার আগে"
+
+msgid "After text"
+msgstr "লেখার পরে"
+
+msgid "Saved state"
+msgstr "সেভ অবস্থা"
+
+msgid "Text and icon colour"
+msgstr "লেখা ও আইকনের রং"
+
+msgid "Space between icon and text"
+msgstr "আইকন ও লেখার মাঝের ফাঁকা"
+
+msgid "Wishlist Button: place it on a product page template, or choose a product ID."
+msgstr "উইশলিস্ট বোতাম: প্রোডাক্ট পেজ টেমপ্লেটে বসান, অথবা একটি প্রোডাক্ট আইডি দিন।"
+
+msgid "Section spacing"
+msgstr "সেকশনের ফাঁকা"
+
+msgid "Space around the title and products. It disappears together with them when there is nothing to show, so use it instead of container padding for \"Recently viewed\" and \"Related\"."
+msgstr "শিরোনাম ও প্রোডাক্টের চারপাশের ফাঁকা। দেখানোর কিছু না থাকলে এগুলোর সাথে এটাও মিলিয়ে যায়, তাই \"Recently viewed\" ও \"Related\"-এর জন্য কনটেইনার প্যাডিংয়ের বদলে এটা ব্যবহার করুন।"

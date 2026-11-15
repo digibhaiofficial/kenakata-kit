@@ -146,6 +146,25 @@ function kk_card_buttons( $product, $a ) {
 	return '<div class="' . esc_attr( $cls ) . '">' . $html . '</div>';
 }
 
+/**
+ * Image attributes for a card. The first cards of a normal page view are usually above the fold, so they load at
+ * once (the first with high priority, which helps Largest Contentful Paint); the rest load lazily.
+ * Cards loaded later by AJAX are always lazy.
+ */
+function kk_card_img_attr() {
+	static $n = 0;
+	$n++;
+	$attr  = array( 'class' => 'kk-pcard__img', 'alt' => '', 'decoding' => 'async', 'loading' => 'lazy' );
+	$eager = (int) apply_filters( 'kk_card_eager_images', 4 );
+	if ( $n <= $eager && ! wp_doing_ajax() && ! ( defined( 'REST_REQUEST' ) && REST_REQUEST ) && ! is_admin() ) {
+		$attr['loading'] = false; // WordPress leaves the attribute out
+		if ( 1 === $n ) {
+			$attr['fetchpriority'] = 'high';
+		}
+	}
+	return $attr;
+}
+
 /** The card. */
 function kk_render_product_card( $product, $args = array() ) {
 	if ( ! $product instanceof WC_Product ) {
@@ -171,7 +190,7 @@ function kk_render_product_card( $product, $args = array() ) {
 			$badges .= '<span class="kk-pcard__badge kk-pcard__badge--stock">' . esc_html( $a['stock_text'] ) . '</span>';
 		}
 		$out .= '<a class="kk-pcard__media" href="' . esc_url( $link ) . '" tabindex="-1" aria-hidden="true">'
-			. $product->get_image( $a['image_size'], array( 'class' => 'kk-pcard__img', 'alt' => '', 'loading' => 'lazy' ) )
+			. $product->get_image( $a['image_size'], kk_card_img_attr() )
 			. ( $badges ? '<span class="kk-pcard__badges">' . $badges . '</span>' : '' ) . '</a>';
 		$out .= apply_filters( 'kk_product_card_media_after', '', $product ); // e.g. the wishlist ♡
 	}

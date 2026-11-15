@@ -152,16 +152,17 @@ add_action( 'rest_api_init', function () {
 		'permission_callback' => '__return_true',
 		'callback'            => function ( WP_REST_Request $req ) {
 			$id = absint( $req->get_param( 'id' ) );
+			$op = 'remove' === $req->get_param( 'op' ) ? 'remove' : 'add';
 			if ( ! kk_wl_enabled() || 'product' !== get_post_type( $id ) ) {
 				return array( 'ok' => false );
 			}
 			// One count per visitor per product per day (cheap flood guard).
-			$key = 'kk_wlp_' . md5( $id . '|' . ( isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '' ) . '|' . $req->get_param( 'op' ) );
+			$key = 'kk_wlp_' . md5( $id . '|' . kk_client_ip() . '|' . $op );
 			if ( get_transient( $key ) ) {
 				return array( 'ok' => true );
 			}
 			set_transient( $key, 1, DAY_IN_SECONDS );
-			$n = max( 0, (int) get_post_meta( $id, '_kk_wl_count', true ) + ( 'remove' === $req->get_param( 'op' ) ? -1 : 1 ) );
+			$n = max( 0, (int) get_post_meta( $id, '_kk_wl_count', true ) + ( 'remove' === $op ? -1 : 1 ) );
 			update_post_meta( $id, '_kk_wl_count', $n );
 			return array( 'ok' => true );
 		},

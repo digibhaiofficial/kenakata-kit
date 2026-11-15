@@ -148,7 +148,7 @@ function kk_license_fetch_revoked() {
 	$data = json_decode( wp_remote_retrieve_body( $res ), true );
 	if ( is_array( $data ) ) {
 		$ids = isset( $data['revoked'] ) && is_array( $data['revoked'] ) ? $data['revoked'] : $data;
-		update_option( 'kk_license_revoked', array_values( array_filter( array_map( 'sanitize_text_field', array_map( 'strval', $ids ) ) ) ), false );
+		update_option( 'kk_license_revoked', array_values( array_filter( array_map( 'sanitize_text_field', array_map( 'strval', $ids ) ) ) ), true ); // read on every request: autoload
 	}
 }
 
@@ -169,13 +169,26 @@ add_action( 'admin_post_kk_license_save', function () {
 	check_admin_referer( 'kk_license_save' );
 	$remove = ! empty( $_POST['kk_license_remove'] );
 	$key    = $remove ? '' : trim( preg_replace( '/\s+/', '', sanitize_text_field( wp_unslash( $_POST['kk_license_key'] ?? '' ) ) ) );
+	$back = admin_url( 'admin.php?page=kenakata-kit&tab=license' );
+	if ( '' !== $key ) {
+		// Check first: a key that does not work here is never saved (the working key, if any, stays).
+		$check = kk_license_check( $key );
+		if ( $check['ok'] && in_array( (string) ( $check['data']['id'] ?? '' ), kk_license_revoked(), true ) ) {
+			$check = array( 'ok' => false, 'code' => 'revoked', 'data' => $check['data'] );
+		}
+		if ( ! $check['ok'] ) {
+			$for = 'domain' === $check['code'] ? implode( ', ', array_map( 'strval', (array) ( $check['data']['d'] ?? array() ) ) ) : '';
+			wp_safe_redirect( add_query_arg( array( 'kk_msg' => 'license-bad', 'kk_code' => $check['code'], 'kk_for' => rawurlencode( substr( $for, 0, 200 ) ) ), $back ) );
+			exit;
+		}
+	}
 	update_option( 'kk_license_key', $key, true );
 	delete_option( 'kk_license_cache' );
 	if ( $key ) {
 		kk_license_fetch_revoked();
 	}
 	delete_site_transient( 'update_plugins' ); // offer an update right away when the key allows it
-	wp_safe_redirect( admin_url( 'admin.php?page=kenakata-kit&tab=license&kk_msg=' . ( $remove ? 'license-removed' : 'license-saved' ) ) );
+	wp_safe_redirect( add_query_arg( 'kk_msg', $remove ? 'license-removed' : 'license-saved', $back ) );
 	exit;
 } );
 
@@ -212,7 +225,9 @@ function kk_render_license_page() {
 			echo '<p class="kk-notice-err">' . esc_html__( 'Your update period has ended. Pro keeps working, but new versions are not offered. Contact us to renew.', 'kenakata-kit' ) . '</p>';
 		}
 	} else {
-		echo '<div class="kk-lic-hero kk-lic-hero--free">' . $logo . '<div><h3>' . esc_html__( 'Kenakata Kit Free', 'kenakata-kit' ) . '</h3><p>' . esc_html( kk_license_message( $s['code'] ) ) . '</p></div></div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $logo escaped above
+		$bad = 'empty' !== $s['code'];
+		$for = $bad && 'domain' === $s['code'] ? ' ' . sprintf( /* translators: %s: website(s) the key was made for */ __( 'The saved key is for: %s.', 'kenakata-kit' ), implode( ', ', array_map( 'strval', (array) ( $data['d'] ?? array() ) ) ) ) : '';
+		echo '<div class="kk-lic-hero kk-lic-hero--free' . ( $bad ? ' kk-lic-hero--bad' : '' ) . '">' . $logo . '<div><h3>' . esc_html( $bad ? __( 'License key not working', 'kenakata-kit' ) : __( 'Kenakata Kit Free', 'kenakata-kit' ) ) . '</h3><p>' . esc_html( kk_license_message( $s['code'] ) . $for ) . '</p></div></div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $logo escaped above
 		if ( $s['dev'] ) {
 			echo '<p class="kk-card__desc">' . esc_html__( 'This is a test copy (localhost / .local / .test), so all Pro features are open here without a key.', 'kenakata-kit' ) . '</p>';
 		}

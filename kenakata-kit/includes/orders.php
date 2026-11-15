@@ -68,7 +68,7 @@ function kk_thank_you_shortcode() {
 				<div><dt><?php esc_html_e( 'Payment', 'kenakata-kit' ); ?></dt><dd><?php echo esc_html( $order->get_payment_method_title() ); ?></dd></div>
 			</dl>
 			<div class="kk-thanks__actions">
-				<?php if ( $track ) : ?><a class="kk-btn kk-btn--primary" href="<?php echo esc_url( add_query_arg( 'kk_phone', rawurlencode( $order->get_billing_phone() ), $track ) ); ?>"><?php echo esc_html( kk_opt( 'ty_track_text' ) ); ?></a><?php endif; ?>
+				<?php if ( $track ) : ?><a class="kk-btn kk-btn--primary" href="<?php echo esc_url( add_query_arg( array( 'kk_phone' => rawurlencode( $order->get_billing_phone() ), 'kk_order' => rawurlencode( $order->get_order_number() ) ), $track ) ); ?>"><?php echo esc_html( kk_opt( 'ty_track_text' ) ); ?></a><?php endif; ?>
 				<a class="kk-btn kk-btn--outline" href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>"><?php echo esc_html( kk_opt( 'ty_shop_text' ) ); ?></a>
 			</div>
 		</div>
@@ -242,6 +242,9 @@ function kk_save_order_tracking( WC_Order $order, $courier, $tracking_id, $track
 	$courier  = isset( $couriers[ $courier ] ) ? $courier : '';
 	$id       = sanitize_text_field( (string) $tracking_id );
 	$url      = esc_url_raw( (string) $tracking_url );
+	if ( '' === $url && $courier && '' !== $id ) { // the courier's own tracking page, made from the ID
+		$url = kk_courier_track_link( $courier, $id, $order->get_billing_phone() );
+	}
 	$old_url  = kk_order_meta( $order, 'tracking_url' );
 
 	$order->update_meta_data( '_kk_courier', $courier );
@@ -311,12 +314,18 @@ function kk_tracking_shortcode() {
 	$param = isset( $_GET['kk_phone'] ) ? 'kk_phone' : 'ss_phone'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$raw   = isset( $_GET[ $param ] ) ? sanitize_text_field( wp_unslash( $_GET[ $param ] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$phone = kk_clean_phone( $raw );
+	$need  = (bool) kk_opt( 'tr_require_order' );
+	$ono   = isset( $_GET['kk_order'] ) ? preg_replace( '/[^0-9A-Za-z-]/', '', kk_digits( sanitize_text_field( wp_unslash( $_GET['kk_order'] ) ) ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$ono   = ltrim( $ono, '#' );
 	$out   = '<form class="kk-box kk-track-form" method="get" action="' . esc_url( get_permalink() ) . '">'
 		. '<label for="kk_phone">' . esc_html( kk_opt( 'tr_form_label' ) ) . '</label>'
 		. '<div class="kk-track-form__row"><input id="kk_phone" name="kk_phone" type="tel"' . kk_attr_string( kk_phone_input_attrs() ) . ' required placeholder="' . esc_attr( kk_opt( 'co_phone_placeholder' ) ) . '" value="' . esc_attr( $raw ) . '">'
-		. '<button type="submit" class="kk-btn kk-btn--primary">' . esc_html( kk_opt( 'tr_button_text' ) ) . '</button></div></form>';
+		. ( $need ? '' : '<button type="submit" class="kk-btn kk-btn--primary">' . esc_html( kk_opt( 'tr_button_text' ) ) . '</button>' ) . '</div>'
+		. ( $need ? '<label for="kk_order">' . esc_html__( 'Order number', 'kenakata-kit' ) . '</label><div class="kk-track-form__row"><input id="kk_order" name="kk_order" type="text" inputmode="numeric" required autocomplete="off" value="' . esc_attr( $ono ) . '">'
+			. '<button type="submit" class="kk-btn kk-btn--primary">' . esc_html( kk_opt( 'tr_button_text' ) ) . '</button></div>' : '' )
+		. '</form>';
 
-	if ( ! $raw ) {
+	if ( ! $raw || ( $need && '' === $ono ) ) {
 		return $out;
 	}
 	if ( ! $phone ) {
@@ -339,6 +348,16 @@ function kk_tracking_shortcode() {
 				$orders[ $o->get_id() ] = $o;
 			}
 		}
+	}
+	if ( $need && ctype_digit( $ono ) && ( $direct = wc_get_order( absint( $ono ) ) ) ) { // phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.Found -- an older order than the last 10
+		$their = kk_clean_phone( $direct->get_billing_phone() );
+		$their = $their ? $their : kk_normalize_phone( $direct->get_billing_phone() );
+		if ( $their === $phone && ! $direct instanceof WC_Order_Refund ) {
+			$orders[ $direct->get_id() ] = $direct;
+		}
+	}
+	if ( $need ) { // only the order with this number (order numbers may differ from IDs with sequential-number plugins)
+		$orders = array_filter( $orders, function ( $o ) use ( $ono ) { return (string) $o->get_order_number() === $ono || (string) $o->get_id() === $ono; } );
 	}
 	krsort( $orders );
 	$orders   = array_slice( $orders, 0, 10 );

@@ -1,0 +1,46 @@
+name: WordPress test
+# Installs real WordPress + WooCommerce with the plugin and clicks through the important paths (dev/ci/smoke.sh).
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+jobs:
+  wordpress:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - php: '7.4'
+            wp: '6.4'
+            wc: '8.9.3'
+          - php: '8.3'
+            wp: 'latest'
+            wc: 'latest'
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: wp
+        ports: ['3306:3306']
+        options: --health-cmd="mysqladmin ping -proot" --health-interval=5s --health-timeout=3s --health-retries=20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mysqli, sodium, gd, zip
+          tools: wp-cli
+      - name: Smoke test (PHP ${{ matrix.php }}, WP ${{ matrix.wp }}, WooCommerce ${{ matrix.wc }})
+        env:
+          WP_VERSION: ${{ matrix.wp }}
+          WC_VERSION: ${{ matrix.wc }}
+        run: bash dev/ci/smoke.sh
+      - name: Logs
+        if: always()
+        run: |
+          echo "---- debug.log ----"; cat /tmp/wp/wp-content/debug.log 2>/dev/null | tail -200 || true
+          echo "---- server ----"; tail -50 /tmp/server.log 2>/dev/null || true

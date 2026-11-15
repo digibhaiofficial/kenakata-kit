@@ -43,6 +43,16 @@ function kk_auth_rate_limited() {
 	return $hits >= 10;
 }
 
+/**
+ * A fresh login/register nonce. A cached page can carry a nonce older than a day, which WordPress rejects ("-1");
+ * the popup then asks here once and tries again. Logged-out nonces are the same for every visitor, so this
+ * reveals nothing.
+ */
+add_action( 'wp_ajax_nopriv_kk_auth_nonce', function () {
+	nocache_headers();
+	wp_send_json_success( array( 'nonce' => wp_create_nonce( 'kk_auth' ) ) );
+} );
+
 add_action( 'wp_ajax_nopriv_kk_login', function () {
 	check_ajax_referer( 'kk_auth', 'nonce' );
 	if ( kk_auth_rate_limited() ) {
@@ -57,6 +67,9 @@ add_action( 'wp_ajax_nopriv_kk_login', function () {
 	if ( ! $user ) {
 		do_action( 'wp_login_failed', '', new WP_Error( 'invalid_username' ) ); // unknown phone/email also counts as a wrong attempt
 	}
+	if ( is_wp_error( $signed ) && 'kk_turnstile' === $signed->get_error_code() ) {
+		wp_send_json_error( array( 'message' => $signed->get_error_message() ) );
+	}
 	if ( ! $user || is_wp_error( $signed ) ) {
 		wp_send_json_error( array( 'message' => __( 'Phone number / email or password is incorrect.', 'kenakata-kit' ) ) );
 	}
@@ -70,6 +83,9 @@ add_action( 'wp_ajax_nopriv_kk_register', function () {
 	}
 	if ( kk_auth_rate_limited() ) {
 		wp_send_json_error( array( 'message' => __( 'Too many attempts. Please wait 15 minutes and try again.', 'kenakata-kit' ) ), 429 );
+	}
+	if ( function_exists( 'kk_turnstile_on' ) && kk_turnstile_on( 'login' ) && ! kk_turnstile_ok() ) {
+		wp_send_json_error( array( 'message' => kk_turnstile_error() ) );
 	}
 	$name     = isset( $_POST['name'] ) ? sanitize_text_field( wp_unslash( $_POST['name'] ) ) : '';
 	$phone_in = isset( $_POST['phone'] ) ? sanitize_text_field( wp_unslash( $_POST['phone'] ) ) : '';
@@ -138,6 +154,7 @@ add_action( 'wp_footer', function () {
 				<p class="kk-field"><label for="kk-login-id"><?php esc_html_e( 'Phone number or email', 'kenakata-kit' ); ?></label><input id="kk-login-id" name="identifier" type="text" autocomplete="username" required></p>
 				<p class="kk-field"><label for="kk-login-pass"><?php esc_html_e( 'Password', 'kenakata-kit' ); ?></label><input id="kk-login-pass" name="password" type="password" autocomplete="current-password" required></p>
 				<p class="kk-field kk-field--row"><label><input type="checkbox" name="remember" value="1" checked> <?php esc_html_e( 'Remember me', 'kenakata-kit' ); ?></label><a href="<?php echo esc_url( wc_lostpassword_url() ); ?>"><?php esc_html_e( 'Forgot password?', 'kenakata-kit' ); ?></a></p>
+				<?php if ( function_exists( 'kk_turnstile_on' ) && kk_turnstile_on( 'login' ) ) : ?><div class="kk-turnstile" data-kk-ts></div><?php endif; ?>
 				<p class="kk-form-msg" role="alert"></p>
 				<button type="submit" class="kk-btn kk-btn--primary kk-btn--block"><?php echo esc_html( kk_opt( 'popup_login_tab' ) ); ?></button>
 			</form>
@@ -147,12 +164,13 @@ add_action( 'wp_footer', function () {
 				<p class="kk-field"><label for="kk-reg-phone"><?php echo esc_html( kk_opt( 'co_phone_label' ) ); ?></label><input id="kk-reg-phone" name="phone" type="tel"<?php echo kk_attr_string( kk_phone_input_attrs() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in kk_attr_string() ?> placeholder="<?php echo esc_attr( kk_opt( 'co_phone_placeholder' ) ); ?>" required></p>
 				<p class="kk-field"><label for="kk-reg-email"><?php echo esc_html( $email_label ); ?></label><input id="kk-reg-email" name="email" type="email" autocomplete="email" <?php echo kk_opt( 'popup_email_required' ) ? 'required' : ''; ?>></p>
 				<p class="kk-field"><label for="kk-reg-pass"><?php esc_html_e( 'Password', 'kenakata-kit' ); ?></label><input id="kk-reg-pass" name="password" type="password" autocomplete="new-password" minlength="6" required></p>
+				<?php if ( function_exists( 'kk_turnstile_on' ) && kk_turnstile_on( 'login' ) ) : ?><div class="kk-turnstile" data-kk-ts></div><?php endif; ?>
 				<p class="kk-form-msg" role="alert"></p>
 				<button type="submit" class="kk-btn kk-btn--primary kk-btn--block"><?php echo esc_html( kk_opt( 'popup_register_tab' ) ); ?></button>
 			</form>
 			<?php endif; ?>
 		</div>
 	</div>
-	<script>window.kkAuth = <?php echo wp_json_encode( array( 'nonce' => wp_create_nonce( 'kk_auth' ) ) ); ?>;</script>
+	<script>window.kkAuth = <?php echo wp_json_encode( array( 'nonce' => wp_create_nonce( 'kk_auth' ), 'ts' => function_exists( 'kk_turnstile_on' ) && kk_turnstile_on( 'login' ) ? trim( (string) kk_opt( 'turnstile_site' ) ) : '' ) ); ?>;</script>
 	<?php
 }, 5 );

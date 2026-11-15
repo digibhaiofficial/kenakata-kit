@@ -142,7 +142,7 @@ add_action( 'rest_api_init', function () {
 				return $err( kk_opt( 'co_phone_error' ) ? kk_opt( 'co_phone_error' ) : __( 'Please enter a valid 11-digit mobile number.', 'kenakata-kit' ) );
 			}
 			// Flood guard: one question per minute per connection, at most 5 a day per phone number.
-			$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
+			$ip = kk_client_ip(); // the real visitor behind Cloudflare, otherwise all visitors would share a few addresses
 			if ( get_transient( 'kk_qa_ip_' . md5( $ip ) ) ) {
 				return $err( __( 'Please wait a minute before sending another question.', 'kenakata-kit' ) );
 			}

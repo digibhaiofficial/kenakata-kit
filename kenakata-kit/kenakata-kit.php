@@ -3,7 +3,7 @@
  * Plugin Name:       Kenakata Kit – WooCommerce Toolkit for Bangladesh
  * Plugin URI:        https://digibhai.com/
  * Description:       Everything a Bangladeshi WooCommerce store needs: Buy Now, simple checkout with delivery areas, fake-order protection, thank-you page, order tracking by phone, live search, login popup, product cards, brand/category carousels, WhatsApp, variation buttons, photo reviews, side cart, mobile bar and 15 Elementor widgets. English and Bengali (বাংলা). Settings: left menu → Kenakata Kit.
- * Version:           3.11.1
+ * Version:           3.12.0
  * Requires at least: 6.3
  * Requires PHP:      7.4
  * Requires Plugins:  woocommerce
@@ -19,7 +19,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'KK_VERSION', '3.11.1' );
+define( 'KK_VERSION', '3.12.0' );
 define( 'KK_FILE', __FILE__ );
 define( 'KK_DIR', __DIR__ );
 define( 'KK_URL', plugin_dir_url( __FILE__ ) );
@@ -135,10 +135,12 @@ function kk_defaults() {
 		'tr_page'               => 0,
 		'tr_shipped_status'     => 1,
 		'tr_auto_shipped'       => 1,
-		'tr_couriers'           => "steadfast|Steadfast Courier\npathao|Pathao Courier\nredx|RedX\nsundarban|Sundarban Courier\nsa|SA Paribahan\npaperfly|Paperfly\necourier|eCourier\nother|Other courier",
+		'tr_courier_pick'       => '{"steadfast":"","pathao":"","redx":"","paperfly":"","ecourier":"","sundarban":"","sa":"","other":""}',
+		'tr_couriers'           => '', // other couriers, one per line: key|Name|tracking link with {id}
 		'tr_form_label'         => 'Phone number used for the order',
 		'tr_button_text'        => 'Track order',
 		'tr_rate_limit'         => 20,
+		'tr_require_order'      => 0,
 		'tr_text_received'      => 'We have your order and will confirm it by phone.',
 		'tr_text_processing'    => 'We are preparing your order for delivery.',
 		'tr_text_shipped'       => 'Your parcel is on the way.',
@@ -322,6 +324,10 @@ function kk_defaults() {
 		'courier_pathao_password'      => '',
 		'courier_pathao_store_id'      => '',  // the merchant store number (plain setting, not secret)
 		'courier_pathao_sandbox'       => 0,   // 1 = Pathao's test server
+		'courier_redx_on'              => 0,
+		'courier_redx_store_id'        => '',
+		'courier_redx_area_id'         => '',
+		'courier_redx_sandbox'         => 0,
 		'courier_default_weight'       => '0.5', // kg per parcel (couriers that need a weight)
 		'courier_bdcourier_token' => '',       // optional look-up service token (private option, never here)
 		'courier_check_cache'   => 24,         // hours a looked-up phone number is remembered
@@ -341,6 +347,14 @@ function kk_defaults() {
 		'sec_hide_version'      => 1,
 		'sec_no_file_edit'      => 1,
 		'sec_uploads_php'       => 0,
+		'speed_no_emoji'        => 0,
+		'speed_no_embeds'       => 0,
+		'speed_wc_assets'       => 0,
+		'speed_heartbeat'       => 0,
+		'turnstile_enable'      => 0,
+		'turnstile_site'        => '',
+		'turnstile_login'       => 1,
+		'turnstile_checkout'    => 0,
 	);
 }
 
@@ -363,11 +377,19 @@ add_action( 'add_option_kk_settings', function () { kk_all_opts( true ); } );
 
 /** Courier list from settings ("key|Label" per line). */
 function kk_couriers() {
-	$out = array();
+	$out     = array();
+	$catalog = kk_courier_catalog();
+	foreach ( kk_courier_picked() as $key => $link ) {
+		if ( isset( $catalog[ $key ] ) ) {
+			$out[ $key ] = $catalog[ $key ]['name'];
+		}
+	}
+	// "Other couriers" box: one per line, key|Name (older versions kept the whole list here).
 	foreach ( preg_split( '/\r\n|\r|\n/', (string) kk_opt( 'tr_couriers' ) ) as $line ) {
-		$parts = array_map( 'trim', explode( '|', $line, 2 ) );
-		if ( '' !== $parts[0] ) {
-			$out[ sanitize_key( $parts[0] ) ] = isset( $parts[1] ) && '' !== $parts[1] ? $parts[1] : $parts[0];
+		$parts = array_map( 'trim', explode( '|', $line, 3 ) );
+		$key   = sanitize_key( $parts[0] );
+		if ( '' !== $key && ! isset( $out[ $key ] ) ) {
+			$out[ $key ] = isset( $parts[1] ) && '' !== $parts[1] ? $parts[1] : ( isset( $catalog[ $key ] ) ? $catalog[ $key ]['name'] : $parts[0] );
 		}
 	}
 	// The courier chosen for one-tap booking is always selectable on orders.
@@ -381,6 +403,114 @@ function kk_couriers() {
 	return $out;
 }
 
+/**
+ * Couriers of Bangladesh. 'link' = the public tracking page, {id} = tracking ID, {phone} = customer phone
+ * ('' when the courier has no page that opens one parcel by link: the customer then gets the ID and the site).
+ * 'api' = parcels can also be sent from the order with one tap (Pro: Courier booking).
+ */
+function kk_courier_catalog() {
+	return apply_filters( 'kk_courier_catalog', array(
+		'steadfast'   => array( 'name' => 'Steadfast Courier', 'site' => 'https://steadfast.com.bd', 'link' => 'https://steadfast.com.bd/t/{id}', 'api' => true ),
+		'pathao'      => array( 'name' => 'Pathao Courier', 'site' => 'https://merchant.pathao.com', 'link' => 'https://merchant.pathao.com/tracking?consignment_id={id}&phone={phone}', 'api' => true ),
+		'redx'        => array( 'name' => 'RedX', 'site' => 'https://redx.com.bd', 'link' => 'https://redx.com.bd/track-parcel/?trackingId={id}', 'api' => true ),
+		'paperfly'    => array( 'name' => 'Paperfly', 'site' => 'https://paperfly.com.bd', 'link' => '' ),
+		'ecourier'    => array( 'name' => 'eCourier', 'site' => 'https://ecourier.com.bd', 'link' => '' ),
+		'carrybee'    => array( 'name' => 'CarryBee', 'site' => 'https://carrybee.com', 'link' => '' ),
+		'deliverytiger' => array( 'name' => 'Delivery Tiger', 'site' => 'https://deliverytiger.com.bd', 'link' => '' ),
+		'sundarban'   => array( 'name' => 'Sundarban Courier', 'site' => 'https://sundarbancourierltd.com', 'link' => '' ),
+		'sa'          => array( 'name' => 'SA Paribahan', 'site' => 'https://saparibahan.com', 'link' => '' ),
+		'karatoa'     => array( 'name' => 'Karatoa Courier (KCS)', 'site' => 'https://kcsbd.com', 'link' => '' ),
+		'janani'      => array( 'name' => 'Janani Express', 'site' => '', 'link' => '' ),
+		'continental' => array( 'name' => 'Continental Courier', 'site' => '', 'link' => '' ),
+		'afs'         => array( 'name' => 'AFS (Associated Fast Service)', 'site' => '', 'link' => '' ),
+		'sheba'       => array( 'name' => 'Sheba Delivery', 'site' => '', 'link' => '' ),
+		'navana'      => array( 'name' => 'Navana Courier', 'site' => '', 'link' => '' ),
+		'post'        => array( 'name' => 'Bangladesh Post (EMS)', 'site' => 'https://bdpost.gov.bd', 'link' => '' ),
+		'own'         => array( 'name' => 'Own delivery person', 'site' => '', 'link' => '' ),
+		'other'       => array( 'name' => 'Other courier', 'site' => '', 'link' => '' ),
+	) );
+}
+
+/** Ticked couriers: array( key => own tracking link or '' for the standard one ). */
+function kk_courier_picked() {
+	$v = json_decode( (string) kk_opt( 'tr_courier_pick' ), true );
+	return is_array( $v ) ? $v : array();
+}
+
+/** Clean the "Couriers I use" table from the settings form. */
+function kk_courier_pick_sanitize( $rows ) {
+	$out     = array();
+	$catalog = kk_courier_catalog();
+	foreach ( is_array( $rows ) ? $rows : array() as $key => $row ) {
+		$key = sanitize_key( $key );
+		if ( ! isset( $catalog[ $key ] ) || empty( $row['on'] ) ) {
+			continue;
+		}
+		$link = isset( $row['link'] ) ? trim( sanitize_text_field( (string) $row['link'] ) ) : '';
+		// Only an https link of our own form; the standard link is not stored (it can be improved in updates).
+		if ( '' !== $link && ( ! preg_match( '#^https://[^\s"<>]+$#i', $link ) || $link === $catalog[ $key ]['link'] ) ) {
+			$link = '';
+		}
+		$out[ $key ] = $link;
+	}
+	return $out;
+}
+
+/**
+ * 3.12 moved the courier list from a text box to a tick list. Once, in the admin: couriers of the old box that are
+ * in the new list become ticks; anything else stays in the "Other couriers" box.
+ */
+add_action( 'admin_init', function () {
+	if ( get_option( 'kk_courier_pick_mig' ) ) {
+		return;
+	}
+	update_option( 'kk_courier_pick_mig', 1, false );
+	$stored = (array) get_option( 'kk_settings', array() );
+	if ( ! isset( $stored['tr_couriers'] ) || isset( $stored['tr_courier_pick'] ) ) {
+		return; // never saved (the new defaults apply) or already moved
+	}
+	$catalog = kk_courier_catalog();
+	$pick    = array();
+	$rest    = array();
+	foreach ( preg_split( '/\r\n|\r|\n/', (string) $stored['tr_couriers'] ) as $line ) {
+		$parts = array_map( 'trim', explode( '|', $line, 3 ) );
+		$key   = sanitize_key( $parts[0] );
+		if ( '' === $key ) {
+			continue;
+		}
+		if ( isset( $catalog[ $key ] ) ) {
+			$pick[ $key ] = '';
+		} else {
+			$rest[] = $line;
+		}
+	}
+	$stored['tr_courier_pick'] = wp_json_encode( $pick );
+	$stored['tr_couriers']     = implode( "\n", $rest );
+	if ( function_exists( 'kk_update_settings' ) ) {
+		kk_update_settings( $stored );
+	} else {
+		update_option( 'kk_settings', $stored );
+	}
+} );
+
+/** The tracking page of one parcel, '' when not known. */
+function kk_courier_track_link( $courier, $tracking_id, $phone = '' ) {
+	$courier = sanitize_key( (string) $courier );
+	$picked  = kk_courier_picked();
+	$catalog = kk_courier_catalog();
+	$tpl     = ! empty( $picked[ $courier ] ) ? $picked[ $courier ] : ( isset( $catalog[ $courier ] ) ? $catalog[ $courier ]['link'] : '' );
+	foreach ( preg_split( '/\r\n|\r|\n/', (string) kk_opt( 'tr_couriers' ) ) as $line ) { // "key|Name|link" in the Other box
+		$parts = array_map( 'trim', explode( '|', $line, 3 ) );
+		if ( sanitize_key( $parts[0] ) === $courier && ! empty( $parts[2] ) && 0 === stripos( $parts[2], 'https://' ) ) {
+			$tpl = $parts[2];
+		}
+	}
+	if ( '' === (string) $tracking_id || '' === $tpl ) {
+		return '';
+	}
+	return esc_url_raw( str_replace( array( '{id}', '{phone}' ), array( rawurlencode( (string) $tracking_id ), rawurlencode( (string) $phone ) ), $tpl ) );
+}
+
 /** URL of a page chosen in settings, falling back to a page with the given slug. */
 function kk_page_url( $setting, $fallback_slug ) {
 	$id = absint( kk_opt( $setting ) );
@@ -391,9 +521,90 @@ function kk_page_url( $setting, $fallback_slug ) {
 	return $page && 'publish' === $page->post_status ? get_permalink( $page ) : '';
 }
 
+/**
+ * A short lock that two requests at the same moment cannot both get (a double tap on "Send to courier" must never
+ * create two parcels). A transient check-then-set is not enough for that. Uses the object cache's atomic add when
+ * there is one, otherwise a unique row in wp_options. Returns true when this request holds the lock.
+ */
+function kk_lock( $name, $ttl = 30 ) {
+	global $wpdb;
+	$name = 'kk_lock_' . sanitize_key( $name );
+	if ( wp_using_ext_object_cache() ) {
+		return wp_cache_add( $name, 1, 'kk_locks', $ttl );
+	}
+	for ( $i = 0; $i < 2; $i++ ) {
+		$ok = $wpdb->query( $wpdb->prepare( "INSERT IGNORE INTO {$wpdb->options} (option_name, option_value, autoload) VALUES (%s, %s, 'no')", $name, (string) ( time() + $ttl ) ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		if ( $ok ) {
+			return true;
+		}
+		$until = (int) $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", $name ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		if ( $until >= time() ) {
+			return false;
+		}
+		// Left over from a request that died: remove it (only if it is still the same stale one) and try once more.
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name = %s AND option_value = %s", $name, (string) $until ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+	}
+	return false;
+}
+
+function kk_unlock( $name ) {
+	global $wpdb;
+	$name = 'kk_lock_' . sanitize_key( $name );
+	if ( wp_using_ext_object_cache() ) {
+		wp_cache_delete( $name, 'kk_locks' );
+		return;
+	}
+	$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name = %s", $name ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+}
+
+/**
+ * Private keys of Free features (e.g. Cloudflare Turnstile secret). Stored in their own option: not autoloaded,
+ * never in the settings export, never printed. (Courier credentials have their own store in courier.php.)
+ */
+function kk_core_secret_keys() {
+	return array( 'turnstile_secret' );
+}
+
+function kk_secret( $key ) {
+	$all = get_option( 'kk_secrets', array() );
+	return is_array( $all ) && isset( $all[ $key ] ) ? (string) $all[ $key ] : '';
+}
+
+/** Save one key. Empty input keeps the saved one. */
+function kk_save_secret( $key, $value ) {
+	$value = trim( preg_replace( '/[\x00-\x1F\x7F]/', '', wp_check_invalid_utf8( (string) $value ) ) );
+	if ( '' === $value || ! in_array( $key, kk_core_secret_keys(), true ) ) {
+		return;
+	}
+	$all         = get_option( 'kk_secrets', array() );
+	$all         = is_array( $all ) ? $all : array();
+	$all[ $key ] = $value;
+	update_option( 'kk_secrets', $all, false );
+}
+
+/** "•••• 1234" for a saved key ('' when nothing is saved): Free keys and courier credentials. */
+function kk_secret_hint( $key ) {
+	if ( in_array( $key, kk_core_secret_keys(), true ) ) {
+		$v = kk_secret( $key );
+	} elseif ( function_exists( 'kk_courier_secret' ) ) {
+		$v = kk_courier_secret( $key );
+	} else {
+		$v = '';
+	}
+	return '' === $v ? '' : '•••• ' . substr( $v, -4 );
+}
+
+/** Bengali (০-৯) and Arabic-Indic digits to 0-9: many customers type their number with a Bengali keyboard. */
+function kk_digits( $s ) {
+	return strtr( (string) $s, array(
+		'০' => '0', '১' => '1', '২' => '2', '৩' => '3', '৪' => '4', '৫' => '5', '৬' => '6', '৭' => '7', '৮' => '8', '৯' => '9',
+		'٠' => '0', '١' => '1', '٢' => '2', '٣' => '3', '٤' => '4', '٥' => '5', '٦' => '6', '٧' => '7', '٨' => '8', '٩' => '9',
+	) );
+}
+
 /** Normalise a Bangladeshi mobile number to 01XXXXXXXXX ('' if invalid). */
 function kk_normalize_phone( $phone ) {
-	$digits = preg_replace( '/\D+/', '', (string) $phone );
+	$digits = preg_replace( '/\D+/', '', kk_digits( $phone ) );
 	if ( 0 === strpos( $digits, '880' ) ) {
 		$digits = substr( $digits, 2 );
 	} elseif ( 0 === strpos( $digits, '1' ) && 10 === strlen( $digits ) ) {
@@ -410,7 +621,7 @@ function kk_normalize_phone( $phone ) {
  * Returns the cleaned number, or '' when invalid.
  */
 function kk_clean_phone( $phone ) {
-	$raw  = trim( (string) $phone );
+	$raw  = trim( kk_digits( $phone ) );
 	$mode = kk_opt( 'co_phone_mode' );
 	if ( 'bd11' === $mode ) {
 		$compact = preg_replace( '/[\s\-().]+/', '', $raw );
@@ -515,6 +726,18 @@ add_action( 'init', function () {
 	}
 }, 0 );
 
+/**
+ * URL of a plugin asset: the minified copy (name.min.css / name.min.js, made by dev/minify.sh) when it exists,
+ * the readable file with SCRIPT_DEBUG on.
+ */
+function kk_asset( $file ) {
+	$min = preg_replace( '/\.(css|js)$/', '.min.$1', $file );
+	if ( ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) && $min !== $file && file_exists( KK_DIR . '/assets/' . $min ) ) {
+		$file = $min;
+	}
+	return KK_URL . 'assets/' . $file;
+}
+
 /** Files that make up the Pro features. */
 function kk_pro_modules() {
 	return array( 'courier', 'incomplete', 'store-dashboard' );
@@ -538,7 +761,7 @@ add_action( 'plugins_loaded', function () {
 	require_once KK_DIR . '/includes/updater.php';
 	// Pro modules (store dashboard, courier, incomplete orders) load only with a valid license key.
 	$pro = kk_is_pro();
-	foreach ( array( 'settings-schema', 'admin', 'rest', 'assets', 'product-card', 'products', 'buy-now', 'cart-guard', 'checkout', 'free-delivery', 'order-guard', 'orders', 'courier', 'incomplete', 'search', 'account', 'my-account', 'wishlist', 'qa', 'terms', 'extras', 'variations', 'reviews', 'bottom-bar', 'security', 'cron-health', 'store-dashboard', 'elementor' ) as $file ) {
+	foreach ( array( 'settings-schema', 'admin', 'rest', 'assets', 'product-card', 'products', 'buy-now', 'cart-guard', 'checkout', 'free-delivery', 'order-guard', 'orders', 'courier', 'incomplete', 'search', 'account', 'my-account', 'wishlist', 'qa', 'terms', 'extras', 'variations', 'reviews', 'bottom-bar', 'security', 'speed', 'cron-health', 'store-dashboard', 'elementor' ) as $file ) {
 		if ( ! $pro && in_array( $file, kk_pro_modules(), true ) ) {
 			continue;
 		}

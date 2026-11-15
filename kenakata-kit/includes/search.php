@@ -25,14 +25,14 @@ function kk_plain_price( $amount ) {
 }
 
 function kk_search_endpoint( WP_REST_Request $request ) {
-	$q   = trim( (string) $request->get_param( 'q' ) );
+	$q   = trim( mb_substr( (string) $request->get_param( 'q' ), 0, 64 ) ); // longer text is never a product search
 	$min = max( 1, absint( kk_opt( 'search_min_chars' ) ) );
 	if ( mb_strlen( $q ) < $min ) {
 		return array( 'items' => array(), 'total' => 0 );
 	}
 	$limit     = max( 3, absint( kk_opt( 'search_limit' ) ) );
 	$cache_key = 'kk_srch_' . md5( strtolower( $q ) . '|' . $limit );
-	$cached    = get_transient( $cache_key );
+	$cached    = kk_search_cache_get( $cache_key );
 	if ( false !== $cached ) {
 		return $cached;
 	}
@@ -64,8 +64,33 @@ function kk_search_endpoint( WP_REST_Request $request ) {
 		'total' => (int) $query->found_posts,
 		'all'   => add_query_arg( array( 's' => $q, 'post_type' => 'product' ), home_url( '/' ) ),
 	);
-	set_transient( $cache_key, $result, 10 * MINUTE_IN_SECONDS );
+	kk_search_cache_set( $cache_key, $result );
 	return $result;
+}
+
+/**
+ * Search cache. With an object cache (Redis/Memcached/LiteSpeed) every search is cached there. Without one, a
+ * transient is a row in wp_options, so only searches that found something are stored, and at most 300 new ones an
+ * hour: a bot typing random words cannot fill the database.
+ */
+function kk_search_cache_get( $key ) {
+	return wp_using_ext_object_cache() ? wp_cache_get( $key, 'kk_search' ) : get_transient( $key );
+}
+
+function kk_search_cache_set( $key, $result ) {
+	if ( wp_using_ext_object_cache() ) {
+		wp_cache_set( $key, $result, 'kk_search', 10 * MINUTE_IN_SECONDS );
+		return;
+	}
+	if ( empty( $result['items'] ) ) {
+		return;
+	}
+	$count = (int) get_transient( 'kk_srch_count' );
+	if ( $count >= 300 ) {
+		return;
+	}
+	set_transient( 'kk_srch_count', $count + 1, HOUR_IN_SECONDS );
+	set_transient( $key, $result, 10 * MINUTE_IN_SECONDS );
 }
 
 function kk_live_search_shortcode( $atts ) {

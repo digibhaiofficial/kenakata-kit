@@ -25,3 +25,7 @@ jobs:
           H=$(grep -oP '\* Version:\s+\K\S+' kenakata-kit/kenakata-kit.php)
           C=$(grep -oP "define\( 'KK_VERSION', '\K[^']+" kenakata-kit/kenakata-kit.php)
           echo "header $H, KK_VERSION $C"; test "$H" = "$C"
+      - name: Minified assets match the sources
+        run: |
+          sh dev/minify.sh > /dev/null
+          git diff --stat --exit-code -- kenakata-kit/assets || { echo "Run: sh dev/minify.sh and commit the .min files"; exit 1; }

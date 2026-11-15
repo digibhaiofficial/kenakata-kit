@@ -322,6 +322,7 @@
 				}, 0);
 			});
 		}
+		if (!$ && D.drawerAuto) document.addEventListener('kk:added', function () { open(); });
 		if (D.ajaxSingle && D.wcAjax) initAjaxSingle();
 	}
 
@@ -953,6 +954,80 @@
 		});
 	}
 
+
+	/* ------------------------------------------------------------------
+	 * Cart without load on the server:
+	 *  - "Add to cart" / "Buy Now" buttons ([data-kk-add] / [data-kk-buy]) hold no add-to-cart link, so bots that
+	 *    follow links never touch the cart. A click POSTs to ?wc-ajax=kk_add: Add to cart answers with the new cart
+	 *    (side cart, count, free-delivery bar) in the same request; Buy Now answers with the checkout address.
+	 *  - Cart count / side cart on page load: nothing is asked while the visitor has no cart (no WooCommerce
+	 *    "items in cart" cookie: new visitors and bots). With a cart, the last answer is reused from this tab
+	 *    until the cart changes; only then is the server asked once.
+	 * ---------------------------------------------------------------- */
+	var FRAG_KEY = 'kk_cart_fragments';
+	function cookie(name) { var m = document.cookie.match('(?:^|; )' + name + '=([^;]*)'); return m ? decodeURIComponent(m[1]) : ''; }
+	function fragStore(hash, fragments) { try { if (fragments) sessionStorage.setItem(FRAG_KEY, JSON.stringify({ hash: hash || '', f: fragments })); } catch (e) { /* private mode */ } }
+	function fragRead() { try { return JSON.parse(sessionStorage.getItem(FRAG_KEY) || 'null'); } catch (e) { return null; } }
+	function applyFragments(f) {
+		if (!f) return;
+		Object.keys(f).forEach(function (sel) {
+			var nodes;
+			try { nodes = document.querySelectorAll(sel); } catch (e) { return; }
+			Array.prototype.forEach.call(nodes, function (n) {
+				var tpl = document.createElement('template');
+				tpl.innerHTML = String(f[sel]).trim(); // HTML made by WooCommerce / this plugin on the server
+				var el = tpl.content.firstElementChild;
+				if (el) n.replaceWith(el);
+			});
+		});
+	}
+	function initCart() {
+		if ($) {
+			$(document.body).on('added_to_cart removed_from_cart', function (e, fragments, hash) {
+				fragStore(hash, fragments);
+				if (!window.wc_add_to_cart_params) applyFragments(fragments); // WooCommerce does it itself when its script is on the page
+			});
+		}
+		// Buttons.
+		document.addEventListener('click', function (e) {
+			var a = e.target.closest && e.target.closest('[data-kk-add],[data-kk-buy]');
+			if (!a || e.ctrlKey || e.metaKey || e.shiftKey || e.button > 0) return; // new tab: the product page
+			e.preventDefault();
+			if (a.classList.contains('loading')) return;
+			var buy = a.hasAttribute('data-kk-buy');
+			var id = a.getAttribute(buy ? 'data-kk-buy' : 'data-kk-add');
+			if (!D.wcAjax || !window.fetch) { window.location = a.href; return; }
+			a.classList.remove('added'); a.classList.add('loading'); a.setAttribute('aria-busy', 'true');
+			if ($ && !buy) $(document.body).trigger('adding_to_cart', [$(a), { product_id: id }]);
+			var body = new URLSearchParams();
+			body.append('product_id', id);
+			body.append('quantity', a.getAttribute('data-quantity') || 1);
+			if (buy) body.append('buy', 1);
+			fetch(D.wcAjax.replace('%%endpoint%%', 'kk_add'), { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: body.toString() })
+				.then(function (r) { return r.json(); })
+				.then(function (res) {
+					if (!res || res.error) { window.location = (res && res.product_url) || a.href; return; }
+					if (res.redirect) { window.location = res.redirect; return; } // Buy Now → checkout (the button keeps spinning)
+					a.classList.remove('loading'); a.removeAttribute('aria-busy');
+					if (D.cartRedirect) { window.location = D.cartUrl; return; }
+					a.classList.add('added');
+					if ($) $(document.body).trigger('added_to_cart', [res.fragments, res.cart_hash, $(a)]);
+					else { fragStore(res.cart_hash, res.fragments); applyFragments(res.fragments); document.dispatchEvent(new CustomEvent('kk:added')); }
+				})
+				.catch(function () { window.location = a.href; });
+		});
+		// Page load: ask the server only when this visitor has a cart and this tab has no fresh copy.
+		if (!cookie('woocommerce_items_in_cart')) { try { sessionStorage.removeItem(FRAG_KEY); } catch (e) {} return; }
+		if (!document.querySelector('.kk-cart__count, .kk-bbar__count, #kk-drawer, .kk-fd')) return;
+		var hash = cookie('woocommerce_cart_hash'), saved = fragRead();
+		if (saved && hash && saved.hash === hash) { applyFragments(saved.f); return; }
+		if (!D.wcAjax || !window.fetch) return;
+		fetch(D.wcAjax.replace('%%endpoint%%', 'get_refreshed_fragments'), { method: 'POST', credentials: 'same-origin' })
+			.then(function (r) { return r.json(); })
+			.then(function (res) { if (res && res.fragments) { fragStore(res.cart_hash, res.fragments); applyFragments(res.fragments); } })
+			.catch(function () { /* the page keeps what it shows */ });
+	}
+
 	onReady(function () {
 		initQa();
 		initWishlist();
@@ -961,6 +1036,7 @@
 		initSwatches();
 		initReviews();
 		initVariationAdd();
+		initCart();
 		initGridPaging();
 		initRecent();
 		document.querySelectorAll('.kk-search').forEach(initSearch);

@@ -84,6 +84,9 @@ function kk_stars_html( $rating, $count ) {
 
 /** Add-to-cart + Buy Now buttons for a card. */
 function kk_card_buttons( $product, $a ) {
+	if ( function_exists( 'kk_need_js' ) ) {
+		kk_need_js(); // the buttons work through kenakata-kit.js
+	}
 	$layout  = $a['actions'];
 	if ( 'none' === $layout ) {
 		return '';
@@ -104,37 +107,38 @@ function kk_card_buttons( $product, $a ) {
 		$classes = array( 'kk-pcard__btn', 'kk-pcard__btn--cart', 'product_type_' . $product->get_type() );
 		$url     = $product->add_to_cart_url();
 		$label   = wp_strip_all_tags( $product->add_to_cart_description() );
-		if ( $buyable && $product->is_type( 'simple' ) ) {
-			$classes[] = 'add_to_cart_button';
-			if ( $product->supports( 'ajax_add_to_cart' ) ) {
-				$classes[] = 'ajax_add_to_cart';
+		$add     = 0;
+		if ( $buyable && ( $product->is_type( 'simple' ) || ( $variable && $quick ) ) ) {
+			// No add-to-cart address in the link (bots follow links, people click): the link points to the product page,
+			// the click is handled in kenakata-kit.js (POST, adds without leaving the page, opens the side cart).
+			$add = $product->get_id();
+			$url = $product->get_permalink();
+			if ( $variable ) {
+				/* translators: %s: product name */
+				$label = sprintf( __( 'Add “%s” to your cart', 'kenakata-kit' ), $name );
 			}
-		} elseif ( $variable && $quick ) {
-			$classes[] = 'add_to_cart_button';
-			$classes[] = 'kk-var-add'; // AJAX in kenakata-kit.js; without JS the link adds the default variation
-			$url       = add_query_arg( array( 'add-to-cart' => $product->get_id(), 'quantity' => 1 ) + kk_cart_args( $product ), $product->get_permalink() );
-			/* translators: %s: product name */
-			$label     = sprintf( __( 'Add “%s” to your cart', 'kenakata-kit' ), $name );
 		}
 		$text = $buyable && ( $product->is_type( 'simple' ) || $variable ) && $a['cart_text'] ? $a['cart_text'] : $product->add_to_cart_text();
 		$html .= sprintf(
-			'<a href="%1$s" data-quantity="1" data-product_id="%2$d" data-product_sku="%3$s" class="%4$s" aria-label="%5$s" rel="nofollow">%6$s<span class="kk-pcard__btn-text">%7$s</span></a>',
+			'<a href="%1$s"%8$s data-quantity="1" data-product_id="%2$d" data-product_sku="%3$s" class="%4$s" aria-label="%5$s" rel="nofollow">%6$s<span class="kk-pcard__btn-text">%7$s</span></a>',
 			esc_url( $url ),
 			$product->get_id(),
 			esc_attr( $product->get_sku() ),
 			esc_attr( implode( ' ', $classes ) ),
 			esc_attr( $label ),
 			kk_icon( 'cart' ),
-			esc_html( $text )
+			esc_html( $text ),
+			$add ? ' data-kk-add="' . absint( $add ) . '"' : ''
 		);
 	}
 	if ( $show_buy ) {
 		$html .= sprintf(
-			'<a href="%1$s" class="kk-pcard__btn kk-pcard__btn--buy kk-buy-now" rel="nofollow" aria-label="%2$s"><span class="kk-pcard__btn-text">%3$s</span></a>',
-			esc_url( $quick ? kk_buy_now_url( $product->get_id() ) : $product->get_permalink() ),
+			'<a href="%1$s"%4$s class="kk-pcard__btn kk-pcard__btn--buy kk-buy-now" rel="nofollow" aria-label="%2$s"><span class="kk-pcard__btn-text">%3$s</span></a>',
+			esc_url( $product->get_permalink() ),
 			/* translators: %s: product name */
 			esc_attr( sprintf( __( 'Buy %s now', 'kenakata-kit' ), wp_strip_all_tags( $product->get_name() ) ) ),
-			esc_html( $a['buy_text'] )
+			esc_html( $a['buy_text'] ),
+			$quick ? ' data-kk-buy="' . absint( $product->get_id() ) . '"' : ''
 		);
 	}
 	$single = ! ( $show_cart && $show_buy );

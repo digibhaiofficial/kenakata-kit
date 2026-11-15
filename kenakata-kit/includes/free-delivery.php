@@ -112,6 +112,6 @@ add_action( 'woocommerce_before_mini_cart_contents', function () {
 /* Product cards and the product page load the cart fragments script so the bar can refresh. */
 add_action( 'wp_enqueue_scripts', function () {
 	if ( kk_fd_active() && function_exists( 'is_product' ) && is_product() ) {
-		wp_enqueue_script( 'wc-cart-fragments' );
+		kk_need_js( true ); // the bar refreshes from the add-to-cart answer; no request per page
 	}
 }, 30 );

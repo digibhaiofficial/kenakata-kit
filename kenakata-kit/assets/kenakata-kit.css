@@ -1212,3 +1212,9 @@ body a.kk-reviews__write--big { width: 100%; }
 .kk-drawer--preview .kk-drawer__panel { position: relative; inset: auto; transform: none; height: auto; max-width: 90vw; box-shadow: 0 10px 40px rgba(0,0,0,.15); text-align: left; }
 .kk-drawer--preview .kk-drawer__body { overflow: visible; }
 .kk-drawer--preview .woocommerce-mini-cart__empty-message { opacity: .6; padding: 16px 0; }
+
+/* Side cart: removing an item shows a light veil with a small spinner (WooCommerce's default veil is black), then the item is gone. */
+.kk-drawer .blockUI.blockOverlay { background: #fff !important; opacity: .7 !important; cursor: wait !important; }
+.kk-drawer .blockUI.blockOverlay::after { content: ''; position: absolute; top: 50%; left: 50%; width: 20px; height: 20px; margin: -10px 0 0 -10px; border: 2px solid var(--kk-border, #ddd); border-top-color: var(--kk-primary, #038348); border-radius: 50%; animation: kk-spin .7s linear infinite; }
+.kk-drawer .woocommerce-mini-cart-item { transition: opacity .2s ease; }
+.kk-drawer .woocommerce-mini-cart-item.processing { opacity: .55; }

@@ -6843,3 +6843,51 @@ msgstr "লাইসেন্স"
 
 msgid "Free or Pro: add your license key here to turn on the Pro features on this website."
 msgstr "Free না Pro: এই ওয়েবসাইটে Pro ফিচার চালু করতে এখানে আপনার লাইসেন্স কী দিন।"
+
+msgid "%1$s · %2$d parcels"
+msgstr "%1$s · %2$dটি পার্সেল"
+
+msgid "Bots and server load"
+msgstr "বট আর সার্ভারের চাপ"
+
+msgid "Check again"
+msgstr "আবার চেক করুন"
+
+msgid "Checked %s ago"
+msgstr "%s আগে চেক করা"
+
+msgid "Checking…"
+msgstr "চেক হচ্ছে…"
+
+msgid "Could not check right now. Please try again."
+msgstr "এখন চেক করা গেল না। আবার চেষ্টা করুন।"
+
+msgid "Courier check is turned off."
+msgstr "কুরিয়ার চেক বন্ধ আছে।"
+
+msgid "Ignore cart links from outside the shop"
+msgstr "দোকানের বাইরে থেকে আসা কার্ট লিংক মানা হবে না"
+
+msgid "New"
+msgstr "নতুন"
+
+msgid "Please choose the options first."
+msgstr "আগে অপশন বেছে নিন।"
+
+msgid "Returned / cancelled"
+msgstr "ফেরত / বাতিল"
+
+msgid "See this customer's delivery record"
+msgstr "এই কাস্টমারের ডেলিভারির রেকর্ড দেখুন"
+
+msgid "Some bots open \"add to cart\" links over and over, which makes the server work hard for nothing. Product cards and Buy Now buttons have no such links any more; this switch also handles old links."
+msgstr "কিছু বট বারবার \"add to cart\" লিংক খোলে, এতে সার্ভারকে অকারণে খাটতে হয়। প্রোডাক্ট কার্ড আর Buy Now বোতামে এখন আর এমন লিংক নেই; এই সুইচটা পুরোনো লিংকগুলোও সামলায়।"
+
+msgid "Success"
+msgstr "সফল"
+
+msgid "Turn it on"
+msgstr "চালু করুন"
+
+msgid "When someone opens an \"add to cart\" or \"Buy Now\" link without coming from a page of your shop (a bot replaying links), the cart is not touched: they see the product page. Customers clicking in your shop are not affected. Turn off only if your ads link straight to \"add to cart\"."
+msgstr "কেউ আপনার দোকানের কোনো পাতা থেকে না এসে সরাসরি \"add to cart\" বা \"Buy Now\" লিংক খুললে (যেমন বট), কার্টে কিছু যোগ হবে না: সে শুধু প্রোডাক্টের পাতা দেখবে। দোকানের ভেতরে ক্লিক করা কাস্টমারদের কোনো অসুবিধা হবে না। আপনার বিজ্ঞাপন সরাসরি \"add to cart\" লিংকে নিয়ে গেলে তবেই এটা বন্ধ করুন।"

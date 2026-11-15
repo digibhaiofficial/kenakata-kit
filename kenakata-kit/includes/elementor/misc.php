@@ -38,7 +38,8 @@ class KK_EW_Buy_Now extends KK_EW_Base {
 			$this->editor_note( __( 'Buy Now: choose an in-stock simple product or a variable product with default options (or place the widget on a product template). Check that Buy Now is on in Kenakata Kit.', 'kenakata-kit' ) );
 			return;
 		}
-		echo '<div class="kk-el-buy-now-wrap"><a class="kk-el-buy-now kk-buy-now" href="' . esc_url( kk_buy_now_url( $product->get_id() ) ) . '" rel="nofollow" aria-label="' . esc_attr( sprintf( /* translators: %s: product name */ __( 'Buy %s now', 'kenakata-kit' ), wp_strip_all_tags( $product->get_name() ) ) ) . '">';
+		kk_need_js();
+		echo '<div class="kk-el-buy-now-wrap"><a class="kk-el-buy-now kk-buy-now" href="' . esc_url( $product->get_permalink() ) . '" data-kk-buy="' . absint( $product->get_id() ) . '" rel="nofollow" aria-label="' . esc_attr( sprintf( /* translators: %s: product name */ __( 'Buy %s now', 'kenakata-kit' ), wp_strip_all_tags( $product->get_name() ) ) ) . '">';
 		if ( ! empty( $s['icon']['value'] ) ) {
 			\Elementor\Icons_Manager::render_icon( $s['icon'], array( 'aria-hidden' => 'true' ) );
 		}

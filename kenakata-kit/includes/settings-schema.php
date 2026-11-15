@@ -173,6 +173,8 @@ function kk_fields() {
 		'co_cart_note'         => kk_f( 'checkout', 'text', __( 'Cart page note', 'kenakata-kit' ), '', array( 'show_if' => 'co_cart_hide_shipping' ) ),
 
 		/* ---------------- Fake-order protection ---------------- */
+		'h_guard_bots'         => kk_f( 'guard', 'heading', __( 'Bots and server load', 'kenakata-kit' ), __( 'Some bots open "add to cart" links over and over, which makes the server work hard for nothing. Product cards and Buy Now buttons have no such links any more; this switch also handles old links.', 'kenakata-kit' ) ),
+		'cart_bot_guard'       => kk_f( 'guard', 'toggle', __( 'Ignore cart links from outside the shop', 'kenakata-kit' ), __( 'When someone opens an "add to cart" or "Buy Now" link without coming from a page of your shop (a bot replaying links), the cart is not touched: they see the product page. Customers clicking in your shop are not affected. Turn off only if your ads link straight to "add to cart".', 'kenakata-kit' ) ),
 		'h_guard_phone'        => kk_f( 'guard', 'heading', __( 'Phone number check', 'kenakata-kit' ), __( 'Applies to checkout, order tracking and registration.', 'kenakata-kit' ) ),
 		'co_phone_mode'        => kk_f( 'guard', 'select', __( 'Accepted numbers', 'kenakata-kit' ), __( '"Exactly 11 digits" blocks most fake numbers. Customers cannot even type more than 11 digits.', 'kenakata-kit' ), array( 'options' => array( 'bd11' => __( 'Exactly 11 digits (01XXXXXXXXX) — recommended', 'kenakata-kit' ), 'bd' => __( 'Bangladeshi mobile, +880 also accepted', 'kenakata-kit' ), 'any' => __( 'Any number (6+ digits)', 'kenakata-kit' ) ) ) ),
 		'co_phone_error'       => kk_f( 'guard', 'text', __( 'Invalid number message', 'kenakata-kit' ) ),

@@ -284,7 +284,6 @@ add_action( 'wp_footer', function () {
 		return;
 	}
 	kk_need_js();
-	wp_enqueue_script( 'wc-cart-fragments' );
 	echo '<div class="kk-bbar-spacer" aria-hidden="true"></div>' . $bar; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in kk_bbar_render()
 	$uses_search = false;
 	foreach ( kk_bbar_items() as $it ) {

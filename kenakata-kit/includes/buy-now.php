@@ -102,15 +102,94 @@ add_action( 'wc_ajax_kk_add_variation', function () {
 
 function kk_buy_now_link( $product, $text = '', $class = '' ) {
 	$text = $text ? $text : kk_opt( 'buynow_text' );
+	if ( function_exists( 'kk_need_js' ) ) {
+		kk_need_js();
+	}
+	// No add-to-cart address in the link: bots that follow links only reach the (cached) product page.
+	// The click is handled in kenakata-kit.js (POST → checkout).
 	return sprintf(
-		'<a href="%1$s" class="button kk-buy-now %4$s" rel="nofollow" aria-label="%2$s">%3$s</a>',
-		esc_url( kk_buy_now_url( $product->get_id() ) ),
+		'<a href="%1$s" data-kk-buy="%2$d" class="button kk-buy-now %5$s" rel="nofollow" aria-label="%3$s">%4$s</a>',
+		esc_url( $product->get_permalink() ),
+		absint( $product->get_id() ),
 		/* translators: %s: product name */
 		esc_attr( sprintf( __( 'Buy %s now', 'kenakata-kit' ), wp_strip_all_tags( $product->get_name() ) ) ),
 		esc_html( $text ),
 		esc_attr( $class )
 	);
 }
+
+/**
+ * Put a product in the cart for "Add to cart" (product cards) and "Buy Now". Variable products use their default
+ * variation, worked out here (posted data can never pick something else). $buy: empty the cart first when the
+ * "Buy only this product" setting is on, and do not add it twice. Returns true or WP_Error.
+ */
+function kk_quick_add( $product_id, $quantity = 1, $buy = false ) {
+	$product = wc_get_product( absint( $product_id ) );
+	if ( ! $product || 'publish' !== get_post_status( $product->get_id() ) || $product->is_type( 'variation' ) ) {
+		return new WP_Error( 'kk_add_missing', __( 'Sorry, this product cannot be purchased right now.', 'kenakata-kit' ) );
+	}
+	$variation_id = 0;
+	$attributes   = array();
+	if ( $product->is_type( 'variable' ) ) {
+		$dv = kk_default_variation( $product );
+		if ( ! $dv ) {
+			return new WP_Error( 'kk_add_choose', __( 'Please choose the options first.', 'kenakata-kit' ) );
+		}
+		list( $variation_id, $attributes ) = $dv;
+	} elseif ( ! $product->is_type( 'simple' ) || ! $product->is_purchasable() || ! $product->is_in_stock() ) {
+		return new WP_Error( 'kk_add_missing', __( 'Sorry, this product cannot be purchased right now.', 'kenakata-kit' ) );
+	}
+	if ( null === WC()->cart ) {
+		wc_load_cart();
+	}
+	$quantity = max( 1, wc_stock_amount( $quantity ) );
+	if ( $buy ) {
+		if ( kk_opt( 'buynow_clear_cart' ) ) {
+			WC()->cart->empty_cart();
+		}
+		foreach ( WC()->cart->get_cart() as $item ) {
+			if ( (int) $item['product_id'] === $product->get_id() && (int) $item['variation_id'] === (int) $variation_id ) {
+				return true; // already there: go to checkout with it
+			}
+		}
+	}
+	$passed = apply_filters( 'woocommerce_add_to_cart_validation', true, $product->get_id(), $quantity, $variation_id, $attributes );
+	if ( ! $passed || false === WC()->cart->add_to_cart( $product->get_id(), $quantity, $variation_id, $attributes ) ) {
+		$notices = function_exists( 'wc_get_notices' ) ? wc_get_notices( 'error' ) : array();
+		wc_clear_notices();
+		$msg = $notices ? wp_strip_all_tags( is_array( $notices[0] ) ? $notices[0]['notice'] : $notices[0] ) : __( 'Sorry, this product cannot be purchased right now.', 'kenakata-kit' );
+		return new WP_Error( 'kk_add_failed', $msg );
+	}
+	return true;
+}
+
+/**
+ * POST ?wc-ajax=kk_add  product_id, quantity, buy (0/1)
+ * Add to cart → the same answer as WooCommerce's own add_to_cart (fragments + cart hash), so mini carts and the
+ * side cart update in one request. Buy Now → { redirect: checkout URL }. Errors → { error, message, product_url }.
+ * POST only: a link can never trigger it, so crawlers cannot fill carts.
+ */
+add_action( 'wc_ajax_kk_add', function () {
+	if ( 'POST' !== ( isset( $_SERVER['REQUEST_METHOD'] ) ? strtoupper( sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) ) : '' ) ) {
+		wp_send_json( array( 'error' => true ), 405 );
+	}
+	$product_id = isset( $_POST['product_id'] ) ? absint( wp_unslash( $_POST['product_id'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification -- public like WooCommerce add_to_cart (cache-safe pages)
+	$quantity   = isset( $_POST['quantity'] ) ? wp_unslash( $_POST['quantity'] ) : 1; // phpcs:ignore WordPress.Security.NonceVerification,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- wc_stock_amount() in kk_quick_add()
+	$buy        = ! empty( $_POST['buy'] ) && kk_opt( 'buynow_enable' ); // phpcs:ignore WordPress.Security.NonceVerification
+	$res        = kk_quick_add( $product_id, $quantity, $buy );
+	if ( is_wp_error( $res ) ) {
+		wp_send_json( array( 'error' => true, 'message' => $res->get_error_message(), 'product_url' => $product_id ? get_permalink( $product_id ) : wc_get_page_permalink( 'shop' ) ) );
+	}
+	if ( $buy ) {
+		wc_clear_notices();
+		wp_send_json( array( 'redirect' => wc_get_checkout_url() ) );
+	}
+	do_action( 'woocommerce_ajax_added_to_cart', $product_id );
+	if ( 'yes' === get_option( 'woocommerce_cart_redirect_after_add' ) ) {
+		wc_add_to_cart_message( array( $product_id => max( 1, wc_stock_amount( $quantity ) ) ), true );
+	}
+	WC_AJAX::get_refreshed_fragments(); // sends { fragments, cart_hash } and exits
+} );
 
 if ( ! kk_opt( 'buynow_enable' ) ) {
 	add_shortcode( 'kk_buy_now', '__return_empty_string' );

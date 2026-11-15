@@ -171,8 +171,7 @@ function kk_cart_count() {
 
 function kk_cart_icon( $atts = array() ) {
 	$a = shortcode_atts( array( 'show_total' => 'no', 'label' => __( 'Cart', 'kenakata-kit' ) ), $atts, 'kk_cart_icon' );
-	kk_need_js();
-	wp_enqueue_script( 'wc-cart-fragments' );
+	kk_need_js(); // kenakata-kit.js refreshes the count only when the visitor has a cart (no request per page)
 	$count = kk_cart_count();
 	$total = 'yes' === $a['show_total'] && function_exists( 'WC' ) && WC()->cart ? '<span class="kk-cart__total">' . wp_kses_post( WC()->cart->get_cart_subtotal() ) . '</span>' : '';
 	return '<a class="kk-cart" href="' . esc_url( wc_get_cart_url() ) . '"' . ( kk_opt( 'cart_drawer_enable' ) ? ' data-kk-drawer' : '' ) . '>'
@@ -195,8 +194,7 @@ add_action( 'wp_footer', function () {
 	if ( ! kk_opt( 'cart_drawer_enable' ) || is_admin() || ( function_exists( 'is_cart' ) && ( is_cart() || is_checkout() ) ) ) {
 		return;
 	}
-	wp_enqueue_script( 'wc-cart-fragments' );
-	kk_need_js( true );
+	kk_need_js( true ); // no wc-cart-fragments: kenakata-kit.js loads the cart only for visitors who have one
 	$dcls = 'kk-drawer' . ( kk_opt( 'cart_drawer_thumbs' ) ? '' : ' kk-drawer--no-thumbs' ) . ( kk_opt( 'cart_drawer_remove' ) ? '' : ' kk-drawer--no-remove' );
 	echo '<div class="' . esc_attr( $dcls ) . '" id="kk-drawer" hidden><div class="kk-drawer__backdrop" data-kk-drawer-close></div>'
 		. '<aside class="kk-drawer__panel" role="dialog" aria-modal="true" aria-labelledby="kk-drawer-title">'

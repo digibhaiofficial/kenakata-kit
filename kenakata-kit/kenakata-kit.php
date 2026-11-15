@@ -88,6 +88,7 @@ function kk_defaults() {
 		'buynow_single'         => 1,
 		'buynow_text'           => 'Buy Now',
 		'buynow_clear_cart'     => 0,
+		'cart_bot_guard'        => 1,          // cart links from outside the shop (bots) do not touch the cart
 
 		// Checkout.
 		'co_enable'             => 1,
@@ -537,7 +538,7 @@ add_action( 'plugins_loaded', function () {
 	require_once KK_DIR . '/includes/updater.php';
 	// Pro modules (store dashboard, courier, incomplete orders) load only with a valid license key.
 	$pro = kk_is_pro();
-	foreach ( array( 'settings-schema', 'admin', 'rest', 'assets', 'product-card', 'products', 'buy-now', 'checkout', 'free-delivery', 'order-guard', 'orders', 'courier', 'incomplete', 'search', 'account', 'my-account', 'wishlist', 'qa', 'terms', 'extras', 'variations', 'reviews', 'bottom-bar', 'security', 'cron-health', 'store-dashboard', 'elementor' ) as $file ) {
+	foreach ( array( 'settings-schema', 'admin', 'rest', 'assets', 'product-card', 'products', 'buy-now', 'cart-guard', 'checkout', 'free-delivery', 'order-guard', 'orders', 'courier', 'incomplete', 'search', 'account', 'my-account', 'wishlist', 'qa', 'terms', 'extras', 'variations', 'reviews', 'bottom-bar', 'security', 'cron-health', 'store-dashboard', 'elementor' ) as $file ) {
 		if ( ! $pro && in_array( $file, kk_pro_modules(), true ) ) {
 			continue;
 		}

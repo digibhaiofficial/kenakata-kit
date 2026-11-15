@@ -187,8 +187,34 @@ add_filter( 'woocommerce_add_to_cart_fragments', function ( $fragments ) {
 	$fragments['span.kk-bbar__count'] = '<span class="kk-bbar__count' . ( $count ? '' : ' is-empty' ) . '" aria-hidden="true">' . esc_html( $count ) . '</span>';
 	/* translators: %d: number of items in the cart */
 	$fragments['span.kk-bbar__sr']    = '<span class="screen-reader-text kk-bbar__sr">' . esc_html( sprintf( _n( '(%d item)', '(%d items)', $count, 'kenakata-kit' ), $count ) ) . '</span>';
+	if ( kk_opt( 'cart_drawer_enable' ) ) {
+		// The side cart has its own fragment, so a page builder's mini cart (e.g. Elementor Pro "Menu Cart" with its own
+		// template) keeps its own markup and styles in div.widget_shopping_cart_content.
+		$fragments['div.kk-drawer__content'] = '<div class="kk-drawer__content">' . kk_drawer_mini_cart() . '</div>';
+	}
 	return $fragments;
 } );
+
+// Fragments saved in the browser before 3.15.1 do not have the side cart's own fragment: use a new storage name.
+add_filter( 'woocommerce_cart_fragment_name', function ( $name ) {
+	return kk_opt( 'cart_drawer_enable' ) ? $name . '_kk2' : $name;
+} );
+
+/**
+ * The side cart's contents: WooCommerce's own mini-cart markup (the theme's override or WooCommerce's default), even when
+ * a page builder replaces the mini-cart template for its own widget. Only this render is affected.
+ */
+function kk_drawer_mini_cart() {
+	if ( ! function_exists( 'woocommerce_mini_cart' ) ) {
+		return '';
+	}
+	$GLOBALS['kk_own_mini_cart'] = true;
+	ob_start();
+	woocommerce_mini_cart();
+	$html = (string) ob_get_clean();
+	unset( $GLOBALS['kk_own_mini_cart'] );
+	return $html;
+}
 
 add_action( 'wp_footer', function () {
 	if ( ! kk_opt( 'cart_drawer_enable' ) || is_admin() || ( function_exists( 'is_cart' ) && ( is_cart() || is_checkout() ) ) ) {
@@ -199,9 +225,7 @@ add_action( 'wp_footer', function () {
 	echo '<div class="' . esc_attr( $dcls ) . '" id="kk-drawer" hidden><div class="kk-drawer__backdrop" data-kk-drawer-close></div>'
 		. '<aside class="kk-drawer__panel" role="dialog" aria-modal="true" aria-labelledby="kk-drawer-title">'
 		. '<header class="kk-drawer__head"><h2 id="kk-drawer-title">' . esc_html( kk_opt( 'cart_drawer_title' ) ) . '</h2><button type="button" class="kk-drawer__close" data-kk-drawer-close aria-label="' . esc_attr__( 'Close', 'kenakata-kit' ) . '">' . kk_icon( 'close' ) . '</button></header>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static SVG
-		. '<div class="kk-drawer__body"><div class="widget_shopping_cart_content">';
-	woocommerce_mini_cart();
-	echo '</div></div></aside></div>';
+		. '<div class="kk-drawer__body"><div class="kk-drawer__content">' . kk_drawer_mini_cart() . '</div></div></aside></div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- WooCommerce template output
 }, 16 );
 
 /* -------------------------------------------------------------------------
@@ -341,11 +365,12 @@ add_filter( 'gettext', function ( $translation, $text, $domain ) {
 }, 20, 3 );
 /*
  * The side cart needs WooCommerce's own mini-cart markup (remove buttons, classes the styles target).
- * Some page builders (Elementor Pro "Menu Cart" template) replace it site-wide; while the side cart is on,
- * use the theme's override or WooCommerce's default instead.
+ * Some page builders (Elementor Pro "Menu Cart" template) replace it site-wide; for the side cart only
+ * (kk_drawer_mini_cart), use the theme's override or WooCommerce's default instead. Before 3.15.1 this applied
+ * to every mini cart, which broke the builder's own cart panel.
  */
 add_filter( 'woocommerce_locate_template', function ( $template, $name ) {
-	if ( 'cart/mini-cart.php' !== $name || ! kk_opt( 'cart_drawer_enable' ) || ! function_exists( 'WC' ) ) {
+	if ( 'cart/mini-cart.php' !== $name || empty( $GLOBALS['kk_own_mini_cart'] ) || ! function_exists( 'WC' ) ) {
 		return $template;
 	}
 	$own = array( wp_normalize_path( WC()->plugin_path() ), wp_normalize_path( get_stylesheet_directory() ), wp_normalize_path( get_template_directory() ) );
@@ -360,7 +385,7 @@ add_filter( 'woocommerce_locate_template', function ( $template, $name ) {
 }, 999, 2 );
 /* Some builders swap the file later through wc_get_template; apply the same rule there. */
 add_filter( 'wc_get_template', function ( $template, $name ) {
-	if ( 'cart/mini-cart.php' !== $name || ! kk_opt( 'cart_drawer_enable' ) || ! function_exists( 'WC' ) ) {
+	if ( 'cart/mini-cart.php' !== $name || empty( $GLOBALS['kk_own_mini_cart'] ) || ! function_exists( 'WC' ) ) {
 		return $template;
 	}
 	$tpl = wp_normalize_path( (string) $template );
@@ -393,7 +418,7 @@ function kk_drawer_preview_html() {
 	$cls = 'kk-drawer kk-drawer--preview is-open' . ( kk_opt( 'cart_drawer_thumbs' ) ? '' : ' kk-drawer--no-thumbs' ) . ( kk_opt( 'cart_drawer_remove' ) ? '' : ' kk-drawer--no-remove' );
 	return '<div class="' . esc_attr( $cls ) . '"><aside class="kk-drawer__panel">'
 		. '<header class="kk-drawer__head"><h2>' . esc_html( kk_opt( 'cart_drawer_title' ) ) . '</h2><button type="button" class="kk-drawer__close" aria-label="' . esc_attr__( 'Close', 'kenakata-kit' ) . '">' . kk_icon( 'close' ) . '</button></header>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static SVG
-		. '<div class="kk-drawer__body"><div class="widget_shopping_cart_content">'
+		. '<div class="kk-drawer__body"><div class="kk-drawer__content">'
 		. ( function_exists( 'kk_free_delivery_html' ) && kk_opt( 'fd_drawer' ) ? kk_free_delivery_html( array( 'class' => 'kk-fd--drawer' ) ) : '' )
 		. '<ul class="woocommerce-mini-cart cart_list product_list_widget">' . $items . '</ul>'
 		. '<p class="woocommerce-mini-cart__total total"><strong>' . esc_html__( 'Subtotal:', 'woocommerce' ) . '</strong> ' . wp_kses_post( wc_price( $sum ) ) . '</p>'

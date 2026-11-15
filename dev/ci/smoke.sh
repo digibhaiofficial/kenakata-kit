@@ -305,6 +305,19 @@ wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["print_enable"] 
 code=$(curl -s -o /tmp/body -w "%{http_code}" -b "$JAR" "$PURL&kind=invoice&ids=$PO")
 check "print switched off → no print page ($code)" '[ "$code" = 403 ] && ! grep -q "Print Test Tee" /tmp/body'
 
+echo "== 3.15.1: side cart and a page builder's mini cart keep their own markup"
+mkdir -p "$WP/wp-content/kk-fake"; echo '<div class="fake-builder-mc">BUILDER CART</div>' > "$WP/wp-content/kk-fake/mini-cart.php"
+cat > "$WP/wp-content/mu-plugins/kk-fake-builder.php" <<'PHP'
+<?php
+add_filter( 'woocommerce_locate_template', function ( $t, $name ) { return 'cart/mini-cart.php' === $name ? WP_CONTENT_DIR . '/kk-fake/mini-cart.php' : $t; }, 10, 2 );
+PHP
+wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["cart_drawer_enable"] = 1; kk_update_settings( $s );'
+curl -s -o /tmp/body -X POST "$URL/?wc-ajax=get_refreshed_fragments"
+check "builder mini cart keeps its template; side cart gets WooCommerce markup in its own fragment" 'php -r '"'"'$j = json_decode( file_get_contents( "/tmp/body" ), true ); $f = $j["fragments"]; exit( isset( $f["div.kk-drawer__content"] ) && false === strpos( $f["div.kk-drawer__content"], "BUILDER" ) && false !== strpos( $f["div.kk-drawer__content"], "woocommerce-mini-cart" ) && false !== strpos( $f["div.widget_shopping_cart_content"], "BUILDER CART" ) ? 0 : 1 );'"'"''
+curl -sL -o /tmp/body "$URL/?post_type=product"
+check "side cart in the page uses WooCommerce markup, not the builder's" 'grep -q "kk-drawer__content" /tmp/body && ! grep -q "kk-drawer__content\"><div class=\"fake-builder-mc" /tmp/body && clean /tmp/body'
+rm -rf "$WP/wp-content/mu-plugins/kk-fake-builder.php" "$WP/wp-content/kk-fake"
+
 echo "== Bots"
 wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["speed_robots_shop"] = 1; $s["speed_bot_block"] = 1; $s["speed_ai_block"] = 1; kk_update_settings( $s );'
 check "robots.txt keeps crawlers off search/sort/filter pages and names the blocked bots" 'curl -s "$URL/?robots=1" | grep -q "orderby" && curl -s "$URL/?robots=1" | grep -q "User-agent: AhrefsBot"'

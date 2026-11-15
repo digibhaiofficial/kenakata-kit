@@ -4,7 +4,7 @@ Plugin URI: https://digibhai.com/
 Requires at least: 6.3
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 3.15.0
+Stable tag: 3.15.1
 License: GPLv2 or later
 
 Everything a Bangladeshi WooCommerce store usually needs. Settings: left admin menu → Kenakata Kit.
@@ -30,6 +30,9 @@ Products Grid, Products Carousel, Brands, Categories, Buy Now Button, Live Searc
 Older [ss_…] shortcodes keep working. Options: see the guide or Kenakata Kit → Shortcodes.
 
 == Changelog ==
+= 3.15.1 =
+* Fix: with the Side cart on, a page builder's own cart panel (Elementor Pro "Menu Cart" with its mini-cart template) showed unstyled after Add to cart (bullets, "View cartCheckout"). The side cart now has its own cart fragment and only it uses WooCommerce's mini-cart markup; the builder's cart keeps its own template and styles.
+
 = 3.15.0 =
 * New (off until turned on): Invoice & label printing. Tick orders in WooCommerce → Orders → Bulk actions → "Print invoices" or "Print shipping labels", use the buttons on the order screen, or press Print in the store dashboard (one order, or all orders shown in the list). A4 invoices with logo, items, totals, cash to collect and a barcode; labels 100 × 150 mm, 75 × 100 mm or 6 per A4 sheet, with the courier tracking code as a barcode.
 * Courier (Pro): Bulk actions "Send to <courier>" (up to 15 orders per press, only orders not sent yet) and "Sync courier status" (up to 40, only parcels still on the way). Store dashboard: "Sync courier" button on the orders list. Nothing runs in the background.

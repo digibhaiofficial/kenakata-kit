@@ -998,7 +998,7 @@
 	 *    "items in cart" cookie: new visitors and bots). With a cart, the last answer is reused from this tab
 	 *    until the cart changes; only then is the server asked once.
 	 * ---------------------------------------------------------------- */
-	var FRAG_KEY = 'kk_cart_fragments';
+	var FRAG_KEY = 'kk_cart_fragments_2'; // _2 (3.15.1): the side cart got its own fragment
 	function cookie(name) { var m = document.cookie.match('(?:^|; )' + name + '=([^;]*)'); return m ? decodeURIComponent(m[1]) : ''; }
 	function fragStore(hash, fragments) { try { if (fragments) sessionStorage.setItem(FRAG_KEY, JSON.stringify({ hash: hash || '', f: fragments })); } catch (e) { /* private mode */ } }
 	function fragRead() { try { return JSON.parse(sessionStorage.getItem(FRAG_KEY) || 'null'); } catch (e) { return null; } }

@@ -441,6 +441,26 @@ wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["co_district_ena
 curl -sL -o /tmp/body -b /tmp/c6 -c /tmp/c6 "$URL/?page_id=$(wpc option get woocommerce_checkout_page_id)"
 check "switched off → no district / thana fields" '! grep -q "id=\"billing_state\"" /tmp/body && ! grep -q "kkThanas" /tmp/body'
 
+echo "== 3.20: login pause, trusted browser, lift the pause"
+wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["sec_limit_login"] = 1; $s["sec_login_attempts"] = 3; kk_update_settings( $s );'
+login() { curl -s -o /tmp/lbody -w "%{http_code}" -b "$1" -c "$1" -d "log=admin&pwd=$2&wp-submit=Log+In&testcookie=1&redirect_to=$URL/wp-admin/profile.php" "$URL/wp-login.php"; }
+rm -f /tmp/jt /tmp/jw; curl -s -o /dev/null -c /tmp/jt "$URL/wp-login.php"; curl -s -o /dev/null -c /tmp/jw "$URL/wp-login.php"
+code=$(login /tmp/jt admin-pass-123)
+check "a good login marks the browser as trusted" '[ "$code" = 302 ] && grep -q "kk_td_" /tmp/jt'
+for i in 1 2 3; do login /tmp/jw wrong-pass >/dev/null; done
+code=$(login /tmp/jw admin-pass-123)
+check "after 3 wrong passwords the connection is paused, with a reset-password link ($code)" '[ "$code" = 200 ] && grep -q "paused" /tmp/lbody && grep -q "action=lostpassword" /tmp/lbody'
+get "$URL/wp-admin/admin.php?page=kenakata-kit&tab=security" >/dev/null
+check "Security tab lists the pause with a button to lift it" 'grep -q "Lift all pauses now" /tmp/body && clean /tmp/body'
+UL=$(grep -oP 'href="\K[^"]*kk_login_unlock[^"]*' /tmp/body | head -1 | sed 's/&amp;/\&/g; s/&#038;/\&/g')
+code=$(login /tmp/jt admin-pass-123)
+check "the owner's trusted browser still logs in ($code)" '[ "$code" = 302 ]'
+for i in 1 2 3; do login /tmp/jw wrong-pass >/dev/null; done
+curl -s -o /dev/null -b "$JAR" "$UL"
+code=$(login /tmp/jw admin-pass-123)
+check "after lifting the pause, login works again ($code)" '[ "$code" = 302 ]'
+wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["sec_limit_login"] = 0; kk_update_settings( $s );'
+
 echo "== Bots"
 wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["speed_robots_shop"] = 1; $s["speed_bot_block"] = 1; $s["speed_ai_block"] = 1; kk_update_settings( $s );'
 check "robots.txt keeps crawlers off search/sort/filter pages and names the blocked bots" 'curl -s "$URL/?robots=1" | grep -q "orderby" && curl -s "$URL/?robots=1" | grep -q "User-agent: AhrefsBot"'

@@ -87,7 +87,7 @@ function kk_sanitize_value( $key, $v ) {
 /** Fields that store a value (not headings / info rows). */
 function kk_value_fields() {
 	return array_filter( kk_fields(), function ( $f ) {
-		return ! in_array( $f['type'], array( 'heading', 'areas', 'courier_test', 'courier_log' ), true );
+		return ! in_array( $f['type'], array( 'heading', 'areas', 'courier_test', 'courier_log', 'login_locks' ), true );
 	} );
 }
 
@@ -519,6 +519,9 @@ function kk_render_field( $key, $f ) {
 			if ( '' !== $hint ) {
 				echo ' <span class="kk-saved">' . esc_html__( 'Saved', 'kenakata-kit' ) . '</span>';
 			}
+			break;
+		case 'login_locks':
+			echo function_exists( 'kk_login_locks_html' ) ? kk_login_locks_html() : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped inside
 			break;
 		case 'courier_log':
 			echo function_exists( 'kk_courier_log_html' ) ? kk_courier_log_html() : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped inside

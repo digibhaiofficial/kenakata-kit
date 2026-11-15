@@ -8933,3 +8933,36 @@ msgstr "জেলার ঘরের লেবেল"
 
 msgid "Thana field label"
 msgstr "থানার ঘরের লেবেল"
+
+msgid "This account is paused for a while because of many wrong passwords from different places (probably bots). Log in from a browser you used before, or reset your password:"
+msgstr "অনেক জায়গা থেকে অনেকবার ভুল পাসওয়ার্ড দেওয়ায় (সম্ভবত বট) এই অ্যাকাউন্ট কিছুক্ষণের জন্য থামানো আছে। আগে ব্যবহার করা ব্রাউজার থেকে লগইন করুন, অথবা পাসওয়ার্ড রিসেট করুন:"
+
+msgid "Too many wrong passwords. For your security, login is paused for 15 minutes. Forgot your password?"
+msgstr "অনেকবার ভুল পাসওয়ার্ড। নিরাপত্তার জন্য ১৫ মিনিট লগইন বন্ধ। পাসওয়ার্ড ভুলে গেছেন?"
+
+msgid "Reset password"
+msgstr "পাসওয়ার্ড রিসেট"
+
+msgid "All pauses lifted."
+msgstr "সব আটকানো খুলে দেওয়া হয়েছে।"
+
+msgid "No login is paused right now."
+msgstr "এখন কোনো লগইন আটকানো নেই।"
+
+msgid "Account %1$s: %2$d more minutes"
+msgstr "অ্যাকাউন্ট %1$s: আরও %2$d মিনিট"
+
+msgid "Connection %1$s: %2$d more minutes"
+msgstr "কানেকশন %1$s: আরও %2$d মিনিট"
+
+msgid "Lift all pauses now"
+msgstr "এখনই সব খুলে দিন"
+
+msgid "Paused logins now"
+msgstr "এখন আটকানো লগইন"
+
+msgid "Locked yourself out on a new browser? Log in from a browser you used before (or reset your password) and lift the pause here."
+msgstr "নতুন ব্রাউজারে আটকে গেছেন? আগে ব্যবহার করা ব্রাউজার থেকে লগইন করে (বা পাসওয়ার্ড রিসেট করে) এখান থেকে খুলে দিন।"
+
+msgid "Applies to wp-login.php, My account, the login popup and XML-RPC. The connection that made the wrong attempts waits 15 minutes; everybody else can log in normally. A browser where you logged in before is never paused, and the message offers a password reset."
+msgstr "wp-login.php, My account, লগইন পপআপ আর XML-RPC-তে কাজ করে। যে কানেকশন থেকে ভুল চেষ্টা হয়েছে সেটা ১৫ মিনিট অপেক্ষা করে; বাকিরা স্বাভাবিকভাবে লগইন করতে পারে। আগে লগইন করা ব্রাউজার কখনো আটকায় না, আর বার্তায় পাসওয়ার্ড রিসেটের লিংক থাকে।"

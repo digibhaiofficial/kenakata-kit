@@ -18,7 +18,7 @@ defined( 'ABSPATH' ) || exit;
 
 /** Ed25519 public key of the license panel (base64). Only the matching private key can sign valid keys. */
 if ( ! defined( 'KK_LICENSE_PUBKEY' ) ) {
-	define( 'KK_LICENSE_PUBKEY', '__KK_PUBKEY__' );
+	define( 'KK_LICENSE_PUBKEY', 'JGQVoQMA0IEGc9qJNseU9uDPREpiFxPwvlzaAB7CQ0I=' );
 }
 /** GitHub repository (owner/name) for updates and the list of taken-back keys. */
 if ( ! defined( 'KK_GH_REPO' ) ) {

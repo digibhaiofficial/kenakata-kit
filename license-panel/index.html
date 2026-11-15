@@ -37,8 +37,8 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
 <div id="v-nosupport" class="card hidden"><h2>এই ব্রাউজারে চলবে না</h2><p>এই প্যানেলের জন্য Ed25519 সমর্থন করে এমন নতুন ব্রাউজার লাগবে: Chrome / Edge 137+, Firefox 129+ বা Safari 17+। ব্রাউজার আপডেট করে আবার খুলুন।</p></div>
 
 <div id="v-setup" class="card hidden">
-  <h2>প্রথমবার: নতুন গোপন চাবি তৈরি</h2>
-  <p>একটা শক্ত পাসওয়ার্ড দিন, অন্তত ১৬ অক্ষর। এই পাসওয়ার্ড দিয়েই প্যানেল খুলবেন। পাসওয়ার্ড হারালে রিকভারি কোড ছাড়া আর কোনো উপায় থাকবে না।</p>
+  <h2 id="s-title">প্রথমবার: নতুন গোপন চাবি তৈরি</h2>
+  <p id="s-intro">একটা শক্ত পাসওয়ার্ড দিন, অন্তত ১৬ অক্ষর। এই পাসওয়ার্ড দিয়েই প্যানেল খুলবেন। পাসওয়ার্ড হারালে রিকভারি কোড ছাড়া আর কোনো উপায় থাকবে না।</p>
   <label for="s-pw">পাসওয়ার্ড</label><input id="s-pw" type="password" autocomplete="new-password">
   <label for="s-pw2">আবার পাসওয়ার্ড</label><input id="s-pw2" type="password" autocomplete="new-password">
   <button id="s-create">চাবি তৈরি করুন</button>
@@ -128,6 +128,8 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
   var VAULT = 'kk_vault', LEDGER = 'kk_ledger', PLANS = 'kk_plans';
   var PKCS8_PREFIX = new Uint8Array([0x30,0x2e,0x02,0x01,0x00,0x30,0x05,0x06,0x03,0x2b,0x65,0x70,0x04,0x22,0x04,0x20]);
   var ITER = 600000;
+  // The one signing key of Kenakata Kit (its public half is in the plugin). The panel never makes another one.
+  var EXPECTED_PUB = 'JGQVoQMA0IEGc9qJNseU9uDPREpiFxPwvlzaAB7CQ0I=';
   var DEFAULT_PLANS = [
     { key: 'pro', name: 'Pro · ১ সাইট · ১ বছর', months: 12, sites: 1 },
     { key: 'agency', name: 'এজেন্সি · ৫ সাইট · ১ বছর', months: 12, sites: 5 },
@@ -188,6 +190,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
     if (pw !== pw2) return msg('s-msg', 'দুই ঘরের পাসওয়ার্ড মেলেনি।');
     msg('s-msg', 'একটু অপেক্ষা করুন…', true);
     var vault = await lockSeed(seed, pw);
+    if (EXPECTED_PUB && vault.pub !== EXPECTED_PUB) return msg('s-msg', 'এই রিকভারি কোড আপনার আসল চাবির নয়। কাগজের অন্য কোডটা দিয়ে চেষ্টা করুন।');
     store(VAULT, vault); pubB64 = vault.pub;
     await useSeed(seed);
     $('s-pw').value = $('s-pw2').value = '';
@@ -201,7 +204,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
   $('s-restore').onclick = function () { var s = unhex($('s-rec').value); if (!s) return msg('s-msg', 'রিকভারি কোডটা ঠিক নেই (৬৪টা অক্ষর হওয়ার কথা)।'); setupWith(s, true).catch(function (e) { msg('s-msg', 'সমস্যা: ' + e.message); }); };
   $('s-file').onchange = function () {
     var f = this.files[0]; if (!f) return;
-    f.text().then(function (t) { var v = JSON.parse(t); if (!v || v.kind !== 'kenakata-kit-license-vault') throw new Error('এটা চাবির ফাইল নয়'); store(VAULT, v); boot(); }).catch(function (e) { msg('s-msg', 'ফাইলটা পড়া গেল না: ' + e.message); });
+    f.text().then(function (t) { var v = JSON.parse(t); if (!v || v.kind !== 'kenakata-kit-license-vault') throw new Error('এটা চাবির ফাইল নয়'); if (EXPECTED_PUB && v.pub !== EXPECTED_PUB) throw new Error('এটা পুরোনো/ভুল চাবির ফাইল। GitHub-এর kenakata-license-panel রিপোর kk-vault.json দিন'); store(VAULT, v); boot(); }).catch(function (e) { msg('s-msg', 'ফাইলটা পড়া গেল না: ' + e.message); });
   };
   $('r-done').onchange = function () { $('r-next').disabled = !this.checked; };
   $('r-next').onclick = function () { $('r-code').textContent = ''; show('settings'); msg('b-msg', 'চাবি তৈরি হয়েছে। এখন kk-vault.json ডাউনলোড করে ব্যাকআপ রাখুন।', true); };
@@ -304,7 +307,14 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
     if (!window.crypto || !crypto.subtle || !(await supported())) { show('nosupport'); return; }
     fillPlans();
     var v = store(VAULT);
-    if (v && v.ct) { pubB64 = v.pub; $('u-pub').textContent = v.pub; show('unlock'); } else { show('setup'); }
+    if (v && v.ct && EXPECTED_PUB && v.pub !== EXPECTED_PUB) { v = null; } // an old test key: ignore it
+    if (v && v.ct) { pubB64 = v.pub; $('u-pub').textContent = v.pub; show('unlock'); return; }
+    if (EXPECTED_PUB) {
+      $('s-create').classList.add('hidden'); $('s-showimport').classList.add('hidden'); $('s-import').classList.remove('hidden');
+      $('s-intro').textContent = 'এই ব্রাউজারে প্যানেল প্রথমবার খুলছেন। আপনার চাবি আগে থেকেই আছে: kk-vault.json ফাইলটা দিন (GitHub → kenakata-license-panel রিপো থেকে নামানো), তারপর পাসওয়ার্ড দিয়ে খুলুন। ফাইল না থাকলে কাগজের রিকভারি কোড আর একটা নতুন পাসওয়ার্ড দিন।';
+      $('s-title').textContent = 'আপনার চাবি আনুন';
+    }
+    show('setup');
   }
   boot();
 }());

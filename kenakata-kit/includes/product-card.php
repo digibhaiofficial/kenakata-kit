@@ -190,7 +190,7 @@ function kk_render_product_card( $product, $args = array() ) {
 			$badges .= '<span class="kk-pcard__badge kk-pcard__badge--stock">' . esc_html( $a['stock_text'] ) . '</span>';
 		}
 		$out .= '<a class="kk-pcard__media" href="' . esc_url( $link ) . '" tabindex="-1" aria-hidden="true">'
-			. $product->get_image( $a['image_size'], kk_card_img_attr() )
+			. $product->get_image( $a['image_size'], array_merge( kk_card_img_attr(), array( 'alt' => wp_strip_all_tags( $product->get_name() ) ) ) ) // the link is hidden from screen readers; the alt is for image search
 			. ( $badges ? '<span class="kk-pcard__badges">' . $badges . '</span>' : '' ) . '</a>';
 		$out .= apply_filters( 'kk_product_card_media_after', '', $product ); // e.g. the wishlist ♡
 	}

@@ -170,6 +170,89 @@ add_filter( 'robots_txt', function ( $out, $public ) {
 	return $out . $add;
 }, 20, 2 );
 
+/**
+ * robots.txt: WordPress, WooCommerce, Rank Math and this plugin each add their own "User-agent: *" group. Search
+ * engines combine them, but one tidy group is easier to read and check, so the rules are merged into the first.
+ */
+function kk_robots_merge_star_groups( $txt ) {
+	$lines = preg_split( '/\r\n|\n/', (string) $txt );
+	$n     = count( $lines );
+	$start = array(); // line index => group number, for the first User-agent line of each group
+	$uas   = array();
+	$rules = array();
+	$g     = -1;
+	$prev  = false;
+	for ( $i = 0; $i < $n; $i++ ) {
+		$t = trim( $lines[ $i ] );
+		if ( preg_match( '/^user-agent\s*:\s*(.+)$/i', $t, $m ) ) {
+			if ( ! $prev ) {
+				$g++;
+				$start[ $i ] = $g;
+				$uas[ $g ]   = array();
+				$rules[ $g ] = array();
+			}
+			$uas[ $g ][] = trim( $m[1] );
+			$prev        = true;
+			continue;
+		}
+		$prev = false;
+		if ( $g >= 0 && preg_match( '/^(allow|disallow|crawl-delay)\s*:/i', $t ) ) {
+			$rules[ $g ][] = $t;
+		}
+	}
+	$star = array();
+	foreach ( $uas as $k => $list ) {
+		if ( array( '*' ) === $list ) {
+			$star[] = $k;
+		}
+	}
+	if ( count( $star ) < 2 ) {
+		return $txt;
+	}
+	$merged = array();
+	foreach ( $star as $k ) {
+		foreach ( $rules[ $k ] as $r ) {
+			$merged[ strtolower( preg_replace( '/\s+/', '', $r ) ) ] = $r;
+		}
+	}
+	$drop  = array_slice( $star, 1 );
+	$out   = array();
+	$cur   = -1;
+	$in_ua = false;
+	for ( $i = 0; $i < $n; $i++ ) {
+		$line = $lines[ $i ];
+		$t    = trim( $line );
+		if ( isset( $start[ $i ] ) ) {
+			$cur = $start[ $i ];
+		}
+		$is_ua = (bool) preg_match( '/^user-agent\s*:/i', $t );
+		if ( 0 === strpos( $t, '#' ) ) { // a comment that only introduces a dropped group goes with it
+			$k = $i + 1;
+			while ( $k < $n && '' === trim( $lines[ $k ] ) ) {
+				$k++;
+			}
+			if ( isset( $start[ $k ] ) && in_array( $start[ $k ], $drop, true ) ) {
+				continue;
+			}
+		}
+		if ( in_array( $cur, $drop, true ) && ( $is_ua || preg_match( '/^(allow|disallow|crawl-delay)\s*:/i', $t ) ) ) {
+			continue;
+		}
+		if ( $cur === $star[0] && preg_match( '/^(allow|disallow|crawl-delay)\s*:/i', $t ) ) {
+			if ( $merged ) {
+				foreach ( $merged as $r ) {
+					$out[] = $r;
+				}
+				$merged = array();
+			}
+			continue;
+		}
+		$out[] = $line;
+	}
+	return trim( preg_replace( "/\n{3,}/", "\n\n", implode( "\n", $out ) ) ) . "\n";
+}
+add_filter( 'robots_txt', 'kk_robots_merge_star_groups', 999 );
+
 /* =========================================================================
  * Cloudflare Turnstile (free, no puzzles for real people) on login, registration and checkout
  * ====================================================================== */

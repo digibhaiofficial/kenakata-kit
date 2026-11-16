@@ -455,6 +455,10 @@ echo "== 3.23: name as a logo for cards without a picture"
 NW=$(wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["cards_noimg"] = "name"; kk_update_settings( $s ); echo do_shortcode( "[kk_categories limit=\"3\" hide_empty=\"no\" layout=\"grid\"]" ); $s["cards_noimg"] = "letter"; kk_update_settings( $s );')
 check "card without a picture shows the name as a logo" 'echo "$NW" | grep -q "kk-term-card__word" && echo "$NW" | grep -q "has-word"'
 
+echo "== 3.24: product card pictures carry the product name as alt"
+CA=$(wpc eval '$p = wc_get_products( array( "limit" => 1 ) )[0]; set_post_thumbnail( $p->get_id(), (int) get_option( "woocommerce_placeholder_image" ) ); $p = wc_get_product( $p->get_id() ); echo ( false !== strpos( kk_render_product_card( $p ), "alt=\"" . esc_attr( $p->get_name() ) . "\"" ) ) ? "yes" : "no";')
+check "card picture alt = product name ($CA)" '[ "$CA" = yes ]'
+
 echo "== 3.21: order messages"
 MSO=$(wpc eval '$o = wc_create_order(); $o->set_billing_first_name( "Rahim" ); $o->set_billing_phone( "01711000777" ); $o->set_billing_email( "rahim@example.com" ); $o->set_total( 1250 ); $o->set_status( "processing" ); $o->save(); echo $o->get_id();')
 curl -s -o /tmp/body -b "$JAR" -H "X-WP-Nonce: $RN" "$URL/?rest_route=/kenakata/v1/sd/orders/$MSO"
@@ -498,6 +502,7 @@ wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["sec_limit_login
 echo "== Bots"
 wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["speed_robots_shop"] = 1; $s["speed_bot_block"] = 1; $s["speed_ai_block"] = 1; kk_update_settings( $s );'
 check "robots.txt keeps crawlers off search/sort/filter pages and names the blocked bots" 'curl -s "$URL/?robots=1" | grep -q "orderby" && curl -s "$URL/?robots=1" | grep -q "User-agent: AhrefsBot"'
+check "robots.txt has one User-agent: * group" '[ "$(curl -s "$URL/?robots=1" | grep -c "^User-agent: \*")" = 1 ]'
 code=$(curl -s -o /dev/null -w "%{http_code}" -A "Mozilla/5.0 (compatible; AhrefsBot/7.0; +http://ahrefs.com/robot/)" "$URL/?p=$PID")
 check "SEO-tool bot gets 403 ($code)" '[ "$code" = 403 ]'
 code=$(curl -s -o /dev/null -w "%{http_code}" -A "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; GPTBot/1.2; +https://openai.com/gptbot)" "$URL/")

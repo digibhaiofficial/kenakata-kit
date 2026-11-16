@@ -478,8 +478,8 @@ code=$(login /tmp/jt admin-pass-123)
 check "a good login marks the browser as trusted" '[ "$code" = 302 ] && grep -q "kk_td_" /tmp/jt'
 for i in 1 2 3; do login /tmp/jw wrong-pass >/dev/null; done
 code=$(login /tmp/jw admin-pass-123)
-check "after 3 wrong passwords the right password is refused, with an error and a reset-password link ($code)" '[ "$code" = 200 ] && grep -q "login_error" /tmp/lbody && grep -q "action=lostpassword" /tmp/lbody'
-if ! grep -q "login_error" /tmp/lbody; then echo "  (diagnostic) WP $(wpc core version) login page after the pause:"; sed -e 's/<script.*<\/script>//' /tmp/lbody | grep -iE "login_error|id=\"login|<strong>|message|notice|error" | head -15; wpc eval 'global $wpdb; echo "transients: "; foreach ( $wpdb->get_col( "SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE \"_transient_kk_%\"" ) as $n ) { echo $n . " "; } echo "\n";'; fi
+# The reset link is wp_lostpassword_url(): WordPress' own page, or the My Account "lost-password" page when WooCommerce filters it (WC 8.x).
+check "after 3 wrong passwords the right password is refused, with an error and a reset-password link ($code)" '[ "$code" = 200 ] && grep -q "login_error" /tmp/lbody && grep -Eq "action=lostpassword|lost-password" /tmp/lbody'
 get "$URL/wp-admin/admin.php?page=kenakata-kit&tab=security" >/dev/null
 check "Security tab lists the pause with a button to lift it" 'grep -q "Lift all pauses now" /tmp/body && clean /tmp/body'
 UL=$(grep -oP 'href="\K[^"]*kk_login_unlock[^"]*' /tmp/body | head -1 | sed 's/&amp;/\&/g; s/&#038;/\&/g')

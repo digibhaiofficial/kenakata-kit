@@ -2253,4 +2253,8 @@ Collect: %5$s`],
 [`"সব দেখুন" লিংক`, `"View all" link`],
 [`"সব দেখুন" লেখা`, `"View all" text`],
 [`"কয়টা" সংখ্যার চেয়ে বেশি আইটেম থাকলে তালিকার নিচে দেখায়। ফাঁকা থাকলে ক্যাটাগরির লিংক শপ পেজে যায়।`, `Shown under the list when there are more items than "How many". Categories use the shop page if this is empty.`],
+[`ছবি ছাড়া কার্ডে দেখাবে`, `Card without a picture shows`],
+[`যেসব ব্র্যান্ড বা ক্যাটাগরির লোগো/ছবি এখনো নেই। "নাম লোগোর মতো" একটা অক্ষরের চেয়ে সুন্দর দেখায়।`, `For brands or categories that have no logo or image yet. "Name as a logo" looks tidier than a single letter.`],
+[`প্রথম অক্ষর`, `First letter`],
+[`নাম লোগোর মতো`, `Name as a logo`],
 ];

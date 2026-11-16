@@ -4,7 +4,7 @@ Plugin URI: https://digibhai.com/
 Requires at least: 6.3
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 3.22.1
+Stable tag: 3.23.0
 License: GPLv2 or later
 
 Everything a Bangladeshi WooCommerce store usually needs. Settings: left admin menu → Kenakata Kit.
@@ -30,6 +30,9 @@ Products Grid, Products Carousel, Brands, Categories, Buy Now Button, Live Searc
 Older [ss_…] shortcodes keep working. Options: see the guide or Kenakata Kit → Shortcodes.
 
 == Changelog ==
+= 3.23.0 =
+* Brand / category cards: new setting "Card without a picture shows" (Settings → Brand & category cards). "Name as a logo" shows the brand name in the logo box instead of a single letter, for brands that have no logo yet. Default stays "First letter".
+
 = 3.22.1 =
 * Speed: the first brand / category pictures on a page load at once instead of lazily (they are often in the header or the first screen; a lazy picture there makes the page look slower). Filter: kk_term_eager_images (default 6).
 

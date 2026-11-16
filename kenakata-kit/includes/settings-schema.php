@@ -128,6 +128,7 @@ function kk_fields() {
 
 		/* ---------------- Brand & category ---------------- */
 		'cards_style'          => kk_f( 'terms', 'choice', __( 'Card style', 'kenakata-kit' ), __( '"Logo only" is best for brand logos (when logos are uploaded).', 'kenakata-kit' ), array( 'options' => array( 'card' => __( 'Card with border', 'kenakata-kit' ), 'minimal' => __( 'No border', 'kenakata-kit' ), 'circle' => __( 'Round image + name', 'kenakata-kit' ), 'logo' => __( 'Logo only', 'kenakata-kit' ) ) ) ),
+		'cards_noimg'          => kk_f( 'terms', 'choice', __( 'Card without a picture shows', 'kenakata-kit' ), __( 'For brands or categories that have no logo or image yet. "Name as a logo" looks tidier than a single letter.', 'kenakata-kit' ), array( 'options' => array( 'letter' => __( 'First letter', 'kenakata-kit' ), 'name' => __( 'Name as a logo', 'kenakata-kit' ) ) ) ),
 		'cards_show_count'     => kk_f( 'terms', 'toggle', __( 'Show product count', 'kenakata-kit' ), __( 'For example "124 products".', 'kenakata-kit' ) ),
 		'cards_image_size'     => kk_f( 'terms', 'number', __( 'Image/logo size', 'kenakata-kit' ), __( 'Without an image the first letter of the name is shown.', 'kenakata-kit' ), array( 'min' => 32, 'max' => 160, 'unit' => 'px' ) ),
 		'h_terms_carousel'     => kk_f( 'terms', 'heading', __( 'Carousel (slider)', 'kenakata-kit' ) ),

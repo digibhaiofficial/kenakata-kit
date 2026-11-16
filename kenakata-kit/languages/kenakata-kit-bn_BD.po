@@ -9107,3 +9107,15 @@ msgstr "\"সব দেখুন\" লেখা"
 
 msgid "Shown under the list when there are more items than \"How many\". Categories use the shop page if this is empty."
 msgstr "\"কয়টা\" সংখ্যার চেয়ে বেশি আইটেম থাকলে তালিকার নিচে দেখায়। ফাঁকা থাকলে ক্যাটাগরির লিংক শপ পেজে যায়।"
+
+msgid "Card without a picture shows"
+msgstr "ছবি ছাড়া কার্ডে দেখাবে"
+
+msgid "For brands or categories that have no logo or image yet. \"Name as a logo\" looks tidier than a single letter."
+msgstr "যেসব ব্র্যান্ড বা ক্যাটাগরির লোগো/ছবি এখনো নেই। \"নাম লোগোর মতো\" একটা অক্ষরের চেয়ে সুন্দর দেখায়।"
+
+msgid "First letter"
+msgstr "প্রথম অক্ষর"
+
+msgid "Name as a logo"
+msgstr "নাম লোগোর মতো"

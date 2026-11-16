@@ -82,19 +82,22 @@ function kk_terms_render( $a ) {
 	$style      = $a['style'] ? $a['style'] : kk_opt( 'cards_style' );
 	$show_count = '' === $a['show_count'] ? (bool) kk_opt( 'cards_show_count' ) : 'yes' === $a['show_count'];
 	$carousel   = 'grid' !== $a['layout'];
+	$word       = 'name' === kk_opt( 'cards_noimg' );
 	$cards      = '';
 	foreach ( array_values( $terms ) as $i => $term ) {
 		$thumb_id = absint( get_term_meta( $term->term_id, 'thumbnail_id', true ) );
 		$name     = html_entity_decode( $term->name );
 		$media    = $thumb_id
 			? wp_get_attachment_image( $thumb_id, 'medium', false, array( 'class' => 'kk-term-card__img', 'alt' => 'no' === $a['show_name'] || 'logo' === $style ? $name : '', 'decoding' => 'async', 'loading' => kk_term_img_loading() ) )
-			: '<span class="kk-term-card__mono" aria-hidden="true">' . esc_html( mb_strtoupper( mb_substr( wp_strip_all_tags( $name ), 0, 1 ) ) ) . '</span>';
-		$name_html = '<span class="kk-term-card__name' . ( 'no' === $a['show_name'] || ( 'logo' === $style && $thumb_id ) ? ' screen-reader-text' : '' ) . '">' . esc_html( $name ) . '</span>';
+			: ( $word
+				? '<span class="kk-term-card__mono kk-term-card__word" aria-hidden="true">' . esc_html( wp_strip_all_tags( $name ) ) . '</span>'
+				: '<span class="kk-term-card__mono" aria-hidden="true">' . esc_html( mb_strtoupper( mb_substr( wp_strip_all_tags( $name ), 0, 1 ) ) ) . '</span>' );
+		$name_html = '<span class="kk-term-card__name' . ( 'no' === $a['show_name'] || ( 'logo' === $style && $thumb_id ) || ( $word && ! $thumb_id ) ? ' screen-reader-text' : '' ) . '">' . esc_html( $name ) . '</span>';
 		/* translators: %s: number of products */
 		$count = $show_count ? '<span class="kk-term-card__count">' . esc_html( sprintf( _n( '%s product', '%s products', $term->count, 'kenakata-kit' ), number_format_i18n( $term->count ) ) ) . '</span>' : '';
 		$cards .= sprintf(
 			'<li class="kk-term-card kk-tone-%4$d%5$s%7$s"><a href="%1$s"><span class="kk-term-card__media">%2$s</span>%3$s%6$s</a></li>',
-			esc_url( get_term_link( $term ) ), $media, $name_html, $i % 3, $thumb_id ? ' has-image' : '', $count, $carousel ? ' kk-slider__slide' : ''
+			esc_url( get_term_link( $term ) ), $media, $name_html, $i % 3, $thumb_id ? ' has-image' : ( $word ? ' has-word' : '' ), $count, $carousel ? ' kk-slider__slide' : ''
 		);
 	}
 

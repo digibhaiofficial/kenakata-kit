@@ -319,7 +319,7 @@ body a.kk-loadmore__btn[aria-busy="true"]::after, .kk-pagination a[aria-busy="tr
 .kk-terms--style-logo .kk-term-card > a { justify-content: center; padding: 14px; min-height: calc(var(--kk-term-img, 72px) + 28px); }
 .kk-terms--style-logo .kk-term-card__media { width: 100%; height: var(--kk-term-img, 72px); aspect-ratio: auto; border-radius: 0; margin: 0; border: 0 !important; background: transparent !important; }
 .kk-terms--style-logo .kk-term-card.has-image .kk-term-card__img { padding: 0; }
-.kk-terms--style-logo .kk-term-card:not(.has-image) .kk-term-card__media { display: none; }
+.kk-terms--style-logo .kk-term-card:not(.has-image):not(.has-word) .kk-term-card__media { display: none; }
 .kk-terms--style-logo .kk-term-card:not(.has-image) .kk-term-card__name { min-height: 0; font-size: 16px; font-weight: 700; }
 
 /* Archive cover (category / brand pages) */
@@ -770,3 +770,7 @@ a.kk-brand__item:hover .kk-brand__name { text-decoration: underline; text-underl
 .kk-terms-all { margin: 12px 0 0; text-align: center; }
 .kk-terms-all a { font-weight: 600; text-decoration: none; }
 .kk-terms-all a:hover { text-decoration: underline; }
+
+/* Name shown as a logo when a brand / category has no picture (setting "Card without a picture shows"). */
+.kk-term-card.has-word .kk-term-card__media { background: #fff; border: 1px solid var(--kk-border); color: var(--kk-primary); }
+.kk-term-card__word { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; max-width: 100%; padding: 0 10%; font-size: max(11px, calc(var(--kk-term-img, 72px) * .14)); font-weight: 800; line-height: 1.15; letter-spacing: .02em; text-align: center; text-transform: uppercase; overflow-wrap: anywhere; }

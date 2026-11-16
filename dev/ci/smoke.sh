@@ -451,6 +451,10 @@ check "limited list: View all link (shop page by default)" 'echo "$VA" | cut -d"
 check "own link and text are used" 'echo "$VA" | grep -q "example.com/all" && echo "$VA" | grep -q "Everything"'
 check "nothing left over: no View all link" '! echo "$VA" | awk -F"[|][|][|]" "{print \$3}" | grep -q "kk-terms-all"'
 
+echo "== 3.23: name as a logo for cards without a picture"
+NW=$(wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["cards_noimg"] = "name"; kk_update_settings( $s ); echo do_shortcode( "[kk_categories limit=\"3\" hide_empty=\"no\" layout=\"grid\"]" ); $s["cards_noimg"] = "letter"; kk_update_settings( $s );')
+check "card without a picture shows the name as a logo" 'echo "$NW" | grep -q "kk-term-card__word" && echo "$NW" | grep -q "has-word"'
+
 echo "== 3.21: order messages"
 MSO=$(wpc eval '$o = wc_create_order(); $o->set_billing_first_name( "Rahim" ); $o->set_billing_phone( "01711000777" ); $o->set_billing_email( "rahim@example.com" ); $o->set_total( 1250 ); $o->set_status( "processing" ); $o->save(); echo $o->get_id();')
 curl -s -o /tmp/body -b "$JAR" -H "X-WP-Nonce: $RN" "$URL/?rest_route=/kenakata/v1/sd/orders/$MSO"

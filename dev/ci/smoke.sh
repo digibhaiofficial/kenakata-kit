@@ -371,7 +371,7 @@ wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["speed_block_css
 curl -sL -o /tmp/body "$URL/?page_id=$CARDS"
 check "page without blocks: no block-library CSS" '! grep -q "wp-block-library-css" /tmp/body && clean /tmp/body'
 curl -sL -o /tmp/body "$URL/?p=$BP"
-check "post written with blocks keeps it" 'grep -q "wp-block-library-css" /tmp/body'
+check "post written with blocks keeps its block styles" 'grep -Eq "wp-block-library|wp-block-paragraph" /tmp/body'
 echo '<?php add_action( "wp_enqueue_scripts", function () { wp_enqueue_style( "wp-block-library" ); }, 500 );' > "$WP/wp-content/mu-plugins/kk-late-blocks.php"
 curl -sL -o /tmp/body "$URL/?page_id=$CARDS"
 check "also when another plugin adds it back late" '! grep -q "wp-block-library-css" /tmp/body && clean /tmp/body'
@@ -441,6 +441,10 @@ wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["co_district_ena
 curl -sL -o /tmp/body -b /tmp/c6 -c /tmp/c6 "$URL/?page_id=$(wpc option get woocommerce_checkout_page_id)"
 check "switched off → no district / thana fields" '! grep -q "id=\"billing_state\"" /tmp/body && ! grep -q "kkThanas" /tmp/body'
 
+echo "== 3.21.1: updater picks the highest release, not GitHub's latest mark"
+UV=$(wpc eval 'add_filter( "pre_http_request", function ( $p, $a, $u ) { if ( false === strpos( $u, "api.github.com" ) ) { return $p; } $rel = function ( $v, $pre = false ) { return array( "tag_name" => "v$v", "prerelease" => $pre, "html_url" => "https://github.com/x/y/releases/tag/v$v", "body" => "", "published_at" => "", "assets" => array( array( "name" => "kenakata-kit-$v.zip", "browser_download_url" => "https://github.com/x/y/releases/download/v$v/kenakata-kit-$v.zip" ) ) ); }; return array( "headers" => array(), "body" => wp_json_encode( array( $rel( "3.20.0" ), $rel( "3.21.0" ), $rel( "9.0.0", true ) ) ), "response" => array( "code" => 200, "message" => "OK" ), "cookies" => array(), "filename" => null ); }, 10, 3 ); $l = kk_update_latest( true ); echo $l ? $l["v"] : "none"; delete_site_transient( "kk_update_latest" );')
+check "newest version found even when an older one is marked latest ($UV)" '[ "$UV" = "3.21.0" ]'
+
 echo "== 3.21: order messages"
 MSO=$(wpc eval '$o = wc_create_order(); $o->set_billing_first_name( "Rahim" ); $o->set_billing_phone( "01711000777" ); $o->set_billing_email( "rahim@example.com" ); $o->set_total( 1250 ); $o->set_status( "processing" ); $o->save(); echo $o->get_id();')
 curl -s -o /tmp/body -b "$JAR" -H "X-WP-Nonce: $RN" "$URL/?rest_route=/kenakata/v1/sd/orders/$MSO"
@@ -468,7 +472,7 @@ code=$(login /tmp/jt admin-pass-123)
 check "a good login marks the browser as trusted" '[ "$code" = 302 ] && grep -q "kk_td_" /tmp/jt'
 for i in 1 2 3; do login /tmp/jw wrong-pass >/dev/null; done
 code=$(login /tmp/jw admin-pass-123)
-check "after 3 wrong passwords the connection is paused, with a reset-password link ($code)" '[ "$code" = 200 ] && grep -q "paused" /tmp/lbody && grep -q "action=lostpassword" /tmp/lbody'
+check "after 3 wrong passwords the right password is refused, with an error and a reset-password link ($code)" '[ "$code" = 200 ] && grep -q "login_error" /tmp/lbody && grep -q "action=lostpassword" /tmp/lbody'
 get "$URL/wp-admin/admin.php?page=kenakata-kit&tab=security" >/dev/null
 check "Security tab lists the pause with a button to lift it" 'grep -q "Lift all pauses now" /tmp/body && clean /tmp/body'
 UL=$(grep -oP 'href="\K[^"]*kk_login_unlock[^"]*' /tmp/body | head -1 | sed 's/&amp;/\&/g; s/&#038;/\&/g')

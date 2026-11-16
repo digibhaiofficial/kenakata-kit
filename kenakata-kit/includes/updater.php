@@ -20,13 +20,23 @@ function kk_update_latest( $force = false ) {
 	if ( ! $force && is_array( $cached ) ) {
 		return $cached['v'] ? $cached : null;
 	}
-	$res  = wp_remote_get( 'https://api.github.com/repos/' . KK_GH_REPO . '/releases/latest', array(
+	// The list, not ".../latest": the highest version wins even if GitHub marked an older one as latest.
+	$res  = wp_remote_get( 'https://api.github.com/repos/' . KK_GH_REPO . '/releases?per_page=10', array(
 		'timeout' => 8,
 		'headers' => array( 'Accept' => 'application/vnd.github+json', 'User-Agent' => 'Kenakata-Kit/' . KK_VERSION ),
 	) );
 	$info = array( 'v' => '' );
 	if ( ! is_wp_error( $res ) && 200 === (int) wp_remote_retrieve_response_code( $res ) ) {
-		$r   = json_decode( wp_remote_retrieve_body( $res ), true );
+		$r = null;
+		foreach ( (array) json_decode( wp_remote_retrieve_body( $res ), true ) as $rel ) {
+			if ( ! is_array( $rel ) || ! empty( $rel['draft'] ) || ! empty( $rel['prerelease'] ) ) {
+				continue;
+			}
+			$v = ltrim( (string) ( $rel['tag_name'] ?? '' ), 'vV' );
+			if ( preg_match( '/^\d+\.\d+(\.\d+)?$/', $v ) && ( ! $r || version_compare( $v, ltrim( (string) $r['tag_name'], 'vV' ), '>' ) ) ) {
+				$r = $rel;
+			}
+		}
 		$ver = is_array( $r ) ? ltrim( (string) ( $r['tag_name'] ?? '' ), 'vV' ) : '';
 		$zip = '';
 		foreach ( (array) ( $r['assets'] ?? array() ) as $a ) {

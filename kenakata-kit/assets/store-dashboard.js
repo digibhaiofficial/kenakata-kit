@@ -1008,6 +1008,35 @@
 		]);
 	}
 
+	/** Ready messages: pick one, change the text if needed, then WhatsApp (opens the app), email or SMS. */
+	function messageCard(o) {
+		var m = o.messages;
+		if (!m || !m.templates || !m.templates.length) { return null; }
+		var sel = select(m.templates.map(function (x, i) { return [String(i), x.label]; }), '0', { 'aria-label': t('msgPick') });
+		var box = h('textarea', { class: 'sd-input sd-msg__text', rows: '4', 'aria-label': t('msgTitle') });
+		box.value = m.templates[0].text;
+		sel.addEventListener('change', function () { box.value = m.templates[+sel.value].text; });
+		var send = function (btn, channel) {
+			if (channel === 'sms' && !window.confirm(t('msgSmsConfirm'))) { return; }
+			busy(btn, true, t('saving'));
+			api('orders/' + o.id + '/message', { method: 'POST', body: { channel: channel, text: box.value } }).then(function () {
+				busy(btn, false); toast(t('msgSent'), 'ok');
+			}, function (e) { busy(btn, false); toast(e.message, 'error'); });
+		};
+		var tools = h('div', { class: 'sd-tools' });
+		if (m.wa) {
+			var wa = h('a', { class: 'sd-btn sd-btn--wa', href: escUrl(m.wa), target: '_blank', rel: 'noopener' }, icon('whatsapp'), h('span', { text: t('whatsapp') }));
+			wa.addEventListener('click', function () {
+				wa.href = m.wa + '?text=' + encodeURIComponent(box.value);
+				api('orders/' + o.id + '/message', { method: 'POST', body: { channel: 'wa', text: box.value } }).catch(function () {});
+			});
+			tools.appendChild(wa);
+		}
+		if (m.email) { var em = button(t('msgEmail'), { class: 'sd-btn sd-btn--ghost' }); em.addEventListener('click', function () { send(em, 'email'); }); tools.appendChild(em); }
+		if (m.sms) { var sm = button(t('msgSms'), { class: 'sd-btn sd-btn--ghost' }); sm.addEventListener('click', function () { send(sm, 'sms'); }); tools.appendChild(sm); }
+		return card(t('msgTitle'), [sel, box, h('p', { class: 'sd-muted', text: t('msgEdit') }), tools]);
+	}
+
 	function renderOrder(o) {
 		var root = h('div', { class: 'sd-view' });
 		root.appendChild(pageHead(t('order') + ' #' + o.number, { back: '#/orders', sub: o.date ? o.date.text : '' }));
@@ -1102,6 +1131,8 @@
 				setDirty(false); toast(t('noteAdded'), 'ok'); swap(renderOrder(res));
 			}, function (err) { busy(noteBtn, false); toast(err.message, 'bad'); });
 		});
+		var msgCard = messageCard(o);
+		if (msgCard) { root.appendChild(msgCard); }
 		root.appendChild(card(t('notes'), [
 			h('div', { class: 'sd-inline sd-inline--stack' }, noteTa, h('div', { class: 'sd-inline' }, noteType, noteBtn)),
 			o.notes.length ? h('ul', { class: 'sd-notes' }, o.notes.map(function (n) {

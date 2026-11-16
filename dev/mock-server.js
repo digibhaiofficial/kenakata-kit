@@ -54,6 +54,8 @@ for (let i = 0; i < 27; i++) {
 }
 orders.forEach((o) => { o.blocked = false; });
 orders[4].payment = 'bKash / Nagad / Rocket'; orders[4].mp_wait = true;
+orders.forEach((o) => { o.messages = { templates: [{ key: 'confirm', label: 'Order confirmed', text: 'Hello ' + o.name + ', thank you for your order #' + o.number + '. <img src=x onerror=alert(1)>' }, { key: 'call', label: 'Could not reach you', text: 'Hello ' + o.name + ', please call us.' }], wa: 'https://wa.me/8801711000000', email: true, sms: true }; });
+const sentMessages = [];
 orders[4].mpay = { wallet: 'bKash', to: '01728366779', sender: '01812345678', trx: 'BK7X9QW2LM', amount: 80, amount_text: money(80), advance: true, shot: '', state: 'wait' };
 const cats = [{ id: 47, name: 'Bedroom & Bedding', depth: 0, count: 12 }, { id: 48, name: 'Bedsheets', depth: 1, count: 9 }, { id: 50, name: 'Cushion Covers', depth: 1, count: 1 }, { id: 52, name: 'Table Linen', depth: 0, count: 3 }];
 let nextId = 2000;
@@ -128,6 +130,11 @@ function api(req, res, route, q, body) {
   if ((m = route.match(/^orders\/(\d+)\/block$/)) && req.method === 'POST') {
     const o = orders.find((x) => x.id === Number(m[1])); if (!o) return err(res, 404, 'kk_sd_not_found', 'Not found.');
     o.blocked = !body.remove; return send(res, 200, o);
+  }
+  if ((m = route.match(/^orders\/(\d+)\/message$/)) && req.method === 'POST') {
+    const o = orders.find((x) => x.id === Number(m[1])); if (!o) return err(res, 404, 'kk_sd_not_found', 'Not found.');
+    if (!String(body.text || '').trim()) return err(res, 400, 'kk_msg_empty', 'The message is empty.');
+    sentMessages.push({ id: o.id, channel: body.channel, text: body.text }); return send(res, 200, o);
   }
   if ((m = route.match(/^orders\/(\d+)\/mpay$/)) && req.method === 'POST') {
     const o = orders.find((x) => x.id === Number(m[1])); if (!o || !o.mpay) return err(res, 400, 'kk_mp_not', 'Not a mobile payment.');
@@ -209,6 +216,7 @@ function page404(res) { res.writeHead(404); res.end('not found'); }
 http.createServer((req, res) => {
   const u = new URL(req.url, 'http://localhost');
   if (u.pathname === '/__log') { send(res, 200, log); return; }
+  if (u.pathname === '/__sent') { send(res, 200, sentMessages); return; }
   if (u.pathname.startsWith('/wp-json/kenakata/v1/sd/')) {
     const route = u.pathname.replace('/wp-json/kenakata/v1/sd/', '');
     if (req.method === 'POST' && (req.headers['content-type'] || '').startsWith('multipart/')) { req.resume(); req.on('end', () => api(req, res, route, u.searchParams, {})); return; }

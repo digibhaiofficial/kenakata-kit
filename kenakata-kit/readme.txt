@@ -4,7 +4,7 @@ Plugin URI: https://digibhai.com/
 Requires at least: 6.3
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 3.20.0
+Stable tag: 3.21.0
 License: GPLv2 or later
 
 Everything a Bangladeshi WooCommerce store usually needs. Settings: left admin menu → Kenakata Kit.
@@ -30,6 +30,9 @@ Products Grid, Products Carousel, Brands, Categories, Buy Now Button, Live Searc
 Older [ss_…] shortcodes keep working. Options: see the guide or Kenakata Kit → Shortcodes.
 
 == Changelog ==
+= 3.21.0 =
+* New (off until turned on): Messages. Ready texts for every order ("Order confirmed", "Sent with courier", "Payment reminder", "Thank you", "Could not reach you") filled in with name, order number, amount to collect and tracking link. In the store dashboard: choose a text, change it if needed, then one tap opens WhatsApp with it, or send it by email (a WooCommerce customer note). On the WooCommerce order screen: one-tap WhatsApp links. Optional SMS through your own gateway (GET or POST, off by default). Nothing is sent automatically and no background jobs are added.
+
 = 3.20.0 =
 * Security: login pause no longer locks the real owner out. A browser where an account logged in successfully is trusted for 180 days and is never paused (the password is still checked). The pause message now offers a password reset, and a password reset lifts the pause for that account. Security tab: "Paused logins now" lists every pause with a "Lift all pauses now" button.
 

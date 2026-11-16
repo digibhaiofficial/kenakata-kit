@@ -3,7 +3,7 @@
  * Plugin Name:       Kenakata Kit – WooCommerce Toolkit for Bangladesh
  * Plugin URI:        https://digibhai.com/
  * Description:       Everything a Bangladeshi WooCommerce store needs: Buy Now, simple checkout with delivery areas, fake-order protection, thank-you page, order tracking by phone, live search, login popup, product cards, brand/category carousels, WhatsApp, variation buttons, photo reviews, side cart, mobile bar and 15 Elementor widgets. English and Bengali (বাংলা). Settings: left menu → Kenakata Kit.
- * Version:           3.20.0
+ * Version:           3.21.0
  * Requires at least: 6.3
  * Requires PHP:      7.4
  * Requires Plugins:  woocommerce
@@ -21,7 +21,7 @@ defined( 'ABSPATH' ) || exit;
 
 $GLOBALS['kk_load_ms'] = -microtime( true ); // time spent loading this plugin (Speed & health shows it)
 
-define( 'KK_VERSION', '3.20.0' );
+define( 'KK_VERSION', '3.21.0' );
 define( 'KK_FILE', __FILE__ );
 define( 'KK_DIR', __DIR__ );
 define( 'KK_URL', plugin_dir_url( __FILE__ ) );
@@ -150,6 +150,16 @@ function kk_defaults() {
 		'tr_live_courier'       => 0,
 		'tr_auto_complete'      => 0,
 		'print_enable'          => 0,
+		'msg_enable'            => 0,
+		'msg_tpl_confirm'       => "Hello {name}, thank you for your order #{order} at {shop}. Total: {total}. We will send it soon.",
+		'msg_tpl_shipped'       => "Hello {name}, your order #{order} is on its way. Please keep {to_collect} ready for the delivery person. Track: {tracking}",
+		'msg_tpl_pay'           => "Hello {name}, your order #{order} is waiting for payment of {to_collect}. Reply here if you need help. - {shop}",
+		'msg_tpl_delivered'     => "Hello {name}, we hope you like your order #{order}. Thank you for shopping with {shop}!",
+		'msg_tpl_call'          => "Hello {name}, we tried to call you about order #{order} but could not reach you. Please call or reply here to confirm. - {shop}",
+		'msg_sms_enable'        => 0,
+		'msg_sms_method'        => 'get',
+		'msg_sms_url'           => '',
+		'msg_sms_body'          => '',
 		'gd_blacklist_enable'   => 0,
 		'gd_blacklist_text'     => '',
 		'gd_blacklist_action'   => 'block',
@@ -826,7 +836,7 @@ add_action( 'plugins_loaded', function () {
 		kk_load_admin();
 		require_once KK_DIR . '/includes/updater.php';
 	}
-	foreach ( array( 'rest', 'assets', 'product-card', 'products', 'buy-now', 'cart-guard', 'checkout', 'free-delivery', 'order-guard', 'shield', 'orders', 'courier', 'print', 'manual-pay', 'incomplete', 'search', 'account', 'my-account', 'wishlist', 'qa', 'terms', 'extras', 'variations', 'reviews', 'bottom-bar', 'security', 'speed', 'cron-health', 'store-dashboard', 'elementor' ) as $file ) {
+	foreach ( array( 'rest', 'assets', 'product-card', 'products', 'buy-now', 'cart-guard', 'checkout', 'free-delivery', 'order-guard', 'shield', 'orders', 'courier', 'print', 'manual-pay', 'messaging', 'incomplete', 'search', 'account', 'my-account', 'wishlist', 'qa', 'terms', 'extras', 'variations', 'reviews', 'bottom-bar', 'security', 'speed', 'cron-health', 'store-dashboard', 'elementor' ) as $file ) {
 		if ( ! $pro && in_array( $file, kk_pro_modules(), true ) ) {
 			continue;
 		}

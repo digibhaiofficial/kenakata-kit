@@ -422,3 +422,6 @@ button, input, select, textarea { font: inherit; color: inherit; }
 /* 3.15: print + sync buttons */
 .sd-tools{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
 .sd-tools .sd-btn{flex:0 0 auto}
+
+/* 3.21 messages */
+.sd-msg__text{display:block;width:100%;margin:8px 0 4px;min-height:96px;font:inherit;line-height:1.45;padding:10px;border:1px solid var(--sd-line,#d9dee3);border-radius:10px;box-sizing:border-box}

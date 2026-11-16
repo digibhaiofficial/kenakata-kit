@@ -258,6 +258,18 @@ function check(name, ok, info) { if (ok) { pass++; console.log('  ✓ ' + name);
   await waitFor(`return document.querySelector('.sd-danger-text')`);
   check('number blocked from the order', (await ev(`return [...document.querySelectorAll('.sd-btn')].some(b=>b.textContent==='Unblock this number')`)) === true);
 
+  console.log('Message the customer');
+  await hash('#/orders/903');
+  await waitFor(`return document.querySelector('.sd-msg__text')`);
+  check('message box filled from the first template', (await ev(`return document.querySelector('.sd-msg__text').value`)).startsWith('Hello '));
+  await ev(`const s=document.querySelector('.sd-msg__text').closest('.sd-card').querySelector('select');s.value='1';s.dispatchEvent(new Event('change'));return 1`);
+  check('choosing another template changes the text', /please call us/.test(await ev(`return document.querySelector('.sd-msg__text').value`)));
+  await ev(`const t=document.querySelector('.sd-msg__text');t.value='Custom text 123';return 1`);
+  await ev(`[...document.querySelectorAll('.sd-btn')].find(b=>b.textContent==='Email').click();return 1`);
+  await waitFor(`return [...document.querySelectorAll('.sd-toast, [class*=toast]')].some(x=>/Message sent/.test(x.textContent))`);
+  check('email sends the edited text', (await ev(`return fetch(location.origin+'/__sent').then(r=>r.json()).then(a=>a.some(x=>x.channel==='email'&&x.text==='Custom text 123'))`)) === true);
+  check('WhatsApp button builds a wa.me link', /^https:\/\/wa\.me\//.test(await ev(`return document.querySelector('.sd-card .sd-btn--wa').getAttribute('href')`)));
+
   console.log('Sales report periods');
   await hash('#/');
   await waitFor(`return document.querySelector('.sd-insight, .sd-insights, [class*=insight]')`);

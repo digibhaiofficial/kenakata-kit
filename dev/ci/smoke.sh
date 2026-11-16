@@ -441,6 +441,25 @@ wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["co_district_ena
 curl -sL -o /tmp/body -b /tmp/c6 -c /tmp/c6 "$URL/?page_id=$(wpc option get woocommerce_checkout_page_id)"
 check "switched off → no district / thana fields" '! grep -q "id=\"billing_state\"" /tmp/body && ! grep -q "kkThanas" /tmp/body'
 
+echo "== 3.21: order messages"
+MSO=$(wpc eval '$o = wc_create_order(); $o->set_billing_first_name( "Rahim" ); $o->set_billing_phone( "01711000777" ); $o->set_billing_email( "rahim@example.com" ); $o->set_total( 1250 ); $o->set_status( "processing" ); $o->save(); echo $o->get_id();')
+curl -s -o /tmp/body -b "$JAR" -H "X-WP-Nonce: $RN" "$URL/?rest_route=/kenakata/v1/sd/orders/$MSO"
+check "messages off: nothing in the order" 'grep -q "\"messages\":null" /tmp/body'
+wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["msg_enable"] = 1; $s["msg_sms_enable"] = 1; $s["msg_sms_url"] = "https://sms.invalid/api?to={phone88}&m={message}"; kk_update_settings( $s );'
+curl -s -o /tmp/body -b "$JAR" -H "X-WP-Nonce: $RN" "$URL/?rest_route=/kenakata/v1/sd/orders/$MSO"
+check "messages on: templates filled with name and order number, WhatsApp link" 'grep -q "Hello Rahim, thank you for your order #$MSO" /tmp/body && grep -q "wa.me\\\\/8801711000777" /tmp/body && grep -q "\"sms\":true" /tmp/body'
+curl -s -o /tmp/body -b "$JAR" -H "X-WP-Nonce: $RN" -H "Content-Type: application/json" -X POST -d '{"channel":"email","text":"Your parcel leaves today"}' "$URL/?rest_route=/kenakata/v1/sd/orders/$MSO/message"
+check "email message becomes a customer note" '[ "$(wpc eval "foreach ( wc_get_order_notes( array( \"order_id\" => $MSO ) ) as \$n ) { if ( \$n->customer_note && false !== strpos( \$n->content, \"parcel leaves today\" ) ) { echo 1; break; } }")" = 1 ]'
+code=$(curl -s -o /tmp/body -w "%{http_code}" -b "$JAR" -H "X-WP-Nonce: $RN" -H "Content-Type: application/json" -X POST -d '{"channel":"sms","text":"Hi"}' "$URL/?rest_route=/kenakata/v1/sd/orders/$MSO/message")
+check "SMS gateway failure is reported, not hidden ($code)" '{ [ "$code" = 502 ] || [ "$code" = 400 ]; } && grep -q "SMS gateway" /tmp/body'
+code=$(curl -s -o /tmp/body -w "%{http_code}" -b "$JAR" -H "X-WP-Nonce: $RN" -H "Content-Type: application/json" -X POST -d '{"channel":"email","text":"  "}' "$URL/?rest_route=/kenakata/v1/sd/orders/$MSO/message")
+check "empty message refused ($code)" '[ "$code" = 400 ]'
+code=$(curl -s -o /dev/null -w "%{http_code}" -H "Content-Type: application/json" -X POST -d '{"channel":"email","text":"x"}' "$URL/?rest_route=/kenakata/v1/sd/orders/$MSO/message")
+check "guests cannot send messages ($code)" '[ "$code" = 401 ] || [ "$code" = 403 ]'
+get "$URL/wp-admin/post.php?post=$MSO&action=edit" >/dev/null; [ -s /tmp/body ] && grep -q "kk-messages" /tmp/body || get "$URL/wp-admin/admin.php?page=wc-orders&action=edit&id=$MSO" >/dev/null
+check "order screen: WhatsApp message box" 'grep -q "kk-messages" /tmp/body && grep -q "wa.me/8801711000777?text=" /tmp/body && clean /tmp/body'
+wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["msg_enable"] = 0; $s["msg_sms_enable"] = 0; kk_update_settings( $s );'
+
 echo "== 3.20: login pause, trusted browser, lift the pause"
 wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["sec_limit_login"] = 1; $s["sec_login_attempts"] = 3; kk_update_settings( $s );'
 login() { curl -s -o /tmp/lbody -w "%{http_code}" -b "$1" -c "$1" -d "log=admin&pwd=$2&wp-submit=Log+In&testcookie=1&redirect_to=$URL/wp-admin/profile.php" "$URL/wp-login.php"; }

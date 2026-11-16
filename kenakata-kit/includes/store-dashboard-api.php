@@ -217,6 +217,7 @@ function kk_sd_order_full( WC_Order $order ) {
 		'edit_url'      => current_user_can( 'manage_woocommerce' ) ? $order->get_edit_order_url() : '',
 	) );
 	$out['mpay']    = kk_sd_order_mpay( $order );
+	$out['messages'] = function_exists( 'kk_msg_for_order' ) ? kk_msg_for_order( $order ) : null;
 	$out['blocked'] = kk_opt( 'gd_blacklist_enable' ) && function_exists( 'kk_is_blacklisted' ) && $order->get_billing_phone() ? kk_is_blacklisted( $order->get_billing_phone() ) : null;
 	// One-tap courier booking: what was booked, or what the confirmation box starts with (courier code loads only here).
 	$out['booking']  = null;
@@ -1539,6 +1540,17 @@ add_action( 'rest_api_init', function () {
 		/* translators: %s: user name */
 		$order->add_order_note( sprintf( $remove ? __( 'Phone number unblocked by %s.', 'kenakata-kit' ) : __( 'Phone number blocked by %s.', 'kenakata-kit' ), $user->display_name ) );
 		return kk_sd_order_full( wc_get_order( $order->get_id() ) );
+	} );
+	$route( 'orders/' . $id . '/message', 'POST', 'edit_shop_orders', function ( WP_REST_Request $req ) {
+		$order = kk_sd_get_order( $req['id'] );
+		if ( is_wp_error( $order ) ) {
+			return $order;
+		}
+		if ( ! function_exists( 'kk_msg_send' ) || ! kk_opt( 'msg_enable' ) ) {
+			return new WP_Error( 'kk_sd_no_msg', __( 'Messages are turned off.', 'kenakata-kit' ), array( 'status' => 400 ) );
+		}
+		$res = kk_msg_send( $order, sanitize_key( (string) $req->get_param( 'channel' ) ), (string) $req->get_param( 'text' ) );
+		return is_wp_error( $res ) ? $res : kk_sd_order_full( wc_get_order( $order->get_id() ) );
 	} );
 	$route( 'orders/' . $id . '/mpay', 'POST', 'edit_shop_orders', function ( WP_REST_Request $req ) {
 		$order = kk_sd_get_order( $req['id'] );

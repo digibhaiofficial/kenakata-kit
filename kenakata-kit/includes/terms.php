@@ -33,6 +33,17 @@ function kk_terms_defaults() {
 	);
 }
 
+/**
+ * The first brand / category pictures of a page view load at once (they are often in the header or the first screen,
+ * and a lazy picture there delays the page); the rest load lazily. Filter: kk_term_eager_images.
+ */
+function kk_term_img_loading() {
+	static $n = 0;
+	$n++;
+	$eager = (int) apply_filters( 'kk_term_eager_images', 6 );
+	return ( $n <= $eager && ! wp_doing_ajax() && ! ( defined( 'REST_REQUEST' ) && REST_REQUEST ) && ! is_admin() ) ? false : 'lazy';
+}
+
 function kk_terms_render( $a ) {
 	$a = wp_parse_args( $a, kk_terms_defaults() );
 	if ( 'product_brand' === $a['taxonomy'] && ! taxonomy_exists( 'product_brand' ) && kk_brand_taxonomy() ) {
@@ -76,7 +87,7 @@ function kk_terms_render( $a ) {
 		$thumb_id = absint( get_term_meta( $term->term_id, 'thumbnail_id', true ) );
 		$name     = html_entity_decode( $term->name );
 		$media    = $thumb_id
-			? wp_get_attachment_image( $thumb_id, 'medium', false, array( 'class' => 'kk-term-card__img', 'alt' => 'no' === $a['show_name'] || 'logo' === $style ? $name : '', 'loading' => 'lazy' ) )
+			? wp_get_attachment_image( $thumb_id, 'medium', false, array( 'class' => 'kk-term-card__img', 'alt' => 'no' === $a['show_name'] || 'logo' === $style ? $name : '', 'decoding' => 'async', 'loading' => kk_term_img_loading() ) )
 			: '<span class="kk-term-card__mono" aria-hidden="true">' . esc_html( mb_strtoupper( mb_substr( wp_strip_all_tags( $name ), 0, 1 ) ) ) . '</span>';
 		$name_html = '<span class="kk-term-card__name' . ( 'no' === $a['show_name'] || ( 'logo' === $style && $thumb_id ) ? ' screen-reader-text' : '' ) . '">' . esc_html( $name ) . '</span>';
 		/* translators: %s: number of products */

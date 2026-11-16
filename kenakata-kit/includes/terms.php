@@ -28,6 +28,8 @@ function kk_terms_defaults() {
 		'loop'       => '',
 		'arrows'     => '',
 		'dots'       => '',
+		'all_url'    => '', // "View all" link shown under a limited list (categories fall back to the shop page)
+		'all_text'   => '',
 	);
 }
 
@@ -44,7 +46,7 @@ function kk_terms_render( $a ) {
 		'hide_empty' => 'no' !== $a['hide_empty'],
 		'orderby'    => 'name' === $a['orderby'] ? 'name' : 'count',
 		'order'      => 'name' === $a['orderby'] ? 'ASC' : 'DESC',
-		'number'     => absint( $a['limit'] ),
+		'number'     => absint( $a['limit'] ) ? absint( $a['limit'] ) + 1 : 0, // one extra tells us whether there is more to show
 		'exclude'    => array_map( 'absint', kk_list( $a['exclude'] ) ),
 	);
 	if ( '' !== (string) $a['parent'] ) {
@@ -59,6 +61,11 @@ function kk_terms_render( $a ) {
 	$terms = get_terms( $args );
 	if ( is_wp_error( $terms ) || empty( $terms ) ) {
 		return '<p class="kk-terms-empty">' . esc_html__( 'Nothing to show yet.', 'kenakata-kit' ) . '</p>';
+	}
+	$more = false;
+	if ( absint( $a['limit'] ) && count( $terms ) > absint( $a['limit'] ) ) {
+		$more  = true;
+		$terms = array_slice( array_values( $terms ), 0, absint( $a['limit'] ) );
 	}
 
 	$style      = $a['style'] ? $a['style'] : kk_opt( 'cards_style' );
@@ -90,8 +97,20 @@ function kk_terms_render( $a ) {
 		}
 	}
 
+	$all = '';
+	if ( $more ) {
+		$all_url = esc_url( $a['all_url'] );
+		if ( ! $all_url && 'product_cat' === $a['taxonomy'] && function_exists( 'wc_get_page_permalink' ) ) {
+			$all_url = esc_url( wc_get_page_permalink( 'shop' ) );
+		}
+		if ( $all_url ) {
+			$all_text = $a['all_text'] ? $a['all_text'] : ( $is_brand ? __( 'View all brands', 'kenakata-kit' ) : __( 'View all categories', 'kenakata-kit' ) );
+			$all      = '<p class="kk-terms-all"><a href="' . $all_url . '">' . esc_html( $all_text ) . ' &rarr;</a></p>';
+		}
+	}
+
 	if ( ! $carousel ) {
-		return '<ul class="' . esc_attr( $classes . ' kk-terms--grid' ) . '" aria-label="' . esc_attr( $label ) . '"' . ( $vars ? ' style="' . esc_attr( $vars ) . '"' : '' ) . '>' . $cards . '</ul>';
+		return '<ul class="' . esc_attr( $classes . ' kk-terms--grid' ) . '" aria-label="' . esc_attr( $label ) . '"' . ( $vars ? ' style="' . esc_attr( $vars ) . '"' : '' ) . '>' . $cards . '</ul>' . $all;
 	}
 	wp_enqueue_script( 'kenakata-kit' );
 	$a['label']  = $label;
@@ -99,7 +118,8 @@ function kk_terms_render( $a ) {
 	$a['dots']   = '' === $a['dots'] ? ( kk_opt( 'cards_dots' ) ? 'yes' : 'no' ) : $a['dots'];
 	return kk_slider_open( $a, 'kk-terms-slider kk-carousel', $vars )
 		. '<ul class="' . esc_attr( $classes . ' kk-terms--carousel kk-slider__track' ) . '" tabindex="0">' . $cards . '</ul>'
-		. kk_slider_close( $a );
+		. kk_slider_close( $a )
+		. $all;
 }
 
 function kk_terms_shortcode( $atts ) {

@@ -445,6 +445,12 @@ echo "== 3.21.1: updater picks the highest release, not GitHub's latest mark"
 UV=$(wpc eval 'add_filter( "pre_http_request", function ( $p, $a, $u ) { if ( false === strpos( $u, "api.github.com" ) ) { return $p; } $rel = function ( $v, $pre = false ) { return array( "tag_name" => "v$v", "prerelease" => $pre, "html_url" => "https://github.com/x/y/releases/tag/v$v", "body" => "", "published_at" => "", "assets" => array( array( "name" => "kenakata-kit-$v.zip", "browser_download_url" => "https://github.com/x/y/releases/download/v$v/kenakata-kit-$v.zip" ) ) ); }; return array( "headers" => array(), "body" => wp_json_encode( array( $rel( "3.20.0" ), $rel( "3.21.0" ), $rel( "9.0.0", true ) ) ), "response" => array( "code" => 200, "message" => "OK" ), "cookies" => array(), "filename" => null ); }, 10, 3 ); $l = kk_update_latest( true ); echo $l ? $l["v"] : "none"; delete_site_transient( "kk_update_latest" );')
 check "newest version found even when an older one is marked latest ($UV)" '[ "$UV" = "3.21.0" ]'
 
+echo "== 3.22: \"View all\" under a limited brand / category list"
+VA=$(wpc eval 'foreach ( array( "Cat A", "Cat B", "Cat C" ) as $n ) { wp_insert_term( $n, "product_cat" ); } foreach ( get_terms( array( "taxonomy" => "product_cat", "hide_empty" => false ) ) as $t ) { wp_update_term( $t->term_id, "product_cat", array( "description" => "x" ) ); } echo do_shortcode( "[kk_categories limit=\"1\" hide_empty=\"no\" layout=\"grid\"]" ) . "|||" . do_shortcode( "[kk_categories limit=\"1\" hide_empty=\"no\" layout=\"grid\" all_url=\"https://example.com/all\" all_text=\"Everything\"]" ) . "|||" . do_shortcode( "[kk_categories limit=\"50\" hide_empty=\"no\" layout=\"grid\"]" );')
+check "limited list: View all link (shop page by default)" 'echo "$VA" | cut -d"|" -f1 | grep -q "kk-terms-all"'
+check "own link and text are used" 'echo "$VA" | grep -q "example.com/all" && echo "$VA" | grep -q "Everything"'
+check "nothing left over: no View all link" '! echo "$VA" | awk -F"[|][|][|]" "{print \$3}" | grep -q "kk-terms-all"'
+
 echo "== 3.21: order messages"
 MSO=$(wpc eval '$o = wc_create_order(); $o->set_billing_first_name( "Rahim" ); $o->set_billing_phone( "01711000777" ); $o->set_billing_email( "rahim@example.com" ); $o->set_total( 1250 ); $o->set_status( "processing" ); $o->save(); echo $o->get_id();')
 curl -s -o /tmp/body -b "$JAR" -H "X-WP-Nonce: $RN" "$URL/?rest_route=/kenakata/v1/sd/orders/$MSO"

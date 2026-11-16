@@ -4,7 +4,7 @@ Plugin URI: https://digibhai.com/
 Requires at least: 6.3
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 3.21.1
+Stable tag: 3.22.0
 License: GPLv2 or later
 
 Everything a Bangladeshi WooCommerce store usually needs. Settings: left admin menu → Kenakata Kit.
@@ -30,6 +30,9 @@ Products Grid, Products Carousel, Brands, Categories, Buy Now Button, Live Searc
 Older [ss_…] shortcodes keep working. Options: see the guide or Kenakata Kit → Shortcodes.
 
 == Changelog ==
+= 3.22.0 =
+* Brands and Categories widgets / shortcodes: with a limit (for example 24), a "View all" link appears under the list when there are more items (own link and text; categories fall back to the shop page). Lighter home pages with many brands.
+
 = 3.21.1 =
 * Updates: the update check now picks the highest released version, even when GitHub marks an older release as "Latest" (this happened when two versions were published together, so sites saw 3.20.0 instead of 3.21.0). The release process also keeps "Latest" on the highest version.
 

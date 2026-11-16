@@ -9092,3 +9092,18 @@ msgstr "মেসেজ পাঠানো হয়েছে।"
 
 msgid "Send this SMS now? Your SMS gateway may charge for it."
 msgstr "এখনই এই SMS পাঠাবেন? এর জন্য আপনার SMS গেটওয়ে চার্জ কাটতে পারে।"
+
+msgid "View all brands"
+msgstr "সব ব্র্যান্ড দেখুন"
+
+msgid "View all categories"
+msgstr "সব ক্যাটাগরি দেখুন"
+
+msgid "\"View all\" link"
+msgstr "\"সব দেখুন\" লিংক"
+
+msgid "\"View all\" text"
+msgstr "\"সব দেখুন\" লেখা"
+
+msgid "Shown under the list when there are more items than \"How many\". Categories use the shop page if this is empty."
+msgstr "\"কয়টা\" সংখ্যার চেয়ে বেশি আইটেম থাকলে তালিকার নিচে দেখায়। ফাঁকা থাকলে ক্যাটাগরির লিংক শপ পেজে যায়।"

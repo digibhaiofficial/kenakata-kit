@@ -25,6 +25,8 @@ abstract class KK_EW_Terms_Base extends KK_EW_Base {
 			$this->add_control( 'taxonomy', array( 'label' => __( 'Content', 'kenakata-kit' ), 'type' => Controls_Manager::SELECT, 'default' => 'product_cat', 'options' => $options ) );
 		}
 		$this->add_control( 'limit', array( 'label' => __( 'How many (0 = all)', 'kenakata-kit' ), 'type' => Controls_Manager::NUMBER, 'min' => 0, 'default' => 12 ) );
+		$this->add_control( 'all_url', array( 'label' => __( '"View all" link', 'kenakata-kit' ), 'type' => Controls_Manager::URL, 'placeholder' => 'https://', 'description' => __( 'Shown under the list when there are more items than "How many". Categories use the shop page if this is empty.', 'kenakata-kit' ) ) );
+		$this->add_control( 'all_text', array( 'label' => __( '"View all" text', 'kenakata-kit' ), 'type' => Controls_Manager::TEXT, 'placeholder' => __( 'View all brands', 'kenakata-kit' ) ) );
 		$this->add_control( 'orderby', array( 'label' => __( 'Order by', 'kenakata-kit' ), 'type' => Controls_Manager::SELECT, 'default' => 'count', 'options' => array( 'count' => __( 'Most products first', 'kenakata-kit' ), 'name' => __( 'Name (A–Z)', 'kenakata-kit' ) ) ) );
 		if ( 'generic' !== $tax ) {
 			$opts = $this->term_options( $tax );
@@ -89,6 +91,8 @@ abstract class KK_EW_Terms_Base extends KK_EW_Base {
 			'columns_tablet' => $s['columns_tablet'] ?? '',
 			'columns_mobile' => $s['columns_mobile'] ?? '',
 			'label'          => $this->get_title(),
+			'all_url'        => is_array( $s['all_url'] ?? null ) ? (string) ( $s['all_url']['url'] ?? '' ) : '',
+			'all_text'       => sanitize_text_field( (string) ( $s['all_text'] ?? '' ) ),
 		);
 		if ( 'product_cat' === $tax && '' === $a['exclude'] && '' === $a['include'] ) {
 			$a['exclude'] = (string) get_option( 'default_product_cat' ); // hide "Uncategorized"

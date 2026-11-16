@@ -4,7 +4,7 @@ Plugin URI: https://digibhai.com/
 Requires at least: 6.3
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 3.24.0
+Stable tag: 3.24.1
 License: GPLv2 or later
 
 Everything a Bangladeshi WooCommerce store usually needs. Settings: left admin menu → Kenakata Kit.
@@ -30,6 +30,9 @@ Products Grid, Products Carousel, Brands, Categories, Buy Now Button, Live Searc
 Older [ss_…] shortcodes keep working. Options: see the guide or Kenakata Kit → Shortcodes.
 
 == Changelog ==
+= 3.24.1 =
+* Speed: fixed carousels (brand/category/product sliders) stopping Chrome's Largest Contentful Paint measurement. The track was snapped by 2px on load, which Chrome treats as a scroll, so PageSpeed showed "NO_LCP" and Core Web Vitals could not be measured.
+
 = 3.24.0 =
 * SEO: product card pictures carry the product name as alt text (image search). The link around the picture stays hidden from screen readers, so nothing is read twice.
 * SEO: robots.txt rules for all crawlers ("User-agent: *") from WordPress, WooCommerce and this plugin are merged into one group.

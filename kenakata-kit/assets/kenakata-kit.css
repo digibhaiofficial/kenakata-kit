@@ -226,6 +226,10 @@ body a.kk-loadmore__btn[aria-busy="true"]::after, .kk-pagination a[aria-busy="tr
 	overflow-x: auto;
 	overscroll-behavior-x: contain;
 	scroll-snap-type: x mandatory;
+	/* Match the 2px side padding so the first item is already snapped at scrollLeft 0.
+	   Without it Chrome snaps the track by 2px on load, which counts as a scroll and
+	   stops Largest Contentful Paint recording (PageSpeed shows NO_LCP). */
+	scroll-padding-inline: 2px;
 	scroll-behavior: smooth;
 	scrollbar-width: none;
 	list-style: none !important;

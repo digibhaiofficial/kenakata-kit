@@ -7,7 +7,7 @@ const path = require('path');
 const OUT = process.argv[2] || path.join(os.tmpdir(), 'kk-sd-shots');
 const LANG = process.argv[3] === 'bn' ? '?lang=bn' : '';
 const SCREENS = ['', 'orders', 'orders/900', 'products', 'products/600', 'products/new', 'posts/new'];
-const BROWSER = ['C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Google/Chrome/Application/chrome.exe'].find((b) => fs.existsSync(b));
+const BROWSER = ['C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Google/Chrome/Application/chrome.exe', '/usr/bin/google-chrome', '/usr/bin/chromium'].find((b) => fs.existsSync(b));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 (async () => {

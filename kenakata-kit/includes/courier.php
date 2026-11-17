@@ -87,7 +87,7 @@ function kk_courier_check_active() {
 
 function kk_courier_secret( $key ) {
 	$all = get_option( 'kk_courier_secrets', array() );
-	return is_array( $all ) && isset( $all[ $key ] ) ? (string) $all[ $key ] : '';
+	return is_array( $all ) && isset( $all[ $key ] ) ? kk_secret_open( (string) $all[ $key ] ) : '';
 }
 
 /** Save one credential. Empty input keeps the saved one. Not autoloaded, never part of the settings export. */
@@ -100,7 +100,7 @@ function kk_courier_save_secret( $key, $value ) {
 	}
 	$all = get_option( 'kk_courier_secrets', array() );
 	$all = is_array( $all ) ? $all : array();
-	$all[ $key ] = $value;
+	$all[ $key ] = kk_secret_seal( $value );
 	update_option( 'kk_courier_secrets', $all, false );
 	if ( 0 === strpos( $key, 'courier_pathao_' ) ) { // new login details: forget the old Pathao token
 		delete_transient( 'kk_pathao_token' );

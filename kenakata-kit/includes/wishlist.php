@@ -161,6 +161,15 @@ add_action( 'rest_api_init', function () {
 			if ( get_transient( $key ) ) {
 				return array( 'ok' => true );
 			}
+			// Without an object cache every guard is a row in wp_options: at most 500 new ones an hour, so a bot
+			// cannot fill the database (3.25). Real shoppers never come near this.
+			if ( ! wp_using_ext_object_cache() ) {
+				$n_hour = (int) get_transient( 'kk_wlp_count' );
+				if ( $n_hour >= 500 ) {
+					return array( 'ok' => true );
+				}
+				set_transient( 'kk_wlp_count', $n_hour + 1, HOUR_IN_SECONDS );
+			}
 			set_transient( $key, 1, DAY_IN_SECONDS );
 			$n = max( 0, (int) get_post_meta( $id, '_kk_wl_count', true ) + ( 'remove' === $op ? -1 : 1 ) );
 			update_post_meta( $id, '_kk_wl_count', $n );

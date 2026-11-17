@@ -112,7 +112,7 @@ function kk_search_endpoint( WP_REST_Request $request ) {
 	$result = array(
 		'items' => $items,
 		'total' => (int) $total,
-		'all'   => add_query_arg( array( 's' => $q, 'post_type' => 'product' ), home_url( '/' ) ),
+		'all'   => add_query_arg( array( 's' => rawurlencode( $q ), 'post_type' => 'product' ), home_url( '/' ) ), // add_query_arg() does not encode: & # + would break the link
 	);
 	kk_search_cache_set( $cache_key, $result );
 	return kk_search_response( $result );
@@ -175,7 +175,7 @@ function kk_live_search_shortcode( $atts ) {
 			. '<button type="submit" class="kk-search__submit">' . $icon . ( $a['button_text'] ? '<span>' . esc_html( $a['button_text'] ) . '</span>' : '<span class="screen-reader-text">' . esc_html__( 'Search', 'kenakata-kit' ) . '</span>' ) . '</button></form>'
 			. '<div class="kk-search__drop" hidden><p class="kk-search__status" role="status" aria-live="polite"></p>'
 			. '<ul class="kk-search__results" id="' . esc_attr( $uid ) . '-list" role="listbox"></ul>'
-			. '<a class="kk-search__all" href="#" hidden></a></div></div>';
+			. '<a class="kk-search__all" href="' . esc_url( add_query_arg( 'post_type', 'product', home_url( '/' ) ) ) . '" hidden>' . esc_html__( 'See all products', 'kenakata-kit' ) . '</a></div></div>';
 	}
 	return '<div class="kk-search">'
 		. '<button type="button" class="kk-search__toggle" aria-expanded="false" aria-controls="' . esc_attr( $uid ) . '" aria-label="' . esc_attr__( 'Search products', 'kenakata-kit' ) . '">' . $icon . '</button>'
@@ -186,7 +186,7 @@ function kk_live_search_shortcode( $atts ) {
 		. '<button type="button" class="kk-search__close" aria-label="' . esc_attr__( 'Close search', 'kenakata-kit' ) . '">&times;</button></form>'
 		. '<p class="kk-search__status" role="status" aria-live="polite"></p>'
 		. '<ul class="kk-search__results" id="' . esc_attr( $uid ) . '-list" role="listbox"></ul>'
-		. '<a class="kk-search__all" href="#" hidden></a>'
+		. '<a class="kk-search__all" href="' . esc_url( add_query_arg( 'post_type', 'product', home_url( '/' ) ) ) . '" hidden>' . esc_html__( 'See all products', 'kenakata-kit' ) . '</a>'
 		. '</div></div></div>';
 }
 add_shortcode( 'kk_live_search', 'kk_live_search_shortcode' );

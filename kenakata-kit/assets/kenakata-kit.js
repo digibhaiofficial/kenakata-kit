@@ -105,7 +105,7 @@
 	/* ------------------------------------------------------------------
 	 * Live search (icon + overlay, or inline bar)
 	 * ---------------------------------------------------------------- */
-	function esc(s) { var d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }
+	function esc(s) { var d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML.replace(/"/g, '&quot;').replace(/'/g, '&#39;'); } // also safe inside attributes
 
 	function searchEngine(input, list, status, all, onResults) {
 		var timer = null, ctrl = null, active = -1;

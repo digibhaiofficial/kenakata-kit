@@ -177,6 +177,10 @@ function kk_render_product_card( $product, $args = array() ) {
 	$link  = $product->get_permalink();
 	$name  = wp_strip_all_tags( $product->get_name() );
 	$tag   = in_array( $a['title_tag'], array( 'h2', 'h3', 'h4', 'p', 'div' ), true ) ? $a['title_tag'] : 'h2';
+	$site  = (string) kk_opt( 'card_title_tag' ); // site-wide choice (3.25), '' = each list's own
+	if ( in_array( $site, array( 'h2', 'h3', 'h4', 'p' ), true ) ) {
+		$tag = $site;
+	}
 	$stock = ! $product->is_in_stock();
 	$cls   = 'kk-pcard kk-pcard--' . sanitize_html_class( $a['style'] ) . ' kk-pcard--align-' . sanitize_html_class( $a['align'] ) . ( $stock ? ' is-out-of-stock' : '' ) . ( $product->is_on_sale() ? ' is-on-sale' : '' );
 

@@ -192,6 +192,9 @@ class KK_EW_Account_Link extends KK_EW_Base {
 	protected function render() {
 		$s    = $this->get_settings_for_display();
 		$text = is_user_logged_in() ? $s['account_text'] : $s['login_text'];
+		if ( '' === trim( (string) $text ) ) {
+			$text = is_user_logged_in() ? __( 'My account', 'kenakata-kit' ) : __( 'Log in', 'kenakata-kit' ); // icon-only links still need a name for screen readers and audits
+		}
 		echo '<div class="kk-el-account-wrap"><a class="kk-el-account" href="' . esc_url( wc_get_page_permalink( 'myaccount' ) ) . '" data-kk-login' . ( 'yes' === $s['hide_text'] ? ' aria-label="' . esc_attr( $text ) . '"' : '' ) . '>';
 		if ( ! empty( $s['icon']['value'] ) ) {
 			\Elementor\Icons_Manager::render_icon( $s['icon'], array( 'aria-hidden' => 'true' ) );

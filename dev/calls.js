@@ -3,7 +3,8 @@
 // Usage: node dev/calls.js includes/store-dashboard.php includes/store-dashboard-api.php
 const fs = require('fs');
 const path = require('path');
-const Parser = require(path.join(__dirname, 'node_modules', 'php-parser'));
+let Parser;
+try { Parser = require(path.join(__dirname, 'node_modules', 'php-parser')); } catch (e) { console.error('php-parser is missing. Run once:  cd dev && npm install   (it is not in the repository: dev/node_modules is ignored by git)'); process.exit(2); }
 const root = path.join(__dirname, '..', 'kenakata-kit');
 const parser = new Parser({ parser: { php7: true, php8: true }, ast: { withPositions: true } });
 

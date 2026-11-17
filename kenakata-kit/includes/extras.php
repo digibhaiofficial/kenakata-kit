@@ -151,7 +151,7 @@ add_action( 'wp_footer', function () {
 	echo '<div class="kk-sticky" hidden><div class="kk-sticky__info">' . $product->get_image( 'thumbnail', array( 'class' => 'kk-sticky__img', 'alt' => '' ) ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- WooCommerce markup
 		. '<span class="kk-sticky__text"><span class="kk-sticky__name">' . esc_html( wp_strip_all_tags( $product->get_name() ) ) . '</span><span class="kk-sticky__price">' . wp_kses_post( $product->get_price_html() ) . '</span></span></div><div class="kk-sticky__actions">';
 	if ( kk_opt( 'sticky_show_cart' ) ) {
-		echo '<button type="button" class="kk-sticky__btn kk-sticky__btn--cart" data-kk-sticky="cart" aria-label="' . esc_attr( kk_opt( 'card_cart_text' ) ) . '">' . kk_icon( 'cart' ) . '</button>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static SVG
+		echo '<button type="button" class="kk-sticky__btn kk-sticky__btn--cart" data-kk-sticky="cart" aria-label="' . esc_attr( '' !== trim( (string) kk_opt( 'card_cart_text' ) ) ? kk_opt( 'card_cart_text' ) : __( 'Add to cart', 'kenakata-kit' ) ) . '">' . kk_icon( 'cart' ) . '</button>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static SVG
 	}
 	if ( kk_opt( 'buynow_enable' ) ) {
 		echo '<button type="button" class="kk-sticky__btn kk-sticky__btn--buy" data-kk-sticky="buy">' . esc_html( kk_opt( 'buynow_text' ) ) . '</button>';

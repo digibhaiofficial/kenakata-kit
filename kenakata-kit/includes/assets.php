@@ -11,7 +11,8 @@ function kk_css_vars( $selector = ':root' ) {
 		$hex = kk_opt( $key );
 		return $el && $elementor ? "var(--e-global-color-{$elementor}, {$hex})" : $hex;
 	};
-	$font = trim( (string) kk_opt( 'font_family' ) );
+	// A font list only: letters (any language), digits, spaces, commas, quotes, dots and dashes. Anything else (; { } : ( ) \) could end the CSS rule.
+	$font = trim( preg_replace( '/[^\p{L}\p{N} ,\'"._-]/u', '', (string) kk_opt( 'font_family' ) ) );
 	$vars = array(
 		'--kk-primary'         => $var( 'primary', 'color_primary' ),
 		'--kk-primary-hover'   => kk_opt( 'color_primary_hover' ),

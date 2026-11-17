@@ -4,7 +4,7 @@ Plugin URI: https://digibhai.com/
 Requires at least: 6.3
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 3.24.1
+Stable tag: 3.25.0
 License: GPLv2 or later
 
 Everything a Bangladeshi WooCommerce store usually needs. Settings: left admin menu → Kenakata Kit.
@@ -30,6 +30,15 @@ Products Grid, Products Carousel, Brands, Categories, Buy Now Button, Live Searc
 Older [ss_…] shortcodes keep working. Options: see the guide or Kenakata Kit → Shortcodes.
 
 == Changelog ==
+= 3.25.0 =
+* Checkout: Kenakata Kit now tells you when the cart or checkout page uses WooCommerce's new blocks (its checkout features work only with the classic checkout), with a one-click switch to the classic page. The block version stays as a page revision. WooCommerce is told that the plugin needs the classic checkout.
+* Speed: "WooCommerce files only on shop pages" no longer removes Order Attribution (where a customer came from: Google, Facebook…) on blog posts, keeps the cart script when the header has a cart icon, and treats pages built with Kenakata Kit's Elementor widgets as shop pages.
+* SEO: new setting Product cards → "Product name tag (SEO)": make product names in cards plain text (or H2/H3/H4) everywhere, so pages with many carousels do not get dozens of headings. Default "Automatic" keeps everything as before.
+* SEO / accessibility: icon-only Login / My account link and the sticky cart button always have a name; the live search "see all" link has text and a real address, and searches with & or # in them link correctly.
+* Security: optional encryption of saved API keys (define KK_ENCRYPTION_KEY in wp-config.php; the site checkup shows the line); saved keys can be removed; the Font setting accepts only font names; safer escaping in live search results; new accounts from the login popup need 8-character passwords; the wishlist counter cannot fill the database.
+* Bots: "Block AI crawlers" is split in two: AI training crawlers, and AI answer engines (ChatGPT search, Perplexity, Claude), which bring customers. Sites that blocked AI crawlers keep both blocked until changed. robots.txt uses the shop's real cart / checkout / account addresses.
+* Uninstall with "Delete all data" also removes the plugin's logs, lists and wishlists.
+
 = 3.24.1 =
 * Speed: fixed carousels (brand/category/product sliders) stopping Chrome's Largest Contentful Paint measurement. The track was snapped by 2px on load, which Chrome treats as a scroll, so PageSpeed showed "NO_LCP" and Core Web Vitals could not be measured.
 

@@ -4,7 +4,8 @@
 // Uses dev/node_modules/php-parser (or PHP_PARSER_DIR = folder containing node_modules/php-parser).
 const fs = require('fs');
 const path = require('path');
-const Engine = require(path.join(process.env.PHP_PARSER_DIR || path.join(__dirname, '..'), 'node_modules', 'php-parser'));
+let Engine;
+try { Engine = require(path.join(process.env.PHP_PARSER_DIR || path.join(__dirname, '..'), 'node_modules', 'php-parser')); } catch (e) { console.error('php-parser is missing. Run once:  cd dev && npm install   (it is not in the repository: dev/node_modules is ignored by git) (or set PHP_PARSER_DIR)'); process.exit(2); }
 const dict = require('./i18n-dict.js');
 const extra = fs.readdirSync(__dirname).filter((f) => /^i18n-(?!dict|build).*\.js$/.test(f)).sort().flatMap((f) => require('./' + f)); // i18n-frontend.js, i18n-v32.js, …
 

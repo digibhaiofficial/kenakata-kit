@@ -112,6 +112,10 @@ function kk_sanitize_settings( $input ) {
 		if ( 'secret' === $f['type'] ) {
 			// API keys never go into the (autoloaded, exportable) settings: they have their own private option.
 			$val = isset( $input[ $key ] ) ? wp_unslash( $input[ $key ] ) : '';
+			if ( ! empty( $input[ $key . '__clear' ] ) && '' === trim( (string) $val ) ) {
+				kk_delete_secret( $key ); // "Remove" ticked and nothing new typed
+				continue;
+			}
 			if ( in_array( $key, kk_core_secret_keys(), true ) ) {
 				kk_save_secret( $key, $val );
 			} elseif ( function_exists( 'kk_courier_save_secret' ) ) {
@@ -390,6 +394,8 @@ function kk_admin_notice( $msg ) {
 	}
 	if ( 'reset' === $msg ) {
 		echo '<div class="kk-notice-ok" role="status">✓ ' . esc_html__( 'Settings were reset to their defaults.', 'kenakata-kit' ) . '</div>';
+	} elseif ( 'classic-checkout' === $msg || 'classic-cart' === $msg ) {
+		echo '<div class="kk-notice-ok" role="status">✓ ' . esc_html__( 'Done: the page now uses the classic WooCommerce form, so all Kenakata Kit features work there. Clear the cache if you use a cache plugin.', 'kenakata-kit' ) . '</div>';
 	} elseif ( 0 === strpos( $msg, 'imported-' ) ) {
 		/* translators: %d: number of settings */
 		echo '<div class="kk-notice-ok" role="status">✓ ' . esc_html( sprintf( __( '%d settings imported.', 'kenakata-kit' ), absint( substr( $msg, 9 ) ) ) ) . '</div>';
@@ -517,7 +523,8 @@ function kk_render_field( $key, $f ) {
 			$hint = kk_secret_hint( $key );
 			echo '<input type="password" class="regular-text" autocomplete="new-password" id="' . esc_attr( $id ) . '" name="' . esc_attr( $name ) . '" value="" placeholder="' . esc_attr( '' !== $hint ? $hint : __( 'Paste the key here', 'kenakata-kit' ) ) . '"' . $describe . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped above
 			if ( '' !== $hint ) {
-				echo ' <span class="kk-saved">' . esc_html__( 'Saved', 'kenakata-kit' ) . '</span>';
+				echo ' <span class="kk-saved">' . esc_html__( 'Saved', 'kenakata-kit' ) . '</span>'
+					. ' <label class="kk-secret-clear"><input type="checkbox" name="' . esc_attr( preg_replace( '/\]$/', '__clear]', $name ) ) . '" value="1"> ' . esc_html__( 'Remove', 'kenakata-kit' ) . '</label>';
 			}
 			break;
 		case 'login_locks':

@@ -66,11 +66,29 @@ function kk_speed_is_shop_page() {
 		return true; // the home page usually shows products
 	}
 	$post = get_post();
-	if ( $post && ( has_shortcode( $post->post_content, 'products' ) || has_shortcode( $post->post_content, 'kk_products' ) || has_shortcode( $post->post_content, 'product_page' ) || false !== strpos( $post->post_content, 'woocommerce' ) || false !== strpos( (string) get_post_meta( $post->ID, '_elementor_data', true ), 'woocommerce' ) ) ) {
+	if ( $post && ( has_shortcode( $post->post_content, 'products' ) || has_shortcode( $post->post_content, 'kk_products' ) || has_shortcode( $post->post_content, 'product_page' ) || false !== strpos( $post->post_content, 'woocommerce' ) || preg_match( '/woocommerce|"widgetType":"kk-/', (string) get_post_meta( $post->ID, '_elementor_data', true ) ) || has_shortcode( $post->post_content, 'kk_live_search' ) ) ) {
 		return true; // a page with WooCommerce blocks, shortcodes or Elementor WooCommerce widgets
 	}
 	return (bool) apply_filters( 'kk_speed_is_shop_page', false );
 }
+
+/**
+ * Does the site header show a cart (Elementor Pro "Menu Cart" in a header template, or a Kenakata Kit cart widget)?
+ * Then the cart scripts stay on every page, or the count would not update. Checked once a day (cached).
+ */
+function kk_speed_header_has_cart() {
+	$cached = get_option( 'kk_hdr_cart' ); // autoloaded: no extra database query on normal pages
+	if ( is_array( $cached ) && isset( $cached['v'], $cached['t'] ) && $cached['t'] > time() - DAY_IN_SECONDS ) {
+		return (bool) $cached['v'];
+	}
+	global $wpdb;
+	$found = (bool) $wpdb->get_var( "SELECT 1 FROM {$wpdb->postmeta} pm JOIN {$wpdb->posts} p ON p.ID = pm.post_id WHERE p.post_type = 'elementor_library' AND p.post_status = 'publish' AND pm.meta_key = '_elementor_data' AND ( pm.meta_value LIKE '%woocommerce-menu-cart%' OR pm.meta_value LIKE '%\"widgetType\":\"kk-cart%' ) LIMIT 1" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+	update_option( 'kk_hdr_cart', array( 'v' => $found ? 1 : 0, 't' => time() ), true );
+	return $found;
+}
+add_action( 'save_post_elementor_library', function () {
+	delete_option( 'kk_hdr_cart' );
+} );
 
 // WooCommerce styles and scripts only where there is something to sell (blog posts and plain pages load faster).
 if ( kk_opt( 'speed_wc_assets' ) ) {
@@ -81,7 +99,13 @@ if ( kk_opt( 'speed_wc_assets' ) ) {
 		foreach ( array( 'woocommerce-general', 'woocommerce-layout', 'woocommerce-smallscreen', 'wc-blocks-style', 'wc-blocks-vendors-style' ) as $h ) {
 			wp_dequeue_style( $h );
 		}
-		foreach ( array( 'wc-cart-fragments', 'woocommerce', 'wc-add-to-cart', 'sourcebuster-js', 'wc-order-attribution' ) as $h ) {
+		// Order Attribution (sourcebuster-js, wc-order-attribution) stays everywhere: it remembers where a visitor came
+		// from (Google, Facebook…) on the first page they open, often a blog post, and shows it on the order (3.25).
+		$scripts = array( 'woocommerce', 'wc-add-to-cart' );
+		if ( ! kk_speed_header_has_cart() ) {
+			$scripts[] = 'wc-cart-fragments'; // a cart icon in the header needs it on every page
+		}
+		foreach ( $scripts as $h ) {
 			wp_dequeue_script( $h );
 		}
 	}, 99 );
@@ -112,7 +136,9 @@ if ( kk_opt( 'speed_block_css' ) ) {
 function kk_bad_bots( $kind ) {
 	$list = array(
 		'seo' => array( 'AhrefsBot', 'SemrushBot', 'MJ12bot', 'DotBot', 'BLEXBot', 'DataForSeoBot', 'serpstatbot', 'Barkrowler', 'SeekportBot', 'MegaIndex', 'PetalBot', 'Bytespider', 'ImagesiftBot', 'Amazonbot', 'Baiduspider', 'YandexBot', 'Sogou', 'ZoominfoBot', 'trendictionbot', 'AwarioBot', 'Linguee' ),
-		'ai'  => array( 'GPTBot', 'ClaudeBot', 'anthropic-ai', 'CCBot', 'Google-Extended', 'meta-externalagent', 'PerplexityBot', 'Diffbot', 'omgili', 'cohere-ai', 'YouBot', 'Timpibot' ),
+		'ai'  => array( 'GPTBot', 'ClaudeBot', 'anthropic-ai', 'CCBot', 'Google-Extended', 'meta-externalagent', 'Diffbot', 'omgili', 'cohere-ai', 'Timpibot' ),
+		// AI answer engines (3.25: a switch of their own). They fetch pages to answer a person's question and link to the shop.
+		'ai_search' => array( 'PerplexityBot', 'Perplexity-User', 'OAI-SearchBot', 'ChatGPT-User', 'Claude-SearchBot', 'Claude-User', 'YouBot' ),
 	);
 	return (array) apply_filters( 'kk_bad_bots', isset( $list[ $kind ] ) ? $list[ $kind ] : array(), $kind );
 }
@@ -126,11 +152,26 @@ function kk_blocked_bots() {
 	if ( kk_opt( 'speed_ai_block' ) ) {
 		$bots = array_merge( $bots, kk_bad_bots( 'ai' ) );
 	}
+	if ( kk_opt( 'speed_ai_search_block' ) ) {
+		$bots = array_merge( $bots, kk_bad_bots( 'ai_search' ) );
+	}
 	return $bots;
 }
 
 // Answer blocked bots with a tiny 403 before WordPress builds a page (some, like Bytespider, ignore robots.txt).
-if ( kk_opt( 'speed_bot_block' ) || kk_opt( 'speed_ai_block' ) ) {
+// 3.25: AI answer engines got their own switch. Sites that blocked "AI crawlers" before keep them blocked until changed.
+if ( kk_opt( 'speed_ai_block' ) ) {
+	$kk_stored = (array) get_option( 'kk_settings', array() );
+	if ( ! array_key_exists( 'speed_ai_search_block', $kk_stored ) ) {
+		$kk_stored['speed_ai_search_block'] = 1;
+		$GLOBALS['kk_settings_internal'] = true; // skip the settings form's sanitizer: this is our own value
+		update_option( 'kk_settings', $kk_stored );
+		$GLOBALS['kk_settings_internal'] = false;
+	}
+	unset( $kk_stored );
+}
+
+if ( kk_opt( 'speed_bot_block' ) || kk_opt( 'speed_ai_block' ) || kk_opt( 'speed_ai_search_block' ) ) {
 	$kk_ua = isset( $_SERVER['HTTP_USER_AGENT'] ) ? (string) $_SERVER['HTTP_USER_AGENT'] : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 	if ( '' !== $kk_ua && ! is_admin() && ! ( defined( 'WP_CLI' ) && WP_CLI ) ) {
 		foreach ( kk_blocked_bots() as $kk_bot ) {
@@ -155,8 +196,16 @@ add_filter( 'robots_txt', function ( $out, $public ) {
 	if ( kk_opt( 'speed_robots_shop' ) ) {
 		// Search, sort and filter pages: endless combinations, never cached, no value in Google.
 		$add .= "\n# Kenakata Kit: search, sort and filter pages are for people, not crawlers\nUser-agent: *\n";
-		foreach ( array( '/?s=', '/*?s=', '/*&s=', '/*?orderby=', '/*&orderby=', '/*?filter_', '/*&filter_', '/*?min_price=', '/*&min_price=', '/*?max_price=', '/*?rating_filter=', '/*?add_to_wishlist=', '/*?per_page=', '/cart/', '/checkout/', '/my-account/' ) as $p ) {
+		foreach ( array( '/?s=', '/*?s=', '/*&s=', '/*?orderby=', '/*&orderby=', '/*?filter_', '/*&filter_', '/*?min_price=', '/*&min_price=', '/*?max_price=', '/*?rating_filter=', '/*?add_to_wishlist=', '/*?per_page=' ) as $p ) {
 			$add .= 'Disallow: ' . $p . "\n";
+		}
+		// Cart, checkout and account pages at their real addresses (3.25: not every shop uses /cart/, /checkout/…).
+		foreach ( array( 'cart', 'checkout', 'myaccount' ) as $k ) {
+			$id   = function_exists( 'wc_get_page_id' ) ? (int) wc_get_page_id( $k ) : 0;
+			$path = $id > 0 ? (string) wp_parse_url( (string) get_permalink( $id ), PHP_URL_PATH ) : '';
+			if ( '' !== $path && '/' !== $path && false === strpos( $path, '?' ) ) {
+				$add .= 'Disallow: ' . trailingslashit( $path ) . "\n";
+			}
 		}
 	}
 	$bots = kk_blocked_bots();
@@ -392,6 +441,65 @@ add_action( 'admin_post_kk_health_cleanup', function () {
 } );
 
 /** One check: array( ok, text, optional fix link ). */
+/**
+ * Cart / checkout pages built with WooCommerce's blocks (3.25). Kenakata Kit's checkout features are made for the
+ * classic checkout (the [woocommerce_checkout] form, Elementor's checkout widget), so on a block checkout they are
+ * silently missing. Returns array( 'checkout' => page id, 'cart' => page id ) for the pages that use blocks.
+ */
+function kk_block_cart_checkout() {
+	$out = array();
+	if ( ! function_exists( 'wc_get_page_id' ) ) {
+		return $out;
+	}
+	foreach ( array( 'checkout', 'cart' ) as $k ) {
+		$id   = (int) wc_get_page_id( $k );
+		$post = $id > 0 ? get_post( $id ) : null;
+		if ( $post && has_block( 'woocommerce/' . $k, $post ) && 'builder' !== get_post_meta( $id, '_elementor_edit_mode', true ) ) {
+			$out[ $k ] = $id;
+		}
+	}
+	return $out;
+}
+
+/** Link that turns a block cart / checkout page into the classic one (the old content stays as a revision). */
+function kk_classic_page_url( $which ) {
+	return wp_nonce_url( admin_url( 'admin-post.php?action=kk_classic_page&page_type=' . rawurlencode( $which ) ), 'kk_classic_page' );
+}
+
+add_action( 'admin_post_kk_classic_page', function () {
+	check_admin_referer( 'kk_classic_page' );
+	$which = isset( $_GET['page_type'] ) ? sanitize_key( wp_unslash( $_GET['page_type'] ) ) : '';
+	$pages = kk_block_cart_checkout();
+	if ( ! isset( $pages[ $which ] ) || ! current_user_can( 'manage_woocommerce' ) || ! current_user_can( 'edit_post', $pages[ $which ] ) ) {
+		wp_die( esc_html__( 'You are not allowed to do this.', 'kenakata-kit' ) );
+	}
+	$code = 'checkout' === $which ? '[woocommerce_checkout]' : '[woocommerce_cart]';
+	wp_update_post( array( 'ID' => $pages[ $which ], 'post_content' => "<!-- wp:shortcode -->\n" . $code . "\n<!-- /wp:shortcode -->" ) ); // WordPress keeps the block version as a revision
+	wp_safe_redirect( admin_url( 'admin.php?page=kenakata-kit&tab=dashboard&kk_msg=classic-' . $which ) );
+	exit;
+} );
+
+// The notice: Kenakata Kit screens and the WordPress Dashboard, for people who can fix it.
+add_action( 'admin_notices', function () {
+	global $pagenow;
+	$ours = 'admin.php' === $pagenow && isset( $_GET['page'] ) && 'kenakata-kit' === $_GET['page']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ( ( ! $ours && 'index.php' !== $pagenow ) || ! current_user_can( 'manage_woocommerce' ) ) {
+		return;
+	}
+	$pages = kk_block_cart_checkout();
+	if ( ! $pages ) {
+		return;
+	}
+	echo '<div class="notice notice-warning"><p><strong>' . esc_html__( 'Kenakata Kit: your shop uses WooCommerce\'s new block cart / checkout.', 'kenakata-kit' ) . '</strong> '
+		. esc_html__( 'The phone check, delivery areas, bKash / Nagad payment, incomplete orders, repeat-order block, bot check and the other checkout features work only with the classic checkout, so they are not shown to customers now.', 'kenakata-kit' ) . '</p><p>';
+	foreach ( $pages as $which => $id ) {
+		$label = 'checkout' === $which ? __( 'Use the classic checkout', 'kenakata-kit' ) : __( 'Use the classic cart', 'kenakata-kit' );
+		echo '<a class="button button-primary" href="' . esc_url( kk_classic_page_url( $which ) ) . '">' . esc_html( $label ) . '</a> ';
+		echo '<a class="button" href="' . esc_url( (string) get_edit_post_link( $id ) ) . '">' . esc_html( get_the_title( $id ) ) . ' ✎</a> ';
+	}
+	echo '</p><p class="description">' . esc_html__( 'The page keeps its address and its old version is saved (Page → Revisions), so it can be brought back.', 'kenakata-kit' ) . '</p></div>';
+} );
+
 function kk_health_checks() {
 	global $wpdb;
 	$c = array();
@@ -444,6 +552,8 @@ function kk_health_checks() {
 			$c['site'][] = $cron['healthy'] ? array( true, __( 'Scheduled tasks (cron) run normally', 'kenakata-kit' ) ) : array( false, __( 'Scheduled tasks (cron) are not running regularly: add a server cron job that opens your-site/wp-cron.php every 5 minutes', 'kenakata-kit' ) );
 		}
 	}
+	$blocks = kk_block_cart_checkout();
+	$c['site'][] = isset( $blocks['checkout'] ) ? array( false, __( 'The checkout page uses WooCommerce\'s Checkout block: Kenakata Kit\'s checkout features are not shown. Switch it to the classic checkout.', 'kenakata-kit' ), kk_classic_page_url( 'checkout' ) ) : array( true, __( 'The checkout page is the classic checkout (all checkout features work)', 'kenakata-kit' ) );
 	$c['site'][] = ( defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY && defined( 'WP_DEBUG' ) && WP_DEBUG ) ? array( false, __( 'Errors are shown to visitors (WP_DEBUG on): turn it off in wp-config.php', 'kenakata-kit' ) ) : array( true, __( 'Errors are not shown to visitors', 'kenakata-kit' ) );
 
 	$c['security'][] = is_ssl() ? array( true, __( 'The site runs on https (secure)', 'kenakata-kit' ) ) : array( false, __( 'You are on http: use https', 'kenakata-kit' ) );
@@ -452,6 +562,23 @@ function kk_health_checks() {
 	$c['security'][] = ( defined( 'DISALLOW_FILE_EDIT' ) && DISALLOW_FILE_EDIT ) || kk_opt( 'sec_no_file_edit' ) ? array( true, __( 'Theme / plugin file editor is off', 'kenakata-kit' ) ) : array( false, __( 'The theme / plugin file editor is on: a stolen password could change your site\'s code', 'kenakata-kit' ), kk_admin_url( 'security' ) );
 	$c['security'][] = kk_opt( 'sec_disable_xmlrpc' ) ? array( true, __( 'XML-RPC (old remote login, a common attack door) is off', 'kenakata-kit' ) ) : array( false, __( 'XML-RPC is on: turn it off unless you use the old WordPress app or Jetpack', 'kenakata-kit' ), kk_admin_url( 'security' ) );
 	$c['security'][] = kk_turnstile_on( 'login' ) ? array( true, __( 'Cloudflare Turnstile protects the login', 'kenakata-kit' ) ) : array( false, __( 'Login has no bot check: turn on Cloudflare Turnstile on this page (free)', 'kenakata-kit' ) );
+	$sealed = function_exists( 'kk_secrets_sealed' ) ? kk_secrets_sealed() : null;
+	if ( null !== $sealed ) {
+		/* translators: %s: a line to add to wp-config.php */
+		$unreadable = false;
+		foreach ( array( 'kk_secrets', 'kk_courier_secrets' ) as $opt ) {
+			foreach ( (array) get_option( $opt, array() ) as $v ) {
+				if ( 0 === strpos( (string) $v, 'kkenc1:' ) && '' === kk_secret_open( $v ) ) {
+					$unreadable = true;
+				}
+			}
+		}
+		if ( $unreadable ) {
+			$c['security'][] = array( false, __( 'Some saved API keys cannot be read: KK_ENCRYPTION_KEY in wp-config.php is missing or was changed. Put the old line back, or paste the keys again on the Courier / Security tabs.', 'kenakata-kit' ) );
+		} else {
+			$c['security'][] = $sealed ? array( true, __( 'Saved API keys (courier, Turnstile) are encrypted', 'kenakata-kit' ) ) : array( false, sprintf( __( 'Saved API keys (courier, Turnstile) are stored as plain text in the database. To encrypt them, add this line to wp-config.php (above "That\'s all, stop editing") and open this page again: %s', 'kenakata-kit' ), "define( 'KK_ENCRYPTION_KEY', '" . wp_generate_password( 48, false ) . "' );" ) );
+		}
+	}
 	$admins          = count( get_users( array( 'role' => 'administrator', 'fields' => 'ID', 'number' => 50 ) ) );
 	/* translators: %d: number of administrators */
 	$c['security'][] = $admins <= 3 ? array( true, sprintf( _n( '%d administrator', '%d administrators', $admins, 'kenakata-kit' ), $admins ) ) : array( false, sprintf( __( '%d administrators: give staff the "Store Manager" or "Shop manager" role instead', 'kenakata-kit' ), $admins ), admin_url( 'users.php?role=administrator' ) );

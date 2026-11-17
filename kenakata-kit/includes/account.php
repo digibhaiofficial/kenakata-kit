@@ -102,8 +102,8 @@ add_action( 'wp_ajax_nopriv_kk_register', function () {
 	if ( kk_opt( 'popup_email_required' ) && ! is_email( $email ) ) {
 		wp_send_json_error( array( 'message' => __( 'Please enter a valid email address.', 'kenakata-kit' ) ) );
 	}
-	if ( strlen( $password ) < 6 ) {
-		wp_send_json_error( array( 'message' => __( 'Password must be at least 6 characters.', 'kenakata-kit' ) ) );
+	if ( strlen( $password ) < 8 ) { // 3.25: 8 (was 6), the usual minimum for shop accounts
+		wp_send_json_error( array( 'message' => __( 'Password must be at least 8 characters.', 'kenakata-kit' ) ) );
 	}
 	if ( kk_user_by_identifier( $phone ) ) {
 		wp_send_json_error( array( 'message' => __( 'An account with this phone number already exists. Please log in.', 'kenakata-kit' ) ) );
@@ -163,7 +163,7 @@ add_action( 'wp_footer', function () {
 				<p class="kk-field"><label for="kk-reg-name"><?php echo esc_html( kk_opt( 'co_name_label' ) ); ?></label><input id="kk-reg-name" name="name" type="text" autocomplete="name" required></p>
 				<p class="kk-field"><label for="kk-reg-phone"><?php echo esc_html( kk_opt( 'co_phone_label' ) ); ?></label><input id="kk-reg-phone" name="phone" type="tel"<?php echo kk_attr_string( kk_phone_input_attrs() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in kk_attr_string() ?> placeholder="<?php echo esc_attr( kk_opt( 'co_phone_placeholder' ) ); ?>" required></p>
 				<p class="kk-field"><label for="kk-reg-email"><?php echo esc_html( $email_label ); ?></label><input id="kk-reg-email" name="email" type="email" autocomplete="email" <?php echo kk_opt( 'popup_email_required' ) ? 'required' : ''; ?>></p>
-				<p class="kk-field"><label for="kk-reg-pass"><?php esc_html_e( 'Password', 'kenakata-kit' ); ?></label><input id="kk-reg-pass" name="password" type="password" autocomplete="new-password" minlength="6" required></p>
+				<p class="kk-field"><label for="kk-reg-pass"><?php esc_html_e( 'Password', 'kenakata-kit' ); ?></label><input id="kk-reg-pass" name="password" type="password" autocomplete="new-password" minlength="8" required></p>
 				<?php if ( function_exists( 'kk_turnstile_on' ) && kk_turnstile_on( 'login' ) ) : ?><div class="kk-turnstile" data-kk-ts></div><?php endif; ?>
 				<p class="kk-form-msg" role="alert"></p>
 				<button type="submit" class="kk-btn kk-btn--primary kk-btn--block"><?php echo esc_html( kk_opt( 'popup_register_tab' ) ); ?></button>

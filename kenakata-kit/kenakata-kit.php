@@ -3,7 +3,7 @@
  * Plugin Name:       Kenakata Kit – WooCommerce Toolkit for Bangladesh
  * Plugin URI:        https://digibhai.com/
  * Description:       Everything a Bangladeshi WooCommerce store needs: Buy Now, simple checkout with delivery areas, fake-order protection, thank-you page, order tracking by phone, live search, login popup, product cards, brand/category carousels, WhatsApp, variation buttons, photo reviews, side cart, mobile bar and 15 Elementor widgets. English and Bengali (বাংলা). Settings: left menu → Kenakata Kit.
- * Version:           3.24.1
+ * Version:           3.25.0
  * Requires at least: 6.3
  * Requires PHP:      7.4
  * Requires Plugins:  woocommerce
@@ -21,7 +21,7 @@ defined( 'ABSPATH' ) || exit;
 
 $GLOBALS['kk_load_ms'] = -microtime( true ); // time spent loading this plugin (Speed & health shows it)
 
-define( 'KK_VERSION', '3.24.1' );
+define( 'KK_VERSION', '3.25.0' );
 define( 'KK_FILE', __FILE__ );
 define( 'KK_DIR', __DIR__ );
 define( 'KK_URL', plugin_dir_url( __FILE__ ) );
@@ -70,6 +70,7 @@ function kk_defaults() {
 		'card_title_lines'      => 2,
 		'card_title_size'       => 15,
 		'card_price_size'       => 17,
+		'card_title_tag'        => '',
 		'card_show_brand'       => 1,
 		'card_show_rating'      => 1,
 		'card_show_badge'       => 1,
@@ -415,6 +416,7 @@ function kk_defaults() {
 		'speed_robots_shop'     => 0,
 		'speed_bot_block'       => 0,
 		'speed_ai_block'        => 0,
+		'speed_ai_search_block' => 0,
 		'turnstile_enable'      => 0,
 		'turnstile_site'        => '',
 		'turnstile_login'       => 1,
@@ -631,7 +633,94 @@ function kk_core_secret_keys() {
 
 function kk_secret( $key ) {
 	$all = get_option( 'kk_secrets', array() );
-	return is_array( $all ) && isset( $all[ $key ] ) ? (string) $all[ $key ] : '';
+	return is_array( $all ) && isset( $all[ $key ] ) ? kk_secret_open( (string) $all[ $key ] ) : '';
+}
+
+/**
+ * Optional encryption of saved API keys (3.25). Off unless wp-config.php defines KK_ENCRYPTION_KEY: the key then
+ * lives outside the database, so a leaked database or backup does not leak the courier / Turnstile keys. Without
+ * the constant everything works as before (plain text), so nothing can lock a shop out of its couriers.
+ */
+function kk_secret_box_key() {
+	if ( ! defined( 'KK_ENCRYPTION_KEY' ) || '' === (string) KK_ENCRYPTION_KEY || ! function_exists( 'sodium_crypto_secretbox' ) ) {
+		return '';
+	}
+	return sodium_crypto_generichash( 'kenakata-kit|' . (string) KK_ENCRYPTION_KEY, '', SODIUM_CRYPTO_SECRETBOX_KEYBYTES );
+}
+
+/** Value to store: encrypted ("kkenc1:…") when a key is set, else unchanged. */
+function kk_secret_seal( $value ) {
+	$key = kk_secret_box_key();
+	if ( '' === $key || '' === (string) $value || 0 === strpos( (string) $value, 'kkenc1:' ) ) {
+		return (string) $value;
+	}
+	$nonce = random_bytes( SODIUM_CRYPTO_SECRETBOX_NONCEBYTES );
+	return 'kkenc1:' . base64_encode( $nonce . sodium_crypto_secretbox( (string) $value, $nonce, $key ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
+}
+
+/** Stored value → the real one ('' when it is encrypted and the key is missing or different). */
+function kk_secret_open( $stored ) {
+	$stored = (string) $stored;
+	if ( 0 !== strpos( $stored, 'kkenc1:' ) ) {
+		return $stored; // plain (saved before encryption was set up)
+	}
+	$key = kk_secret_box_key();
+	$raw = base64_decode( substr( $stored, 7 ), true ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
+	if ( '' === $key || false === $raw || strlen( $raw ) <= SODIUM_CRYPTO_SECRETBOX_NONCEBYTES ) {
+		return '';
+	}
+	$plain = sodium_crypto_secretbox_open( substr( $raw, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES ), substr( $raw, 0, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES ), $key );
+	return false === $plain ? '' : $plain;
+}
+
+/** With KK_ENCRYPTION_KEY newly set: encrypt the keys that were saved in plain text (admin screens, once per change). */
+add_action( 'admin_init', function () {
+	if ( '' === kk_secret_box_key() ) {
+		return;
+	}
+	foreach ( array( 'kk_secrets', 'kk_courier_secrets' ) as $opt ) {
+		$all = get_option( $opt, array() );
+		if ( ! is_array( $all ) || ! $all ) {
+			continue;
+		}
+		$sealed = array_map( 'kk_secret_seal', array_map( 'strval', $all ) );
+		if ( $sealed !== $all ) {
+			update_option( $opt, $sealed, false );
+		}
+	}
+} );
+
+/** Are all saved API keys encrypted? null when no key is saved. */
+function kk_secrets_sealed() {
+	$vals = array();
+	foreach ( array( 'kk_secrets', 'kk_courier_secrets' ) as $opt ) {
+		$all  = get_option( $opt, array() );
+		$vals = array_merge( $vals, is_array( $all ) ? array_values( array_filter( array_map( 'strval', $all ) ) ) : array() );
+	}
+	if ( ! $vals ) {
+		return null;
+	}
+	foreach ( $vals as $v ) {
+		if ( 0 !== strpos( $v, 'kkenc1:' ) ) {
+			return false;
+		}
+	}
+	return true;
+}
+
+/** Remove one saved key ("Remove" tick box next to the field). */
+function kk_delete_secret( $key ) {
+	foreach ( array( 'kk_secrets', 'kk_courier_secrets' ) as $opt ) {
+		$all = get_option( $opt, array() );
+		if ( is_array( $all ) && isset( $all[ $key ] ) ) {
+			unset( $all[ $key ] );
+			update_option( $opt, $all, false );
+		}
+	}
+	if ( 0 === strpos( (string) $key, 'courier_pathao_' ) ) {
+		delete_transient( 'kk_pathao_token' );
+		delete_transient( 'kk_pathao_token_sb' );
+	}
 }
 
 /** Save one key. Empty input keeps the saved one. */
@@ -642,7 +731,7 @@ function kk_save_secret( $key, $value ) {
 	}
 	$all         = get_option( 'kk_secrets', array() );
 	$all         = is_array( $all ) ? $all : array();
-	$all[ $key ] = $value;
+	$all[ $key ] = kk_secret_seal( $value );
 	update_option( 'kk_secrets', $all, false );
 }
 
@@ -868,6 +957,8 @@ register_deactivation_hook( __FILE__, function () {
 add_action( 'before_woocommerce_init', function () {
 	if ( class_exists( '\Automattic\WooCommerce\Utilities\FeaturesUtil' ) ) {
 		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', KK_FILE, true );
+		// The checkout features are built on the classic checkout: WooCommerce then warns in the block editor and offers the switch.
+		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'cart_checkout_blocks', KK_FILE, false );
 	}
 } );
 

@@ -137,8 +137,9 @@ function kk_bad_bots( $kind ) {
 	$list = array(
 		'seo' => array( 'AhrefsBot', 'SemrushBot', 'MJ12bot', 'DotBot', 'BLEXBot', 'DataForSeoBot', 'serpstatbot', 'Barkrowler', 'SeekportBot', 'MegaIndex', 'PetalBot', 'Bytespider', 'ImagesiftBot', 'Amazonbot', 'Baiduspider', 'YandexBot', 'Sogou', 'ZoominfoBot', 'trendictionbot', 'AwarioBot', 'Linguee' ),
 		'ai'  => array( 'GPTBot', 'ClaudeBot', 'anthropic-ai', 'CCBot', 'Google-Extended', 'meta-externalagent', 'Diffbot', 'omgili', 'cohere-ai', 'Timpibot' ),
-		// AI answer engines (3.25: a switch of their own). They fetch pages to answer a person's question and link to the shop.
-		'ai_search' => array( 'PerplexityBot', 'Perplexity-User', 'OAI-SearchBot', 'ChatGPT-User', 'Claude-SearchBot', 'Claude-User', 'YouBot' ),
+		// AI answer engines (3.25: a switch of their own): their search crawlers only. Fetches made for one person at that
+		// moment (ChatGPT-User, Claude-User, Perplexity-User: also used by the shop's own AI tools and connectors) are never blocked.
+		'ai_search' => array( 'PerplexityBot', 'OAI-SearchBot', 'Claude-SearchBot', 'YouBot' ),
 	);
 	return (array) apply_filters( 'kk_bad_bots', isset( $list[ $kind ] ) ? $list[ $kind ] : array(), $kind );
 }
@@ -175,7 +176,8 @@ if ( kk_opt( 'speed_bot_block' ) || kk_opt( 'speed_ai_block' ) || kk_opt( 'speed
 	$kk_ua = isset( $_SERVER['HTTP_USER_AGENT'] ) ? (string) $_SERVER['HTTP_USER_AGENT'] : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 	if ( '' !== $kk_ua && ! is_admin() && ! ( defined( 'WP_CLI' ) && WP_CLI ) ) {
 		foreach ( kk_blocked_bots() as $kk_bot ) {
-			if ( false !== stripos( $kk_ua, $kk_bot ) && ! preg_match( '#robots\.txt|[?&]robots=1#', (string) ( $_SERVER['REQUEST_URI'] ?? '' ) ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+			// Pages only: never robots.txt, the REST API (/wp-json/, ?rest_route=) or admin-ajax, which logged-in tools and connectors use (3.25.1).
+			if ( false !== stripos( $kk_ua, $kk_bot ) && ! preg_match( '#robots\.txt|[?&]robots=1|/wp-json/|[?&]rest_route=|admin-ajax\.php#', (string) ( $_SERVER['REQUEST_URI'] ?? '' ) ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 				status_header( 403 );
 				header( 'Content-Type: text/plain; charset=utf-8' );
 				header( 'Cache-Control: no-store' ); // never let a cache keep this answer for a real visitor

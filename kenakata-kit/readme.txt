@@ -4,7 +4,7 @@ Plugin URI: https://digibhai.com/
 Requires at least: 6.3
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 3.25.0
+Stable tag: 3.25.1
 License: GPLv2 or later
 
 Everything a Bangladeshi WooCommerce store usually needs. Settings: left admin menu → Kenakata Kit.
@@ -30,6 +30,9 @@ Products Grid, Products Carousel, Brands, Categories, Buy Now Button, Live Searc
 Older [ss_…] shortcodes keep working. Options: see the guide or Kenakata Kit → Shortcodes.
 
 == Changelog ==
+= 3.25.1 =
+* Fix: "Block AI answer engines" blocked AI tools acting for a person (Claude-User, ChatGPT-User, Perplexity-User), which some shops use to manage the site through its REST API. Only the answer engines' crawlers are blocked now, and the bot block never applies to the REST API or admin-ajax.
+
 = 3.25.0 =
 * Checkout: Kenakata Kit now tells you when the cart or checkout page uses WooCommerce's new blocks (its checkout features work only with the classic checkout), with a one-click switch to the classic page. The block version stays as a page revision. WooCommerce is told that the plugin needs the classic checkout.
 * Speed: "WooCommerce files only on shop pages" no longer removes Order Attribution (where a customer came from: Google, Facebook…) on blog posts, keeps the cart script when the header has a cart icon, and treats pages built with Kenakata Kit's Elementor widgets as shop pages.

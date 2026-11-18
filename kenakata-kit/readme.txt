@@ -4,7 +4,7 @@ Plugin URI: https://digibhai.com/
 Requires at least: 6.3
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 3.26.0
+Stable tag: 3.26.1
 License: GPLv2 or later
 
 Everything a Bangladeshi WooCommerce store usually needs. Settings: left admin menu → Kenakata Kit.
@@ -30,6 +30,9 @@ Products Grid, Products Carousel, Brands, Categories, Buy Now Button, Live Searc
 Older [ss_…] shortcodes keep working. Options: see the guide or Kenakata Kit → Shortcodes.
 
 == Changelog ==
+= 3.26.1 =
+* The first signed release: same code as 3.26.0, now with its signature file, so shops that update to it start checking every later update.
+
 = 3.26.0 =
 * Security: signed updates. GitHub signs every release zip; before installing an update the plugin checks the signature with the public key inside the plugin. A changed zip is never installed (the shop keeps running on its version). After the first signed update, unsigned updates are refused too. Manual zip upload is not affected.
 

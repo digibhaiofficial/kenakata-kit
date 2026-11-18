@@ -36,7 +36,11 @@ jobs:
         run: |
           if [ -z "$KK_SIGNING_KEY" ]; then echo "::warning::Secret KK_RELEASE_SIGNING_KEY is not set: this release is NOT signed"; exit 0; fi
           umask 077
-          printf '%s\n' "$KK_SIGNING_KEY" > "$RUNNER_TEMP/k.pem"
+          # Rebuild a clean PEM whatever way the key was pasted (with or without the BEGIN/END lines, Windows line
+          # ends, one long line…): keep only the base64 body, wrap it at 64 characters.
+          B64=$(printf '%s' "$KK_SIGNING_KEY" | tr -d '\r' | sed -e 's/-----[A-Z ]*-----//g' | tr -d ' \n\t')
+          { echo "-----BEGIN PRIVATE KEY-----"; printf '%s\n' "$B64" | fold -w 64; echo "-----END PRIVATE KEY-----"; } > "$RUNNER_TEMP/k.pem"
+          openssl pkey -in "$RUNNER_TEMP/k.pem" -noout 2>/dev/null || { rm -f "$RUNNER_TEMP/k.pem"; echo "::error::KK_RELEASE_SIGNING_KEY is not a valid Ed25519 private key (paste the whole kk-release-signing-key.pem file)"; exit 1; }
           openssl pkeyutl -sign -rawin -inkey "$RUNNER_TEMP/k.pem" -in "dist/kenakata-kit-$V.zip" -out "$RUNNER_TEMP/sig.bin"
           rm -f "$RUNNER_TEMP/k.pem"
           base64 -w0 "$RUNNER_TEMP/sig.bin" > "dist/kenakata-kit-$V.zip.sig"

@@ -20,6 +20,13 @@ defined( 'ABSPATH' ) || exit;
 if ( ! defined( 'KK_LICENSE_PUBKEY' ) ) {
 	define( 'KK_LICENSE_PUBKEY', 'JGQVoQMA0IEGc9qJNseU9uDPREpiFxPwvlzaAB7CQ0I=' );
 }
+/**
+ * Ed25519 public key that checks the update zips (3.26). GitHub signs each release zip with the matching private
+ * key (kept as a GitHub secret, not in the code); the updater installs a zip only when its signature is right.
+ */
+if ( ! defined( 'KK_RELEASE_PUBKEY' ) ) {
+	define( 'KK_RELEASE_PUBKEY', 'cPoC703dXRQWV1V5e3ENKopFDcQ+F5isLcJm4nSczw0=' );
+}
 /** GitHub repository (owner/name) for updates and the list of taken-back keys. */
 if ( ! defined( 'KK_GH_REPO' ) ) {
 	define( 'KK_GH_REPO', 'digibhaiofficial/kenakata-kit' );

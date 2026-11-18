@@ -74,6 +74,49 @@ function kk_update_latest( $force = false ) {
 	return $info['v'] ? $info : null;
 }
 
+/**
+ * Signed updates (3.26). Before WordPress installs an update zip from GitHub, Kenakata Kit downloads the zip and its
+ * signature (the same address + ".sig") and checks it with KK_RELEASE_PUBKEY. A wrong signature is always refused:
+ * the zip was changed after it was built. A missing signature is accepted only until this site has once installed a
+ * signed update; after that every update must be signed. A refused update changes nothing: the shop keeps running
+ * on the version it has. Manual upload (Plugins → Add New → Upload) is not affected.
+ */
+add_filter( 'upgrader_pre_download', function ( $reply, $package ) {
+	if ( false !== $reply || ! is_string( $package ) || false !== strpos( KK_GH_REPO, '__' ) ) {
+		return $reply;
+	}
+	if ( ! preg_match( '#^https://github\.com/' . preg_quote( KK_GH_REPO, '#' ) . '/releases/download/[^/]+/kenakata-kit-[\d.]+\.zip$#', $package ) ) {
+		return $reply; // not ours
+	}
+	$res = wp_remote_get( $package . '.sig', array( 'timeout' => 20, 'headers' => array( 'User-Agent' => 'Kenakata-Kit/' . KK_VERSION ) ) );
+	$sig = ! is_wp_error( $res ) && 200 === (int) wp_remote_retrieve_response_code( $res ) ? base64_decode( trim( (string) wp_remote_retrieve_body( $res ) ), true ) : false; // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
+	if ( false === $sig ) {
+		if ( get_option( 'kk_upd_signed' ) ) {
+			return new WP_Error( 'kk_unsigned', __( 'Kenakata Kit: this update has no signature, so it was not installed (the shop keeps running). Download the zip from your account and upload it by hand, or contact DigiBhai.', 'kenakata-kit' ) );
+		}
+		return $reply; // releases before 3.26 are not signed yet
+	}
+	if ( ! function_exists( 'sodium_crypto_sign_verify_detached' ) || ! function_exists( 'download_url' ) ) {
+		return $reply; // WordPress always has both (sodium_compat); never block an update on an odd server
+	}
+	$tmp = download_url( $package, 300 );
+	if ( is_wp_error( $tmp ) ) {
+		return $tmp;
+	}
+	$ok = false;
+	try {
+		$ok = SODIUM_CRYPTO_SIGN_BYTES === strlen( $sig ) && sodium_crypto_sign_verify_detached( $sig, (string) file_get_contents( $tmp ), base64_decode( KK_RELEASE_PUBKEY ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents,WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
+	} catch ( \Throwable $e ) {
+		$ok = false;
+	}
+	if ( ! $ok ) {
+		wp_delete_file( $tmp );
+		return new WP_Error( 'kk_bad_signature', __( 'Kenakata Kit: the update file does not match its signature, so it was not installed (the shop keeps running). Please tell DigiBhai.', 'kenakata-kit' ) );
+	}
+	update_option( 'kk_upd_signed', 1, false );
+	return $tmp; // WordPress installs this checked file
+}, 10, 2 );
+
 /** May this site install updates? Free: yes. Pro with a key whose update period ended: no. */
 function kk_update_allowed() {
 	if ( ! function_exists( 'kk_license_state' ) ) {

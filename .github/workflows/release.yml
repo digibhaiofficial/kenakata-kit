@@ -30,6 +30,20 @@ jobs:
         run: sh dev/minify.sh
       - name: Build zip
         run: python3 dev/build-zip.py
+      - name: Sign the zip (updates are checked with KK_RELEASE_PUBKEY)
+        env:
+          KK_SIGNING_KEY: ${{ secrets.KK_RELEASE_SIGNING_KEY }}
+        run: |
+          if [ -z "$KK_SIGNING_KEY" ]; then echo "::warning::Secret KK_RELEASE_SIGNING_KEY is not set: this release is NOT signed"; exit 0; fi
+          umask 077
+          printf '%s\n' "$KK_SIGNING_KEY" > "$RUNNER_TEMP/k.pem"
+          openssl pkeyutl -sign -rawin -inkey "$RUNNER_TEMP/k.pem" -in "dist/kenakata-kit-$V.zip" -out "$RUNNER_TEMP/sig.bin"
+          rm -f "$RUNNER_TEMP/k.pem"
+          base64 -w0 "$RUNNER_TEMP/sig.bin" > "dist/kenakata-kit-$V.zip.sig"
+          # The key must match the public key inside the plugin, or every site would refuse this update.
+          PUB=$(grep -oP "define\( 'KK_RELEASE_PUBKEY', '\K[^']+" kenakata-kit/includes/license.php)
+          php -r 'exit( sodium_crypto_sign_verify_detached( base64_decode( file_get_contents( $argv[1] ) ), file_get_contents( $argv[2] ), base64_decode( $argv[3] ) ) ? 0 : 1 );' "dist/kenakata-kit-$V.zip.sig" "dist/kenakata-kit-$V.zip" "$PUB" || { echo "::error::Signature does not match KK_RELEASE_PUBKEY"; exit 1; }
+          echo "Signed: dist/kenakata-kit-$V.zip.sig"
       - name: Release notes from readme.txt
         run: |
           awk -v v="= $V =" '$0==v{f=1;next} /^= [0-9]/{if(f)exit} f' kenakata-kit/readme.txt > notes.md
@@ -40,6 +54,7 @@ jobs:
         run: |
           # Two tags pushed together finish in any order: "Latest" must always be the highest version
           # (the plugin's updater follows it), never simply the one that finished last.
-          gh release create "$GITHUB_REF_NAME" "dist/kenakata-kit-$V.zip" --title "Kenakata Kit $V" --notes-file notes.md --latest=false
+          FILES="dist/kenakata-kit-$V.zip"; [ -f "dist/kenakata-kit-$V.zip.sig" ] && FILES="$FILES dist/kenakata-kit-$V.zip.sig"
+          gh release create "$GITHUB_REF_NAME" $FILES --title "Kenakata Kit $V" --notes-file notes.md --latest=false
           HIGH=$(gh release list --limit 100 --exclude-drafts --exclude-pre-releases --json tagName --jq '.[].tagName' | sort -V | tail -1)
           gh release edit "$HIGH" --latest

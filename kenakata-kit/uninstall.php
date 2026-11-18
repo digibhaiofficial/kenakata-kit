@@ -26,6 +26,7 @@ delete_option( 'kk_license_cache' );
 delete_option( 'kk_license_revoked' );
 delete_option( 'kk_autoload_fix' );
 delete_option( 'kk_hdr_cart' );
+delete_option( 'kk_upd_signed' );
 
 if ( ! get_option( 'kk_uninstall_wipe' ) ) {
 	return; // keep the settings: reinstalling brings everything back

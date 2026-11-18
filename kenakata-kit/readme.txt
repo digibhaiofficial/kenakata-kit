@@ -4,7 +4,7 @@ Plugin URI: https://digibhai.com/
 Requires at least: 6.3
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 3.25.1
+Stable tag: 3.25.2
 License: GPLv2 or later
 
 Everything a Bangladeshi WooCommerce store usually needs. Settings: left admin menu → Kenakata Kit.
@@ -30,6 +30,10 @@ Products Grid, Products Carousel, Brands, Categories, Buy Now Button, Live Searc
 Older [ss_…] shortcodes keep working. Options: see the guide or Kenakata Kit → Shortcodes.
 
 == Changelog ==
+= 3.25.2 =
+* Privacy: the thank-you page (?order=…&key=…) is never stored by page caches (LiteSpeed, WP Rocket…), because it shows the customer's name, phone and address.
+* User guide: the new 3.25 settings (product name tag, block checkout switch, the three bot switches, API key encryption) are explained.
+
 = 3.25.1 =
 * Fix: "Block AI answer engines" blocked AI tools acting for a person (Claude-User, ChatGPT-User, Perplexity-User), which some shops use to manage the site through its REST API. Only the answer engines' crawlers are blocked now, and the bot block never applies to the REST API or admin-ajax.
 

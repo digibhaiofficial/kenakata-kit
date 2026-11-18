@@ -456,8 +456,9 @@ function kk_tracking_live_status( WC_Order $order, &$left ) {
 }
 
 // Tracking results are personal and change: never keep them in a page cache.
+// The thank-you page (?order=…&key=…) shows the customer's name, phone and address: never in a page cache either (3.25.2).
 add_action( 'template_redirect', function () {
-	if ( isset( $_GET['kk_phone'] ) || isset( $_GET['ss_phone'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ( isset( $_GET['kk_phone'] ) || isset( $_GET['ss_phone'] ) || ( isset( $_GET['order'], $_GET['key'] ) && 0 === strpos( (string) wp_unslash( $_GET['key'] ), 'wc_order_' ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput
 		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
 			define( 'DONOTCACHEPAGE', true );
 		}

@@ -387,6 +387,7 @@ footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border
 	<li><strong>Buttons on mobile:</strong> "Cart icon + Buy Now" দিলে ছোট স্ক্রিনে দুটো বাটন এক লাইনে আঁটে। কম্পিউটারেও কার্ড খুব সরু হলে (এক সারিতে ৫–৬টা) Add to cart নিজে থেকে আইকন হয়ে যায়।</li>
 	<li><strong>Shop, category and brand pages:</strong> প্রতি পেজে কয়টি প্রোডাক্ট (Products per page), আর কম্পিউটার, ট্যাবলেট ও মোবাইলে এক সারিতে কয়টি।</li>
 	<li><strong>Use this card for every product list:</strong> বন্ধ করলে থিম বা WooCommerce-এর নিজের কার্ড দেখায়, পাশে Buy Now বাটন যোগ হয়।</li>
+	<li><strong>Product name tag (SEO):</strong> হোমপেজে কয়েকটা প্রোডাক্ট ক্যারোসেল থাকলে প্রতিটি প্রোডাক্টের নাম একটা করে হেডিং (H2/H3) হয়, পেজে ৫০টির বেশি হেডিং জমে যায়। <strong>Plain text</strong> দিলে দেখতে একই থাকে কিন্তু হেডিং থাকে না, SEO অডিট টুলও খুশি থাকে। <strong>Automatic</strong> = আগের মতো (প্রতিটি লিস্ট বা উইজেট নিজের পছন্দ রাখে)। অন্য কিছু বাছলে সাইটের সব কার্ডে, Elementor উইজেটেও সেটাই চলে।</li>
 </ul>
 <div class="tip"><strong>টিপ</strong>Elementor-এর <strong>Products Grid</strong> উইজেটে প্রতিটি সেকশন আলাদা করে সাজানো যায়। এখানকার সেটিং হলো ডিফল্ট।</div>
 
@@ -426,7 +427,7 @@ footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border
 	<li><strong>ভুলের মেসেজ:</strong> পরিষ্কার একটাই মেসেজ দেখায়, যেমন "Full name is a required field."।</li>
 	<li><strong>Promo code (coupon) field:</strong> কার্ট আর চেকআউট দুটোতেই / শুধু চেকআউটে / শুধু কার্টে / কোথাও না। কোনো অফার না চললে লুকিয়ে রাখুন। WooCommerce-এ কুপন চালুই থাকে, তাই পরে আবার দেখানো যায়।</li>
 </ul>
-<div class="warn"><strong>মনে রাখুন</strong>সহজ চেকআউট WooCommerce-এর "ক্লাসিক" চেকআউটে কাজ করে (শর্টকোড <code>[woocommerce_checkout]</code> বা Elementor-এর <strong>Checkout Form</strong> উইজেট)। ব্লক চেকআউট ব্যবহার করলে Checkout পেজটা ক্লাসিক শর্টকোডে বদলে নিন।</div>
+<div class="warn"><strong>মনে রাখুন</strong>সহজ চেকআউট WooCommerce-এর "ক্লাসিক" চেকআউটে কাজ করে (শর্টকোড <code>[woocommerce_checkout]</code> বা Elementor-এর <strong>Checkout Form</strong> উইজেট)। ব্লক চেকআউট ব্যবহার করলে Kenakata Kit নিজেই ড্যাশবোর্ডে হলুদ নোটিশ দেখায়: <strong>Use the classic checkout</strong> বাটনে এক চাপে পেজটা ক্লাসিক হয়ে যায় (ঠিকানা একই থাকে, আগের ব্লক সংস্করণ Page → Revisions-এ জমা থাকে)।</div>
 
 <h3 id="s-guard">Fake-order protection (ভুয়া অর্ডার সুরক্ষা)</h3>
 <ul>
@@ -790,8 +791,10 @@ footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border
 <h3 id="s-speed">Speed &amp; health (স্পিড ও হেলথ)</h3>
 <p>সব সুইচ শুরুতে বন্ধ। একটা চালু করার পর হোম, একটা প্রোডাক্ট, কার্ট আর চেকআউট একবার খুলে দেখুন, ক্যাশ প্লাগইন থাকলে ক্যাশ মুছুন।</p>
 <ul>
-	<li><strong>হালকা পেজ:</strong> ইমোজি ও এমবেড স্ক্রিপ্ট সরানো, ব্লগ/সাধারণ পেজে WooCommerce-এর ফাইল না লোড করা, শান্ত Heartbeat।</li>
+	<li><strong>হালকা পেজ:</strong> ইমোজি ও এমবেড স্ক্রিপ্ট সরানো, ব্লগ/সাধারণ পেজে WooCommerce-এর ফাইল না লোড করা, শান্ত Heartbeat। ক্রেতা কোথা থেকে এসেছে (Order Attribution) সেই হিসাবের ফাইল সব পেজে থাকে, আর হেডারে কার্ট আইকন থাকলে কার্টের ফাইলও থাকে, যাতে সংখ্যা ঠিক দেখায়।</li>
 	<li><strong>Cloudflare Turnstile:</strong> লগইন, রেজিস্ট্রেশন আর চেকআউটে ফ্রি বট-যাচাই। dash.cloudflare.com → Turnstile থেকে দুটি কী এনে বসান। Cloudflare বন্ধ থাকলেও অর্ডার আটকায় না।</li>
+	<li><strong>খারাপ বট আটকানো:</strong> তিনটা আলাদা সুইচ। <em>Block bad bots</em>: SEO টুলের ক্রলার আর স্ক্র্যাপার। <em>Block AI training crawlers</em>: GPTBot, ClaudeBot, CCBot ইত্যাদি, যারা AI শেখাতে পুরো দোকান নামায়, ক্রেতা আনে না। <em>Block AI answer engines</em>: ChatGPT search, Perplexity, Claude-এর সার্চ ক্রলার; এরা উত্তরে আপনার দোকানের লিংক দেখায়, তাই সাধারণত বন্ধ (অনুমতি দেওয়া) রাখাই ভালো। কোনো মানুষের হয়ে AI যখন একটা পেজ খোলে (ChatGPT-User, Claude-User) সেটা কখনো আটকানো হয় না, আর WordPress-এর API (<code>/wp-json/</code>) কখনো ব্লক হয় না, তাই সংযুক্ত টুল/কানেক্টর চলতে থাকে। robots.txt-এ কার্ট, চেকআউট আর অ্যাকাউন্ট পেজের আসল ঠিকানা নিজে বসে।</li>
+	<li><strong>API কি এনক্রিপশন (ঐচ্ছিক):</strong> কুরিয়ার আর Turnstile-এর কি সাধারণত ডাটাবেসে সরাসরি থাকে। চেকআপে যে লাইনটা দেখায় (<code>define( 'KK_ENCRYPTION_KEY', '…' );</code>) সেটা wp-config.php-তে বসালে কি-গুলো এনক্রিপ্ট হয়ে যায়; ডাটাবেস বা ব্যাকআপ ফাঁস হলেও কি পড়া যায় না। লাইনটা পরে মুছবেন না বা বদলাবেন না, না হলে কি আবার দিতে হবে (চেকআপ তখন জানিয়ে দেয়)। সেভ করা কি মুছতে পাশে <strong>Remove</strong> টিক দিয়ে Save।</li>
 	<li><strong>সাইট ও নিরাপত্তা চেকআপ:</strong> PHP ভার্সন, ক্যাশ, প্রতি পেজে লোড হওয়া সেটিংসের সাইজ, cron, https, "admin" ইউজার, ফাইল এডিটর, XML-RPC, প্লাগইন আপডেট। সমস্যা থাকলে পাশে "Fix →" লিংক।</li>
 	<li><strong>ডাটাবেস পরিষ্কার:</strong> শুধু মেয়াদ শেষ অস্থায়ী ডাটা, পুরোনো কার্ট সেশন আর ৩০ দিনের পুরোনো স্প্যাম কমেন্ট মোছে। প্রোডাক্ট, অর্ডার, পেজ, পোস্টে হাত দেয় না।</li>
 </ul>

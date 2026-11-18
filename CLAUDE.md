@@ -65,10 +65,13 @@ customer ledger and handoff notes live in the private repo `digibhaiofficial/ken
   Never reuse a version number.
 
 ## Test before every delivery (all must pass)
+On a fresh clone run `cd dev && npm install` once (php-parser for calls.js and i18n-build.js; dev/node_modules is not in git).
+Without npm: lint falls back to `php -l`; translations can be added straight to the .po and compiled with
+`python dev/i18n/po2mo.py <po> <mo>` (also add them to dev/i18n/i18n-vNN.js so the next full build keeps them).
 ```
 node dev/lint.js
 node dev/calls.js includes/store-dashboard.php includes/store-dashboard-api.php   # review the list
-node dev/e2e-dashboard.js - <outDir>          # starts its own mock server; expect "48 passed, 0 failed"
+node dev/e2e-dashboard.js - <outDir>          # starts its own mock server; expect "70 passed, 0 failed"
 node dev/shots-dashboard.js <outDir> bn       # look at the screenshots (phone + desktop, Bengali)
 sh dev/minify.sh                              # after any CSS/JS change: regenerates assets/*.min.* (CI checks they match)
 python dev/build-zip.py                       # local zip for testing; releases come from the tag

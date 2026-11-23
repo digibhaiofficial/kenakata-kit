@@ -148,7 +148,7 @@ add_action( 'wp_footer', function () {
 	}
 	kk_need_js( true );
 	$simple = kk_can_quick_buy( $product );
-	echo '<div class="kk-sticky" hidden><div class="kk-sticky__info">' . $product->get_image( 'thumbnail', array( 'class' => 'kk-sticky__img', 'alt' => '' ) ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- WooCommerce markup
+	echo '<div class="kk-sticky" hidden><div class="kk-sticky__info">' . $product->get_image( 'thumbnail', array( 'class' => 'kk-sticky__img', 'alt' => wp_strip_all_tags( $product->get_name() ), 'aria-hidden' => 'true' ) ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- WooCommerce markup
 		. '<span class="kk-sticky__text"><span class="kk-sticky__name">' . esc_html( wp_strip_all_tags( $product->get_name() ) ) . '</span><span class="kk-sticky__price">' . wp_kses_post( $product->get_price_html() ) . '</span></span></div><div class="kk-sticky__actions">';
 	if ( kk_opt( 'sticky_show_cart' ) ) {
 		echo '<button type="button" class="kk-sticky__btn kk-sticky__btn--cart" data-kk-sticky="cart" aria-label="' . esc_attr( '' !== trim( (string) kk_opt( 'card_cart_text' ) ) ? kk_opt( 'card_cart_text' ) : __( 'Add to cart', 'kenakata-kit' ) ) . '">' . kk_icon( 'cart' ) . '</button>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static SVG
@@ -290,7 +290,7 @@ function kk_product_brand_html( $product, $a = array() ) {
 		$media = '';
 		if ( 'yes' === $a['logo'] ) {
 			if ( $thumb ) {
-				$media = '<span class="kk-brand__logo">' . wp_get_attachment_image( $thumb, 'thumbnail', false, array( 'alt' => 'yes' === $a['name'] ? '' : $name, 'loading' => 'lazy' ) ) . '</span>';
+				$media = '<span class="kk-brand__logo"' . ( 'yes' === $a['name'] ? ' aria-hidden="true"' : '' ) . '>' . wp_get_attachment_image( $thumb, 'thumbnail', false, array( 'alt' => wp_strip_all_tags( $name ), 'loading' => 'lazy' ) ) . '</span>';
 			} elseif ( 'letter' === $a['fallback'] ) {
 				$media = '<span class="kk-brand__logo kk-brand__logo--letter" aria-hidden="true">' . esc_html( mb_strtoupper( mb_substr( wp_strip_all_tags( $name ), 0, 1 ) ) ) . '</span>';
 			}

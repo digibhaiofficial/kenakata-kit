@@ -454,6 +454,8 @@ check "nothing left over: no View all link" '! echo "$VA" | awk -F"[|][|][|]" "{
 echo "== 3.23: name as a logo for cards without a picture"
 NW=$(wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["cards_noimg"] = "name"; kk_update_settings( $s ); echo do_shortcode( "[kk_categories limit=\"3\" hide_empty=\"no\" layout=\"grid\"]" ); $s["cards_noimg"] = "letter"; kk_update_settings( $s );')
 check "card without a picture shows the name as a logo" 'echo "$NW" | grep -q "kk-term-card__word" && echo "$NW" | grep -q "has-word"'
+IM=$(wpc eval '$up = wp_upload_dir(); $f = $up["path"] . "/kk-term-test.png"; $im = imagecreatetruecolor( 40, 40 ); imagepng( $im, $f ); $id = wp_insert_attachment( array( "post_mime_type" => "image/png", "post_title" => "t", "post_status" => "inherit" ), $f ); require_once ABSPATH . "wp-admin/includes/image.php"; wp_update_attachment_metadata( $id, wp_generate_attachment_metadata( $id, $f ) ); $t = wp_insert_term( "Pic Cat", "product_cat" ); update_term_meta( $t["term_id"], "thumbnail_id", $id ); echo do_shortcode( "[kk_categories limit=\"50\" hide_empty=\"no\" layout=\"grid\"]" );')
+check "card picture carries the name as alt text, hidden from screen readers" 'echo "$IM" | grep -q "<span class=\"kk-term-card__media\" aria-hidden=\"true\"><img[^>]*alt=\"Pic Cat\""'
 
 echo "== 3.24: product card pictures carry the product name as alt"
 CA=$(wpc eval '$p = wc_get_products( array( "limit" => 1 ) )[0]; set_post_thumbnail( $p->get_id(), (int) get_option( "woocommerce_placeholder_image" ) ); $p = wc_get_product( $p->get_id() ); echo ( false !== strpos( kk_render_product_card( $p ), "alt=\"" . esc_attr( $p->get_name() ) . "\"" ) ) ? "yes" : "no";')

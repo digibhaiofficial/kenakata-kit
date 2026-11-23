@@ -4,7 +4,7 @@ Plugin URI: https://digibhai.com/
 Requires at least: 6.3
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 3.26.2
+Stable tag: 3.26.3
 License: GPLv2 or later
 
 Everything a Bangladeshi WooCommerce store usually needs. Settings: left admin menu → Kenakata Kit.
@@ -30,6 +30,9 @@ Products Grid, Products Carousel, Brands, Categories, Buy Now Button, Live Searc
 Older [ss_…] shortcodes keep working. Options: see the guide or Kenakata Kit → Shortcodes.
 
 == Changelog ==
+= 3.26.3 =
+* SEO: brand and category card pictures, the brand logo on the product page and the sticky Buy bar picture carry the name as alt text (image search; SEO tools no longer report empty alt). The picture stays hidden from screen readers where the name is already written next to it, so nothing is read twice.
+
 = 3.26.2 =
 * The first signed release (3.26.1 could not be published: the release step now accepts the signing key however it was pasted into GitHub). Same plugin code as 3.26.0.
 

@@ -88,7 +88,7 @@ function kk_terms_render( $a ) {
 		$thumb_id = absint( get_term_meta( $term->term_id, 'thumbnail_id', true ) );
 		$name     = html_entity_decode( $term->name );
 		$media    = $thumb_id
-			? wp_get_attachment_image( $thumb_id, 'medium', false, array( 'class' => 'kk-term-card__img', 'alt' => 'no' === $a['show_name'] || 'logo' === $style ? $name : '', 'decoding' => 'async', 'loading' => kk_term_img_loading() ) )
+			? wp_get_attachment_image( $thumb_id, 'medium', false, array( 'class' => 'kk-term-card__img', 'alt' => wp_strip_all_tags( $name ), 'decoding' => 'async', 'loading' => kk_term_img_loading() ) )
 			: ( $word
 				? '<span class="kk-term-card__mono kk-term-card__word" aria-hidden="true">' . esc_html( wp_strip_all_tags( $name ) ) . '</span>'
 				: '<span class="kk-term-card__mono" aria-hidden="true">' . esc_html( mb_strtoupper( mb_substr( wp_strip_all_tags( $name ), 0, 1 ) ) ) . '</span>' );
@@ -96,8 +96,10 @@ function kk_terms_render( $a ) {
 		/* translators: %s: number of products */
 		$count = $show_count ? '<span class="kk-term-card__count">' . esc_html( sprintf( _n( '%s product', '%s products', $term->count, 'kenakata-kit' ), number_format_i18n( $term->count ) ) ) . '</span>' : '';
 		$cards .= sprintf(
-			'<li class="kk-term-card kk-tone-%4$d%5$s%7$s"><a href="%1$s"><span class="kk-term-card__media">%2$s</span>%3$s%6$s</a></li>',
-			esc_url( get_term_link( $term ) ), $media, $name_html, $i % 3, $thumb_id ? ' has-image' : ( $word ? ' has-word' : '' ), $count, $carousel ? ' kk-slider__slide' : ''
+			'<li class="kk-term-card kk-tone-%4$d%5$s%7$s"><a href="%1$s"><span class="kk-term-card__media"%8$s>%2$s</span>%3$s%6$s</a></li>',
+			esc_url( get_term_link( $term ) ), $media, $name_html, $i % 3, $thumb_id ? ' has-image' : ( $word ? ' has-word' : '' ), $count, $carousel ? ' kk-slider__slide' : '',
+			// The picture carries the name as alt text (image search); the name is in the link text, so screen readers skip the picture.
+			$thumb_id ? ' aria-hidden="true"' : ''
 		);
 	}
 

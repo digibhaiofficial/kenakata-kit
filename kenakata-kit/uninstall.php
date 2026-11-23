@@ -39,6 +39,7 @@ foreach ( array( 'kk_settings', 'kk_license_key', 'kk_secrets', 'kk_courier_secr
 delete_metadata( 'user', 0, 'kk_wishlist', '', true );
 delete_metadata( 'user', 0, 'kk_update_later', '', true );
 delete_metadata( 'post', 0, '_kk_wl_count', '', true );
+delete_metadata( 'term', 0, '_kk_intro', '', true );
 $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}kk_incomplete" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 // Staff who had only the Store Manager role become Customers: they keep their account but lose shop access.
 $role = get_role( 'kk_store_manager' );

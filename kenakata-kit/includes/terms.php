@@ -158,6 +158,70 @@ add_shortcode( 'kk_categories', function ( $atts ) {
 	return kk_terms_render( shortcode_atts( kk_terms_defaults(), $atts, 'kk_categories' ) );
 } );
 
+/*
+ * Short intro for category / brand / tag pages: a few sentences the shop writes on the term's edit screen,
+ * shown above the products with [kk_term_intro] (the long description stays where the theme shows it).
+ * Nothing is shown while the field is empty.
+ */
+function kk_term_intro_taxonomies() {
+	$tax = array( 'product_cat', 'product_tag' );
+	if ( kk_brand_taxonomy() ) {
+		$tax[] = kk_brand_taxonomy();
+	}
+	return array_values( array_unique( (array) apply_filters( 'kk_term_intro_taxonomies', $tax ) ) );
+}
+
+function kk_term_intro_field( $value = '' ) {
+	wp_nonce_field( 'kk_term_intro', 'kk_term_intro_nonce' );
+	echo '<textarea name="kk_term_intro" id="kk_term_intro" rows="4" cols="50" class="large-text">' . esc_textarea( $value ) . '</textarea>';
+	echo '<p class="description">' . esc_html__( '2-3 sentences shown above the products with the [kk_term_intro] shortcode (for example in the Elementor product archive template). The long description stays below. Leave empty to show nothing.', 'kenakata-kit' ) . '</p>';
+}
+
+add_action( 'admin_init', function () {
+	foreach ( kk_term_intro_taxonomies() as $tax ) {
+		add_action( $tax . '_add_form_fields', function () {
+			echo '<div class="form-field term-kk-intro-wrap"><label for="kk_term_intro">' . esc_html__( 'Short intro (above products)', 'kenakata-kit' ) . '</label>';
+			kk_term_intro_field();
+			echo '</div>';
+		} );
+		add_action( $tax . '_edit_form_fields', function ( $term ) {
+			echo '<tr class="form-field term-kk-intro-wrap"><th scope="row"><label for="kk_term_intro">' . esc_html__( 'Short intro (above products)', 'kenakata-kit' ) . '</label></th><td>';
+			kk_term_intro_field( (string) get_term_meta( $term->term_id, '_kk_intro', true ) );
+			echo '</td></tr>';
+		} );
+		add_action( 'created_' . $tax, 'kk_term_intro_save' );
+		add_action( 'edited_' . $tax, 'kk_term_intro_save' );
+	}
+} );
+
+function kk_term_intro_save( $term_id ) {
+	if ( ! isset( $_POST['kk_term_intro'], $_POST['kk_term_intro_nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['kk_term_intro_nonce'] ) ), 'kk_term_intro' ) || ! current_user_can( 'edit_term', $term_id ) ) {
+		return;
+	}
+	$text = trim( wp_kses_post( wp_unslash( $_POST['kk_term_intro'] ) ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- wp_kses_post
+	if ( '' === $text ) {
+		delete_term_meta( $term_id, '_kk_intro' );
+	} else {
+		update_term_meta( $term_id, '_kk_intro', mb_substr( $text, 0, 3000 ) );
+	}
+}
+
+/** [kk_term_intro] — the short intro of the category / brand page being viewed, or of term="slug or id" (taxonomy="…"). */
+add_shortcode( 'kk_term_intro', function ( $atts ) {
+	$a    = shortcode_atts( array( 'term' => '', 'taxonomy' => 'product_cat' ), $atts, 'kk_term_intro' );
+	$term = null;
+	if ( '' !== $a['term'] ) {
+		$term = ctype_digit( (string) $a['term'] ) ? get_term( absint( $a['term'] ) ) : get_term_by( 'slug', sanitize_title( $a['term'] ), sanitize_key( $a['taxonomy'] ) );
+	} elseif ( is_tax() || is_category() || is_tag() ) {
+		$term = get_queried_object();
+	}
+	if ( ! $term instanceof WP_Term ) {
+		return '';
+	}
+	$text = (string) get_term_meta( $term->term_id, '_kk_intro', true );
+	return '' === trim( $text ) ? '' : '<div class="kk-term-intro">' . wpautop( wp_kses_post( $text ) ) . '</div>';
+} );
+
 add_action( 'wp_head', function () {
 	if ( ! is_tax() ) {
 		return;

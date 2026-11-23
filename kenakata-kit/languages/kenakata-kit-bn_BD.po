@@ -9211,3 +9211,11 @@ msgstr "Kenakata Kit: এই আপডেটে কোনো স্বাক্�
 #: 3.26
 msgid "Kenakata Kit: the update file does not match its signature, so it was not installed (the shop keeps running). Please tell DigiBhai."
 msgstr "Kenakata Kit: আপডেট ফাইলটি তার স্বাক্ষরের সাথে মেলে না, তাই ইনস্টল করা হয়নি (দোকান চলছে)। দয়া করে DigiBhai-কে জানান।"
+
+#: includes/terms.php
+msgid "Short intro (above products)"
+msgstr "ছোট ভূমিকা (প্রোডাক্টের উপরে)"
+
+#: includes/terms.php
+msgid "2-3 sentences shown above the products with the [kk_term_intro] shortcode (for example in the Elementor product archive template). The long description stays below. Leave empty to show nothing."
+msgstr "প্রোডাক্টের উপরে [kk_term_intro] শর্টকোড দিয়ে দেখানো ২–৩ বাক্য (যেমন Elementor-এর প্রোডাক্ট আর্কাইভ টেমপ্লেটে)। লম্বা বিবরণ নিচেই থাকে। কিছু দেখাতে না চাইলে খালি রাখুন।"

@@ -3,7 +3,8 @@
 You are continuing development of **Kenakata Kit**, a WordPress/WooCommerce plugin for Bangladeshi online shops,
 written by DigiBhai.com. **Language: always talk to and report to the owner in simple Bengali (বাংলা) — every reply, every
 report, every question.** Keep code, comments and UI source strings in English.
-Read `HANDOFF.md` (in the private repo `kenakata-license-panel`) for the current status, the roadmap and open decisions.
+Read `docs/STATUS.md` first (current status, where everything lives, open items, roadmap, owner decisions).
+Business notes (customers, prices) are in `HANDOFF.md` of the private repo `kenakata-license-panel`.
 
 ## Folder layout
 ```
@@ -20,6 +21,8 @@ kenakata-kit/                 ← this project folder (open it in Claude Code)
 ├─ .github/workflows/         ← check.yml (lint on every push), release.yml (tag vX.Y.Z → zip → GitHub release)
 ├─ revoked.json               ← IDs of cancelled license keys (sites read it daily)
 ├─ license-panel/index.html   ← owner's key panel, served by GitHub Pages (panel.yml); holds no secret
+├─ docs/                      ← STATUS.md (project status), OWNER-GUIDE-bn.md (owner's PC guide), PUSH-TO-GITHUB.bat
+├─ AGENTS.md                  ← pointer for other AI agents
 ├─ dev/                       ← development tools (never shipped)
 │  ├─ lint.js                 syntax check of all PHP (php-parser) + JS (node --check)
 │  ├─ calls.js                lists external functions/methods used by given PHP files (to verify they exist)
@@ -94,8 +97,10 @@ the sites. Never hand the owner a zip to upload. One click for the owner per ver
 2. Commit, then tag: `git tag vX.Y.Z` (must equal KK_VERSION), then `git bundle create kenakata-kit.bundle main --tags`.
    Before bundling, merge GitHub-only commits: `git fetch https://github.com/digibhaiofficial/kenakata-kit main` and
    merge FETCH_HEAD if it is not already in main (the repo is public, fetch works here).
-3. Copy it to the owner's PC: `D:\kenakata-kit\github-push\kenakata-kit.bundle` (device_commit_files, overwrite).
-4. Owner double-clicks `D:\kenakata-kit\github-push\push-to-github.bat` → pushes main + tags → release.yml builds,
+3. Copy it to the owner's PC: `D:\kenakata-kit\inbox\kenakata-kit.bundle` (device_commit_files, overwrite).
+   (An agent working directly in `D:\kenakata-kit\kenakata-kit` on the PC skips the bundle: it commits and tags there.)
+4. Owner double-clicks `D:\kenakata-kit\PUSH-TO-GITHUB.bat` (copy of `docs/PUSH-TO-GITHUB.bat`): takes the inbox
+   bundle, commits any local changes, pulls GitHub, pushes main + tags (both repos) → release.yml builds,
    signs and publishes the release (~30 s). Check https://github.com/digibhaiofficial/kenakata-kit/actions (public).
 5. Sites check for updates every 6 h; Dashboard → Updates → "Check again" checks at once. Then update the plugin there
    and test the live site.
@@ -104,3 +109,10 @@ the sites. Never hand the owner a zip to upload. One click for the owner per ver
 purpleflorabd.com (Hello theme + Elementor Pro + WooCommerce + LiteSpeed Cache). It is a demo shop, not a live
 business, but treat its data carefully: never delete content, never place real orders, back up before changing
 Elementor documents. Access details are in the private repo, never in this one.
+
+## Owner's standing instructions (the owner should never have to repeat these)
+- Talk in simple Bengali. Do the work end to end; don't ask him to approve wording or technical choices.
+- Releases: one click for the owner (PUSH-TO-GITHUB.bat) with a TAGGED commit; never a zip to upload.
+- No site-specific code in the plugin; a site's need becomes a generic kit feature with a setting (off by default).
+- Every external link put on a page or in the guide must be opened and confirmed first (never a URL from memory).
+- Never print, paste or commit secrets (signing keys, Application Passwords, license vault password).

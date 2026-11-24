@@ -15,7 +15,8 @@ kenakata-kit/                    the plugin (this folder is what goes into the z
 │  └─ data/bd-thanas.php         districts and thanas (English + Bengali)
 ├─ assets/                       name.css / name.js (readable) + name.min.* (made by dev/minify.sh; served by default).
 │                                kenakata-kit.css = core; -checkout/-account/-order/-product = per page type;
-│                                -wishlist/-search/-popup/-bbar/-sticky/-readmore = only when that feature is on
+│                                -wishlist/-search/-popup/-bbar/-sticky/-readmore = only when that feature is on;
+│                                -carousel/-terms = only on pages that draw a slider / brand-category cards
 ├─ templates/                    WooCommerce template overrides used by the kit
 ├─ languages/                    kenakata-kit-bn_BD.po / .mo (built from dev/i18n)
 ├─ docs/index.html               the shop owner's Bengali user guide (opened from the Help tab)

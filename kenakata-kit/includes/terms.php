@@ -44,7 +44,13 @@ function kk_term_img_loading() {
 	return ( $n <= $eager && ! wp_doing_ajax() && ! ( defined( 'REST_REQUEST' ) && REST_REQUEST ) && ! is_admin() ) ? false : 'lazy';
 }
 
+/** Brand / category cards with their stylesheet (3.30: loaded only where cards are shown). */
 function kk_terms_render( $a ) {
+	$html = kk_terms_render_html( $a );
+	return '' === $html ? '' : kk_need_css( 'terms' ) . $html;
+}
+
+function kk_terms_render_html( $a ) {
 	$a = wp_parse_args( $a, kk_terms_defaults() );
 	if ( 'product_brand' === $a['taxonomy'] && ! taxonomy_exists( 'product_brand' ) && kk_brand_taxonomy() ) {
 		$a['taxonomy'] = kk_brand_taxonomy();

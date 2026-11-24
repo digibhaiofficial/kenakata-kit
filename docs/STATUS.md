@@ -1,6 +1,6 @@
 # Kenakata Kit — project status (read this first)
 
-Last updated: 25 Nov 2026 · current version **3.29.0** (faster styles, a plain-permalink fix, browser tests; see `kenakata-kit/readme.txt`).
+Last updated: 25 Nov 2026 · current version **3.30.0** (smaller styles, see `kenakata-kit/readme.txt`).
 Owner: DigiBhai.com (talks Bengali; is not a programmer). Kenakata Kit is a stand-alone product sold to any
 Bangladeshi WooCommerce shop; it belongs to no particular website. Docs index: `README.md` in this folder.
 
@@ -37,9 +37,9 @@ every version: `kenakata-kit/readme.txt`.
 
 ## 3. How work is done
 - Code rules, tests and the release steps: `../CLAUDE.md` (also valid for other AI agents; `../AGENTS.md` points there).
-- Tests (all pass on 3.29.0, 25 Nov 2026): `node dev/lint.js` → 0 errors ·
+- Tests (all pass on 3.30.0, 25 Nov 2026): `node dev/lint.js` → 0 errors ·
   `dev/ci/smoke.sh` on real WordPress + WooCommerce (SQLite), including the shop browser test `dev/e2e-shop.js` and a
-  size budget → 215 passed, 0 failed · `node dev/e2e-dashboard.js` → 70 passed, 0 failed. GitHub runs lint + smoke on PHP 7.4 and 8.3 on every push.
+  size budget → 220 passed, 0 failed · `node dev/e2e-dashboard.js` → 70 passed, 0 failed. GitHub runs lint + smoke on PHP 7.4 and 8.3 on every push.
 - Release = commit + tag → push (by the AI directly when the Claude GitHub App is installed, otherwise the owner
   double-clicks `D:\kenakata-kit\PUSH-TO-GITHUB.bat`) → GitHub builds and signs the zip → shops see "Update
   available" (checked every 6 h, or License → "Check for updates now" (or Dashboard → Updates → Check again)). Details: `RELEASE-AND-UPDATES.md`.
@@ -60,16 +60,15 @@ with real data. Treat any shop's data carefully: never delete content, never pla
 - District → thana: separate switch, off by default.
 
 ## 6. Known open items (not bugs — all tests pass)
-Done in 3.29: main stylesheet 61 → 44 KB (feature styles load only when switched on); browser tests for cards,
+Done in 3.29–3.30: main stylesheet 61 → 37 KB (feature styles only when switched on, slider and brand/category
+card styles only where shown; screenshots identical to before); browser tests for cards,
 wishlist, side cart, search, login popup, Q&A, reviews and phone layout; size budget in the tests; Bengali checked
 (2,311 texts, none missing); "could not be reactivated" explained in the Updates box; plain-permalink address fix.
 Still open (small improvements, no new features):
-1. The main stylesheet (44 KB) is still above the old 15 KB goal: what is left is product cards, lists, carousels,
-   brand/category cards, Buy Now, WhatsApp/delivery, side cart, variation buttons — used by most shop pages. Further
-   splitting (per page type) is possible but needs care with Elementor templates.
+1. The main stylesheet (37 KB) is still above the old 15 KB goal: what is left is product cards, product lists,
+   Buy Now, WhatsApp/delivery, side cart and variation buttons — on almost every shop page.
 2. Browser tests do not yet cover Elementor widgets inside the Elementor editor.
-3. Speed & health could warn about many failed WooCommerce scheduled actions and offer a one-click clean-up.
-4. Store dashboard cannot yet create orders, refunds or coupons (counts as a new feature: discuss first).
+3. Store dashboard cannot yet create orders, refunds or coupons (counts as a new feature: discuss first).
 
 ## 7. Roadmap (not started — discuss with the owner before building)
 - Marketing: Meta Pixel + Conversions API, GA4, GTM, TikTok; one light product feed for Google and Facebook

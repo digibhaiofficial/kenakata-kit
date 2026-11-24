@@ -89,6 +89,18 @@ function check(name, ok, info) { if (ok) { pass++; console.log('  ✓ ' + name);
     await shot('desktop-wishlist-page');
   }
 
+  const CAR = process.env.KK_CAROUSEL_PAGE, BRP = process.env.KK_TERMS_PAGE;
+  if (CAR) {
+    await go(`${BASE}/?page_id=${CAR}`);
+    await shot('desktop-carousel');
+    check('carousel is laid out as a slider (its own styles loaded)', await ev("const t = document.querySelector('.kk-slider__track'); if (!t) return false; const cs = getComputedStyle(t); return (cs.display === 'grid' || cs.display === 'flex') && /auto|scroll|hidden/.test(cs.overflowX);"));
+  }
+  if (BRP) {
+    await go(`${BASE}/?page_id=${BRP}`);
+    await shot('desktop-categories');
+    check('category cards are styled (their own styles loaded)', await ev("const t = document.querySelector('.kk-terms'); const m = document.querySelector('.kk-term-card__media'); return !!t && !!m && getComputedStyle(t).listStyleType === 'none' && parseFloat(getComputedStyle(m).borderTopLeftRadius) > 0;"));
+  }
+
   console.log('Product page (Q&A, reviews)');
   await go(`${BASE}/?p=${PID}`);
   await shot('desktop-product');

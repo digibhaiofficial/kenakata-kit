@@ -4,7 +4,7 @@ Plugin URI: https://digibhai.com/
 Requires at least: 6.3
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 3.29.0
+Stable tag: 3.30.0
 License: GPLv2 or later
 
 Everything a Bangladeshi WooCommerce store usually needs. Settings: left admin menu → Kenakata Kit.
@@ -30,6 +30,11 @@ Products Grid, Products Carousel, Brands, Categories, Buy Now Button, Live Searc
 Older [ss_…] shortcodes keep working. Options: see the guide or Kenakata Kit → Shortcodes.
 
 == Changelog ==
+= 3.30.0 =
+* Faster pages: the main shop stylesheet is smaller again (44 KB → 37 KB minified; 61 KB in 3.28). Slider (carousel) styles load only on pages with a carousel, brand / category card styles only where those cards are shown; in the Elementor editor everything is loaded. Checked with screenshots: shop, product, carousel and category pages look exactly as before, on computer and phone.
+* "Recently viewed" shown as a carousel gets its slider styles even though its products arrive after the page.
+* Tests: the browser test also opens a carousel page and a category-cards page.
+
 = 3.29.0 =
 * Faster pages: the main shop stylesheet is about 30% smaller (61 KB → 44 KB, minified). The styles of the wishlist, live search, login popup, bottom bar, sticky Buy Now bar and "Read more" now load only when that feature is switched on (the sticky bar only on product pages). Nothing changes in how the shop looks.
 * Fix: with WordPress's plain web addresses (Settings → Permalinks → Plain) the wishlist page stayed empty and "Recently viewed" showed nothing; the store dashboard's and order screen's courier check could not refresh. The request address had two "?" in it.

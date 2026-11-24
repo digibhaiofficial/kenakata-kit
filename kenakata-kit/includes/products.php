@@ -193,7 +193,8 @@ function kk_render_products( array $a ) {
 		} else {
 			kk_need_js( true );
 			$q = base64_encode( wp_json_encode( $a ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- transport only, signed below
-			return '<div class="kk-products-wrap kk-recent" data-kk-recent="' . esc_attr( $q ) . '" data-kk-sig="' . esc_attr( kk_sign( $q ) ) . '" data-kk-exclude="' . esc_attr( is_singular( 'product' ) ? get_the_ID() : 0 ) . '" hidden></div>';
+			// The list itself arrives later by REST, where no stylesheet can be added: ask for the slider style now.
+			return ( 'carousel' === $a['layout'] ? kk_need_css( 'carousel' ) : '' ) . '<div class="kk-products-wrap kk-recent" data-kk-recent="' . esc_attr( $q ) . '" data-kk-sig="' . esc_attr( kk_sign( $q ) ) . '" data-kk-exclude="' . esc_attr( is_singular( 'product' ) ? get_the_ID() : 0 ) . '" hidden></div>';
 		}
 	}
 
@@ -365,7 +366,7 @@ function kk_slider_open( array $a, $class, $style = '' ) {
 	$auto  = '' === (string) $a['autoplay'] ? ( kk_opt( 'cards_autoplay' ) ? 1 : 0 ) : ( 'yes' === $a['autoplay'] ? 1 : 0 );
 	$speed = '' === (string) $a['speed'] ? max( 2, absint( kk_opt( 'cards_autoplay_speed' ) ) ) * 1000 : max( 1500, absint( $a['speed'] ) );
 	$loop  = '' === (string) $a['loop'] ? ( kk_opt( 'cards_loop' ) ? 1 : 0 ) : ( 'yes' === $a['loop'] ? 1 : 0 );
-	return '<div class="kk-slider ' . esc_attr( $class ) . '" role="region" aria-roledescription="carousel" aria-label="' . esc_attr( isset( $a['label'] ) && $a['label'] ? $a['label'] : __( 'Carousel', 'kenakata-kit' ) ) . '"'
+	return kk_need_css( 'carousel' ) . '<div class="kk-slider ' . esc_attr( $class ) . '" role="region" aria-roledescription="carousel" aria-label="' . esc_attr( isset( $a['label'] ) && $a['label'] ? $a['label'] : __( 'Carousel', 'kenakata-kit' ) ) . '"'
 		. ' data-autoplay="' . esc_attr( $auto ) . '" data-speed="' . esc_attr( $speed ) . '" data-loop="' . esc_attr( $loop ) . '"'
 		. ( $style ? ' style="' . esc_attr( $style ) . '"' : '' ) . '>';
 }

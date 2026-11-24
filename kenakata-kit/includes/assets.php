@@ -115,7 +115,8 @@ function kk_feature_css_parts( $all = false ) {
 }
 
 /**
- * Styles that only some pages need (3.13): 'checkout', 'account', 'order' (thank-you + tracking), 'product' (Q&A + reviews).
+ * Styles that only some pages need (3.13): 'checkout', 'account', 'order' (thank-you + tracking), 'product' (Q&A + reviews);
+ * since 3.30 also 'carousel' (any slider) and 'terms' (brand / category cards), asked for by their renderers.
  * Pages known in advance get the file in <head>. A shortcode or widget shown somewhere else calls this while it is
  * being drawn and puts the returned <link> in front of its own HTML, so the style is there before the content
  * (no flash of unstyled content, and it also works inside cached Elementor widgets and the Elementor editor).
@@ -125,7 +126,7 @@ function kk_feature_css_parts( $all = false ) {
  */
 function kk_need_css( $part ) {
 	static $sent = array();
-	$parts = array( 'checkout', 'account', 'order', 'product' );
+	$parts = array_merge( array( 'checkout', 'account', 'order', 'product', 'carousel', 'terms' ), array_keys( kk_feature_css_parts( true ) ) );
 	if ( ! in_array( $part, $parts, true ) || isset( $sent[ $part ] ) ) {
 		return '';
 	}
@@ -174,6 +175,12 @@ add_action( 'wp_enqueue_scripts', function () {
 	if ( function_exists( 'is_product' ) && is_product() ) {
 		kk_need_css( 'product' );
 	}
+	// Elementor editor / preview: widgets are drawn and re-drawn by AJAX, so every component style is there from the start.
+	if ( function_exists( 'kk_is_editor' ) && kk_is_editor() ) {
+		foreach ( array( 'carousel', 'terms', 'product' ) as $part ) {
+			kk_need_css( $part );
+		}
+	}
 	// Styles of features that are switched off are not loaded at all (3.29). Each of these features prints nothing
 	// while its switch is off, so its styles are needed only when it is on.
 	foreach ( kk_feature_css_parts() as $part => $on ) {
@@ -184,7 +191,10 @@ add_action( 'wp_enqueue_scripts', function () {
 	if ( is_singular() ) {
 		$post = get_post();
 		$text = $post ? (string) $post->post_content : '';
-		foreach ( array( 'kk_my_account' => 'account', 'kk_order_tracking' => 'order', 'ss_order_tracking' => 'order', 'kk_thank_you' => 'order', 'ss_thank_you' => 'order', 'woocommerce_checkout' => 'checkout', 'woocommerce_cart' => 'checkout' ) as $code => $part ) {
+		if ( false !== strpos( $text, 'layout="carousel' ) || false !== strpos( $text, "layout='carousel" ) ) {
+			kk_need_css( 'carousel' );
+		}
+		foreach ( array( 'kk_brands' => 'terms', 'kk_categories' => 'terms', 'kk_terms' => 'terms', 'ss_terms' => 'terms', 'kk_my_account' => 'account', 'kk_order_tracking' => 'order', 'ss_order_tracking' => 'order', 'kk_thank_you' => 'order', 'ss_thank_you' => 'order', 'woocommerce_checkout' => 'checkout', 'woocommerce_cart' => 'checkout' ) as $code => $part ) {
 			if ( false !== strpos( $text, '[' . $code ) ) {
 				kk_need_css( $part );
 			}
@@ -193,7 +203,7 @@ add_action( 'wp_enqueue_scripts', function () {
 	// "Strong styles" come last, as before 3.13 (after the page-only styles too).
 	if ( kk_opt( 'compat_strong' ) ) {
 		$deps = array( 'kenakata-kit' );
-		foreach ( array_merge( array( 'checkout', 'account', 'order', 'product' ), array_keys( kk_feature_css_parts( true ) ) ) as $part ) {
+		foreach ( array_merge( array( 'checkout', 'account', 'order', 'product', 'carousel', 'terms' ), array_keys( kk_feature_css_parts( true ) ) ) as $part ) {
 			if ( wp_style_is( 'kenakata-kit-' . $part, 'enqueued' ) ) {
 				$deps[] = 'kenakata-kit-' . $part;
 			}

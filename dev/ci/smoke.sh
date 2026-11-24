@@ -272,7 +272,12 @@ B_OFF=$(kkbytes /tmp/home_off); B_ON=$(kkbytes /tmp/home_on)
 echo "    home page plugin CSS+JS: $B_OFF bytes (features off), $B_ON bytes (all on)"
 check "speed budget: home page with default features <= 70 KB of plugin CSS+JS" '[ "$B_OFF" -gt 0 ] && [ "$B_OFF" -le 71680 ]'
 check "speed budget: home page with every feature on <= 110 KB of plugin CSS+JS" '[ "$B_ON" -le 112640 ]'
-check "speed budget: core stylesheet <= 48 KB minified" '[ "$(wc -c < "$WP/wp-content/plugins/kenakata-kit/assets/kenakata-kit.min.css")" -le 49152 ]'
+check "speed budget: core stylesheet <= 40 KB minified" '[ "$(wc -c < "$WP/wp-content/plugins/kenakata-kit/assets/kenakata-kit.min.css")" -le 40960 ]'
+CARP=$(wpc post create --post_type=page --post_status=publish --post_title="Carousel test" --post_content='[kk_products source="latest" limit="6" layout="carousel"]' --porcelain)
+BRP=$(wpc post create --post_type=page --post_status=publish --post_title="Categories test" --post_content='[kk_categories hide_empty="no"]' --porcelain)
+check "3.30: slider styles only where a carousel is shown" '! grep -q "kenakata-kit-carousel-css" /tmp/home_off && curl -sL "$URL/?page_id=$CARP" | grep -q "kenakata-kit-carousel-css"'
+check "3.30: brand/category card styles only where cards are shown" '! grep -q "kenakata-kit-terms-css" /tmp/home_off && curl -sL "$URL/?page_id=$BRP" | grep -q "kenakata-kit-terms-css"'
+check "3.30: carousel page draws the slider" 'curl -sL "$URL/?page_id=$CARP" | grep -q "kk-slider__track"'
 LMS=$(for i in 1 2 3; do curl -s -o /dev/null -w "%{time_total}\n" "$URL/"; done | sort -n | head -1)
 echo "    home page time (fastest of 3): ${LMS}s"
 wpc eval '$s = (array) get_option( "kk_settings", array() ); foreach ( json_decode( file_get_contents( "/tmp/kkfeat" ), true ) ?: array() as $k => $v ) { $s[ $k ] = $v; } kk_update_settings( $s );' >/dev/null
@@ -556,7 +561,7 @@ kkset '{"card_enable":1,"cart_drawer_enable":1,"cart_drawer_auto_open":1,"wl_ena
 UIP=$(wpc post create --post_type=page --post_status=publish --post_title="Shop UI" --post_content='[kk_live_search mode="bar"] [kk_account_link] [kk_wishlist_link] [kk_cart_icon] [kk_products source="latest" limit="4" columns="4"]' --porcelain)
 WLP=$(wpc post create --post_type=page --post_status=publish --post_title="Saved" --post_content='[kk_wishlist]' --porcelain)
 if command -v node >/dev/null 2>&1; then
-	node "$(dirname "$0")/../e2e-shop.js" "$URL" "$UIP" "$WLP" "$PID" /tmp/kk-shop-e2e > /tmp/e2e-shop.log 2>&1
+	KK_CAROUSEL_PAGE="$CARP" KK_TERMS_PAGE="$BRP" node "$(dirname "$0")/../e2e-shop.js" "$URL" "$UIP" "$WLP" "$PID" /tmp/kk-shop-e2e > /tmp/e2e-shop.log 2>&1
 	sed 's/^/  /' /tmp/e2e-shop.log | grep -v "passed, " 
 	EP=$(grep -c "✓" /tmp/e2e-shop.log); EF=$(grep -c "✗" /tmp/e2e-shop.log)
 	PASSES=$((PASSES+EP)); FAILS=$((FAILS+EF))

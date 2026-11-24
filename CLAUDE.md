@@ -87,7 +87,7 @@ Without MySQL / wordpress.org it also runs on SQLite:
 `LOCAL_WP=<WordPress git checkout> LOCAL_WC_ZIP=<woocommerce.zip> LOCAL_SQLITE=<sqlite-database-integration/packages/plugin-sqlite-database-integration> bash dev/ci/smoke.sh`
 (WordPress: `git clone --depth 1 --branch <ver> https://github.com/WordPress/WordPress`; WooCommerce zip from its GitHub releases).
 The owner's Windows PC has no PHP: there PHP is checked by syntax lint + careful review + the live test site.
-After the release, update the plugin on the live site from Dashboard → Updates and test there with real data.
+After the release, update the plugin on the test shop from Dashboard → Updates and test there with real data.
 
 ## Release (how code reaches GitHub — this cloud session cannot push itself)
 Shops update ONLY from a tagged, signed GitHub release (Dashboard → Updates). Pushing main alone changes nothing on
@@ -105,10 +105,10 @@ the sites. Never hand the owner a zip to upload. One click for the owner per ver
 5. Sites check for updates every 6 h; Dashboard → Updates → "Check again" checks at once. Then update the plugin there
    and test the live site.
 
-## Live site used for testing
-purpleflorabd.com (Hello theme + Elementor Pro + WooCommerce + LiteSpeed Cache). It is a demo shop, not a live
-business, but treat its data carefully: never delete content, never place real orders, back up before changing
-Elementor documents. Access details are in the private repo, never in this one.
+## Testing on a real shop
+After the release, update the plugin on a test shop the owner names and check it with real data. Never delete
+content, never place real orders, back up before changing Elementor documents. Access details are kept by the
+owner, never in a repo. Kenakata Kit is a stand-alone product: no code or docs specific to any one shop.
 
 ## Owner's standing instructions (the owner should never have to repeat these)
 - Talk in simple Bengali. Do the work end to end; don't ask him to approve wording or technical choices.

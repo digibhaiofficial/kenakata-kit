@@ -616,7 +616,7 @@ module.exports = [
 [`লগইন ট্যাবের লেখা`, `Login tab text`],
 [`রেজিস্ট্রেশন ট্যাবের লেখা`, `Registration tab text`],
 [`WhatsApp নম্বর`, `WhatsApp number`],
-[`যেমন 01811263223। সাইটের সব WhatsApp বাটন এই নম্বর ব্যবহার করবে।`, `For example 01811263223. Every WhatsApp button on the site uses this number.`],
+[`যেমন 01XXXXXXXXX। সাইটের সব WhatsApp বাটন এই নম্বর ব্যবহার করবে।`, `For example 01XXXXXXXXX. Every WhatsApp button on the site uses this number.`],
 [`কল করার নম্বর`, `Call number`],
 [`খালি রাখলে WhatsApp নম্বরই ব্যবহার হবে।`, `Leave empty to use the WhatsApp number.`],
 [`ভাসমান বাটন (সব পেজে কোণে দেখাবে)`, `Floating buttons (in the corner of every page)`],

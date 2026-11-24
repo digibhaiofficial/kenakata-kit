@@ -4,7 +4,7 @@ Plugin URI: https://digibhai.com/
 Requires at least: 6.3
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 3.28.0
+Stable tag: 3.28.1
 License: GPLv2 or later
 
 Everything a Bangladeshi WooCommerce store usually needs. Settings: left admin menu → Kenakata Kit.
@@ -30,6 +30,10 @@ Products Grid, Products Carousel, Brands, Categories, Buy Now Button, Live Searc
 Older [ss_…] shortcodes keep working. Options: see the guide or Kenakata Kit → Shortcodes.
 
 == Changelog ==
+= 3.28.1 =
+* The WhatsApp number setting showed a real phone number as its example; it now shows 01XXXXXXXXX (English and Bengali).
+* New developer and owner documentation in the repository (docs/): status, features, settings reference, architecture, development, releases and updates, license system, troubleshooting.
+
 = 3.28.0 =
 * New tab "SEO & Google" (all off until switched on):
 * Delivery and returns for Google: the delivery charge and time (inside Dhaka / rest of the country, or taken from WooCommerce shipping) and the return policy are added to the product data of Rank Math or WooCommerce, the fields Search Console asks for under Merchant listings. Categories that cannot be returned (e.g. medicine) can be marked. Fields already in the data are never changed.

@@ -291,7 +291,7 @@ function kk_fields() {
 		'popup_register_tab'   => kk_f( 'account', 'text', __( 'Registration tab text', 'kenakata-kit' ), '', array( 'show_if' => 'popup_register' ) ),
 
 		/* ---------------- WhatsApp & call ---------------- */
-		'wa_number'            => kk_f( 'whatsapp', 'text', __( 'WhatsApp number', 'kenakata-kit' ), __( 'For example 01811263223. Every WhatsApp button on the site uses this number.', 'kenakata-kit' ), array( 'placeholder' => '01XXXXXXXXX' ) ),
+		'wa_number'            => kk_f( 'whatsapp', 'text', __( 'WhatsApp number', 'kenakata-kit' ), __( 'For example 01XXXXXXXXX. Every WhatsApp button on the site uses this number.', 'kenakata-kit' ), array( 'placeholder' => '01XXXXXXXXX' ) ),
 		'call_number'          => kk_f( 'whatsapp', 'text', __( 'Call number', 'kenakata-kit' ), __( 'Leave empty to use the WhatsApp number.', 'kenakata-kit' ), array( 'placeholder' => '01XXXXXXXXX' ) ),
 		'h_wa_float'           => kk_f( 'whatsapp', 'heading', __( 'Floating buttons (in the corner of every page)', 'kenakata-kit' ) ),
 		'wa_float_enable'      => kk_f( 'whatsapp', 'toggle', __( 'Floating WhatsApp button', 'kenakata-kit' ) ),

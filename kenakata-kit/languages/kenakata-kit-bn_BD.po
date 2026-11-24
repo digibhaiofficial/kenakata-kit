@@ -1970,8 +1970,8 @@ msgstr "যেমন \"১২৪ products\"।"
 
 #: includes/settings-schema.php:220
 msgid ""
-"For example 01811263223. Every WhatsApp button on the site uses this number."
-msgstr "যেমন 01811263223। সাইটের সব WhatsApp বাটন এই নম্বর ব্যবহার করবে।"
+"For example 01XXXXXXXXX. Every WhatsApp button on the site uses this number."
+msgstr "যেমন 01XXXXXXXXX। সাইটের সব WhatsApp বাটন এই নম্বর ব্যবহার করবে।"
 
 #: includes/settings-schema.php:138
 msgid "For example: Buy Now / Order now"

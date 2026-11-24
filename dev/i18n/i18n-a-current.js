@@ -471,7 +471,7 @@ module.exports = [
 [`WooCommerce সেটিং অনুযায়ী`, `Follow WooCommerce setting`],
 [`ফন্ট`, `Font`],
 [`যেমন "১২৪ products"।`, `For example "124 products".`],
-[`যেমন 01811263223। সাইটের সব WhatsApp বাটন এই নম্বর ব্যবহার করবে।`, `For example 01811263223. Every WhatsApp button on the site uses this number.`],
+[`যেমন 01XXXXXXXXX। সাইটের সব WhatsApp বাটন এই নম্বর ব্যবহার করবে।`, `For example 01XXXXXXXXX. Every WhatsApp button on the site uses this number.`],
 [`যেমন: Buy Now / অর্ডার করুন / এখনই কিনুন`, `For example: Buy Now / Order now`],
 [`যেমন: আরও পড়ুন`, `For example: আরও পড়ুন`],
 [`যেমন: কম দেখুন`, `For example: কম দেখুন`],

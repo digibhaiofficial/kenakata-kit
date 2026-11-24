@@ -1,7 +1,8 @@
 # Kenakata Kit — project status (read this first)
 
-Last updated: 25 Nov 2026 · current version **3.28.0** (released, signed, installed on rupshii.com).
-Owner: DigiBhai.com (talks Bengali; is not a programmer). Read `../CLAUDE.md` for the rules of the code.
+Last updated: 25 Nov 2026 · current version **3.28.1** (3.28.0 is the last release installed on shops; 3.28.1 only replaces an example phone number in a help text).
+Owner: DigiBhai.com (talks Bengali; is not a programmer). Kenakata Kit is a stand-alone product sold to any
+Bangladeshi WooCommerce shop; it belongs to no particular website. Docs index: `README.md` in this folder.
 
 ## 1. What this is
 A WordPress + WooCommerce plugin for Bangladeshi online shops: "everything for selling and orders" in one
@@ -32,23 +33,22 @@ every version: `kenakata-kit/readme.txt`.
 | Signing key for licenses (encrypted), customer ledger, business handoff | private repo `digibhaiofficial/kenakata-license-panel` (`kk-vault.json`, `customers.json`, `HANDOFF.md`). PC: `D:\kenakata-kit\kenakata-license-panel\` |
 | Release-signing secret for GitHub Actions | GitHub repo secret (set by the owner). Copies on the PC in `D:\kenakata-kit\secrets\` — never commit, never print |
 | Owner guide for the PC folder | `D:\kenakata-kit\00-START-HERE.md` (copy: `docs/OWNER-GUIDE-bn.md`) |
+| Marketing material (logos, icons, banners) | `D:\kenakata-kit\media\` on the owner's PC (not in git) |
 
 ## 3. How work is done
 - Code rules, tests and the release steps: `../CLAUDE.md` (also valid for other AI agents; `../AGENTS.md` points there).
-- Tests (all pass on 3.28.0, 25 Nov 2026): `node dev/lint.js` → 57 PHP + 12 JS files, 0 errors ·
+- Tests (all pass on 3.28.1, 25 Nov 2026): `node dev/lint.js` → 57 PHP + 12 JS files, 0 errors ·
   `dev/ci/smoke.sh` on real WordPress + WooCommerce (SQLite) → 191 passed, 0 failed ·
   `node dev/e2e-dashboard.js` → 70 passed, 0 failed. GitHub runs lint + smoke on PHP 7.4 and 8.3 on every push.
-- Release = commit + tag → push (owner double-clicks `D:\kenakata-kit\PUSH-TO-GITHUB.bat`) → GitHub builds and
-  signs the zip → shops see "Update available" (checked every 6 h, or Dashboard → Updates → Check again).
+- Release = commit + tag → push (by the AI directly when the Claude GitHub App is installed, otherwise the owner
+  double-clicks `D:\kenakata-kit\PUSH-TO-GITHUB.bat`) → GitHub builds and signs the zip → shops see "Update
+  available" (checked every 6 h, or License → "Check for updates now" (or Dashboard → Updates → Check again)). Details: `RELEASE-AND-UPDATES.md`.
 - Never give the owner a zip to upload; never put site-specific code in the plugin; new features start switched off.
 
-## 4. Live sites
-| Site | Use |
-|---|---|
-| rupshii.com | owner's real shop (pharmacy/skincare); runs 3.28.0; reachable by the "Rupshii Online Pharmacy WordPress" MCP connector |
-| skinseba.com | owner's second shop; "Skin Seba WordPress" MCP connector |
-| purpleflorabd.com | demo/test shop (Hello + Elementor Pro + LiteSpeed). Treat data carefully: never delete content or place real orders |
-Access: MCP connectors or WordPress Application Passwords kept by the owner — never in any repo or chat.
+## 4. Testing on a real shop
+After every release, update the plugin on a test shop the owner chooses (Dashboard → Updates) and check it there
+with real data. Treat any shop's data carefully: never delete content, never place real orders. Site access
+(Application Passwords, MCP connectors) is kept by the owner — never in a repo, a doc or a chat.
 
 ## 5. Owner decisions (keep)
 - Every feature has its own on/off switch; if a feature risks breaking a site or conflicting, leave it out.

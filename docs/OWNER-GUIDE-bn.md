@@ -1,73 +1,89 @@
 # Kenakata Kit — মালিকের গাইড (শুরু করুন এখান থেকে)
 
+Kenakata Kit একটা আলাদা পণ্য (প্লাগইন), যেকোনো বাংলাদেশি WooCommerce দোকানে চলে। কোনো নির্দিষ্ট ওয়েবসাইটের অংশ নয়।
 এই গাইড তাঁদের জন্য যাঁরা কোড জানেন না, কিন্তু কম্পিউটার আর ফাইল-ফোল্ডার ভালো বোঝেন।
-এর একটা কপি থাকে আপনার কম্পিউটারে `D:\kenakata-kit\00-START-HERE.md` নামে, আরেকটা GitHub-এ `docs/OWNER-GUIDE-bn.md`।
+কপি থাকে দুই জায়গায়: আপনার কম্পিউটারে `D:\kenakata-kit\00-START-HERE.md`, আর GitHub-এ `docs/OWNER-GUIDE-bn.md`।
 
 ## ১. ফোল্ডারে কী কোথায়
 
 ```
 D:\kenakata-kit\
-├─ 00-START-HERE.md          ← এই গাইড। যেকোনো AI-কে প্রথমে এটা পড়তে বলুন
-├─ CLAUDE.md                 ← AI-এর জন্য নির্দেশনা (এই ফোল্ডার খুললে AI নিজেই পড়ে)
-├─ PUSH-TO-GITHUB.bat        ← এক ক্লিকে সব পরিবর্তন GitHub-এ পাঠানো
-├─ kenakata-kit\             ← প্লাগইনের আসল কোড (GitHub-এর public রিপো, ভার্সন 3.28.0)
-│   ├─ kenakata-kit\         ← প্লাগইন নিজে (এটাই zip হয়ে সাইটে যায়)
-│   ├─ docs\STATUS.md        ← প্রজেক্টের পুরো অবস্থা: কী আছে, কী বাকি, সিদ্ধান্ত
-│   ├─ CLAUDE.md             ← কোড লেখার নিয়ম, টেস্ট, রিলিজের ধাপ
+├─ 00-START-HERE.md          ← এই গাইড। যেকোনো AI বা ডেভেলপারকে প্রথমে এটা পড়তে বলুন
+├─ CLAUDE.md                 ← AI-এর জন্য ছোট নির্দেশনা (ফোল্ডার খুললে AI নিজেই পড়ে)
+├─ PUSH-TO-GITHUB.bat        ← দরকার হলে এক ক্লিকে সব GitHub-এ পাঠানো
+├─ kenakata-kit\             ← প্লাগইনের আসল কোড (GitHub-এর public রিপো)
+│   ├─ kenakata-kit\         ← প্লাগইন নিজে (এটাই zip হয়ে দোকানে যায়)
+│   ├─ docs\                 ← সব ডকুমেন্ট (নিচের তালিকা দেখুন)
+│   ├─ CLAUDE.md, AGENTS.md  ← কোড লেখার নিয়ম, টেস্ট, রিলিজ (AI ও ডেভেলপারের জন্য)
 │   ├─ license-panel\        ← লাইসেন্স কী বানানোর প্যানেল (ওয়েবসাইট হিসেবে চলে)
-│   └─ dev\                  ← টেস্ট আর বানানোর টুল (সাইটে যায় না)
-├─ kenakata-license-panel\   ← প্রাইভেট রিপো: তালাবদ্ধ চাবি, কাস্টমারের খাতা, ব্যবসার হ্যান্ডঅফ
-├─ inbox\                    ← ক্লাউডের Claude যে "প্যাকেট" (.bundle) পাঠায়, সেটা এখানে আসে
-├─ releases\                 ← চূড়ান্ত zip (kenakata-kit-3.28.0.zip), শুধু রেফারেন্সের জন্য
-├─ secrets\                  ← গোপন ফাইল। কখনো কাউকে দেবেন না, GitHub-এ তুলবেন না, চ্যাটে পেস্ট করবেন না
-├─ media\                    ← লোগো আর ডিজাইনের ছবি
-├─ other-projects\           ← প্লাগইনের বাইরের কাজ (যেমন রূপসীর SEO-র নোট)
-└─ _to_delete\               ← পুরনো ভার্সন। দেখে নিশ্চিত হয়ে নিজে মুছে দিন
+│   └─ dev\                  ← টেস্ট আর বানানোর টুল (দোকানে যায় না)
+├─ kenakata-license-panel\   ← প্রাইভেট রিপো: তালাবদ্ধ চাবি, কাস্টমারের খাতা, ব্যবসার নোট
+├─ media\                    ← মার্কেটিং: 01-logo, 02-app-icons-and-favicon, 03-banners-and-posters,
+│                              04-brand-guide, 09-design-drafts
+├─ releases\                 ← সর্বশেষ zip, শুধু রেফারেন্সের জন্য (দোকানে আপলোড করবেন না)
+├─ inbox\                    ← ক্লাউডের AI "প্যাকেট" (.bundle) পাঠালে এখানে আসে
+├─ secrets\                  ← গোপন ফাইল। কাউকে দেবেন না, চ্যাটে পেস্ট করবেন না, GitHub-এ তুলবেন না
+└─ _to_delete\               ← পুরনো জিনিস। দেখে নিশ্চিত হয়ে নিজে মুছে দিন
 ```
 
-আসল কোডের মালিক GitHub। কম্পিউটারের `kenakata-kit\` আর `kenakata-license-panel\` ফোল্ডার দুটো তার কপি।
-কম্পিউটার নষ্ট হলেও GitHub থেকে সব ফিরে পাবেন। শুধু `secrets\` ফোল্ডারটা নিজে আলাদা করে ব্যাকআপ রাখুন
-(পেনড্রাইভ বা নিজের Google Drive)।
+**ডকুমেন্ট (`kenakata-kit\docs\`):**
+| ফাইল | কী আছে |
+|---|---|
+| `README.md` | সব ডকুমেন্টের তালিকা |
+| `STATUS.md` | প্রজেক্টের অবস্থা: কী হয়েছে, কী বাকি, আপনার সিদ্ধান্ত, পরের পরিকল্পনা |
+| `FEATURES.md` | প্লাগইনের প্রতিটি ফিচার: কী করে, Free না Pro, কোথায় চালু করতে হয় |
+| `SETTINGS-REFERENCE.md` | প্রতিটি সেটিং, শর্টকোড আর Elementor উইজেটের পূর্ণ তালিকা (কোড থেকে বানানো) |
+| `ARCHITECTURE.md` | ভেতরে কীভাবে কাজ করে (ডেভেলপারের জন্য) |
+| `DEVELOPMENT.md` | কীভাবে নতুন কিছু বানানো বা ঠিক করা হয়, টেস্ট |
+| `RELEASE-AND-UPDATES.md` | কোড থেকে দোকানের অটো-আপডেট পর্যন্ত পুরো পথ, আর আটকে গেলে কী করবেন |
+| `LICENSE-SYSTEM.md` | Free/Pro, লাইসেন্স কী, প্যানেল, কী বাতিল |
+| `TROUBLESHOOTING.md` | সাধারণ সমস্যা আর সমাধান |
 
-## ২. নতুন কম্পিউটারে একবারের সেটআপ
-1. **GitHub Desktop** ইনস্টল করুন (https://github.com/apps/desktop — Windows-এর বোতামটা চাপুন) আর আপনার GitHub অ্যাকাউন্টে লগইন করুন
-   (`digibhaiofficial`)। এর সাথে Git-ও চলে আসে।
-2. `D:\kenakata-kit` নামে একটা ফোল্ডার বানান।
-3. GitHub Desktop → File → Clone repository → `digibhaiofficial/kenakata-kit` → Local path: `D:\kenakata-kit\kenakata-kit`।
+আসল কোডের মালিক GitHub। কম্পিউটার নষ্ট হলেও সব GitHub থেকে ফেরত আসবে। শুধু `secrets\` আর `media\` ফোল্ডার নিজে
+আলাদা ব্যাকআপ রাখুন (পেনড্রাইভ বা নিজের Google Drive)।
+
+## ২. সবচেয়ে সহজ পদ্ধতি: AI নিজেই GitHub-এ পাঠাবে (একবারের সেটআপ)
+এটা করলে আপনাকে আর কোনো বাট ফাইলেও ক্লিক করতে হবে না।
+1. ব্রাউজারে **claude.ai/code** খুলুন, আপনার Claude অ্যাকাউন্টে লগইন করুন।
+2. GitHub যুক্ত করতে বললে অনুমতি দিন, আর **Claude GitHub App** ইনস্টল করার সময় `kenakata-kit` আর
+   `kenakata-license-panel` রিপো দুটো বেছে দিন।
+3. এরপর যেকোনো কাজ সেখানে লিখে দিন (বাংলায়), যেমন: *"kenakata-kit রিপোতে docs\STATUS.md পড়ো, তারপর <কাজ> করো,
+   সব টেস্ট চালাও, নতুন ভার্সন রিলিজ করো। আমার সাথে বাংলায় কথা বলো।"*
+4. AI কোড বদলাবে, টেস্ট চালাবে, ভার্সন নম্বর বাড়াবে আর নিজেই GitHub-এ পাঠাবে। GitHub ~৩০ সেকেন্ডে zip বানিয়ে
+   সই করে রিলিজ দেবে, আর সব দোকানে নিজে থেকে "Update available" আসবে।
+
+## ৩. বিকল্প পদ্ধতি: বাট ফাইলে এক ক্লিক
+AI-এর GitHub অনুমতি না থাকলে (অন্য AI, অন্য অ্যাকাউন্ট, বা এই কম্পিউটারে চলা AI):
+- AI কাজ শেষে হয় এই ফোল্ডারেই কোড সেভ করবে, নয়তো `inbox\`-এ একটা প্যাকেট রেখে দেবে।
+- আপনি **`PUSH-TO-GITHUB.bat`-এ ডাবল-ক্লিক** করবেন। এটা নিজে নিজে:
+  1. ফোল্ডারে কেউ কিছু বদলে থাকলে সেটা সেভ (commit) করে;
+  2. `inbox\`-এ প্যাকেট থাকলে সেটা কোডে মিলিয়ে নেয়;
+  3. GitHub-এ নতুন কিছু থাকলে সেটা নিয়ে আসে;
+  4. সব GitHub-এ পাঠায় (দুই রিপোই)।
+- "DONE" দেখালে AI-কে লিখুন **"হয়েছে"**।
+
+যেকোনো নতুন AI বা ডেভেলপারকে শুধু বলুন: *"D:\kenakata-kit\00-START-HERE.md আর kenakata-kit\docs\STATUS.md পড়ে কাজ শুরু করো।"*
+
+## ৪. নতুন কম্পিউটারে একবারের সেটআপ
+1. **GitHub Desktop** ইনস্টল করুন (https://github.com/apps/desktop — Windows-এর বোতামটা চাপুন), আপনার GitHub
+   অ্যাকাউন্টে (`digibhaiofficial`) লগইন করুন। এর সাথে Git-ও চলে আসে।
+2. `D:\kenakata-kit` ফোল্ডার বানান।
+3. GitHub Desktop → File → Clone repository → `digibhaiofficial/kenakata-kit` → Local path `D:\kenakata-kit\kenakata-kit`।
    একইভাবে `digibhaiofficial/kenakata-license-panel` → `D:\kenakata-kit\kenakata-license-panel`।
-4. GitHub থেকে `kenakata-kit\docs\OWNER-GUIDE-bn.md` ফাইলটা `D:\kenakata-kit\00-START-HERE.md` নামে কপি করুন,
-   আর `kenakata-kit\docs\PUSH-TO-GITHUB.bat` ফাইলটা `D:\kenakata-kit\` ফোল্ডারে কপি করুন।
-5. আপনার ব্যাকআপ থেকে `secrets\` ফোল্ডারটা `D:\kenakata-kit\`-এ রাখুন।
-6. লাইসেন্স প্যানেল নতুন ব্রাউজারে: `kenakata-license-panel\README.md` দেখুন ("আগের চাবি আছে" → `kk-vault.json` → পাসওয়ার্ড)।
+4. `kenakata-kit\docs\OWNER-GUIDE-bn.md` → `D:\kenakata-kit\00-START-HERE.md` নামে কপি করুন;
+   `kenakata-kit\docs\PUSH-TO-GITHUB.bat` → `D:\kenakata-kit\`-এ কপি করুন।
+5. ব্যাকআপ থেকে `secrets\` আর `media\` ফোল্ডার `D:\kenakata-kit\`-এ রাখুন।
+6. লাইসেন্স প্যানেল নতুন ব্রাউজারে খুলতে: `kenakata-license-panel\README.md` দেখুন।
 
-## ৩. AI দিয়ে প্লাগইনে কাজ করানো
-যেকোনো AI এজেন্টকে (Claude, অন্য কোনো AI, অন্য অ্যাকাউন্ট) `D:\kenakata-kit` ফোল্ডারটা দিন আর বলুন:
-> "প্রথমে 00-START-HERE.md, তারপর kenakata-kit\docs\STATUS.md আর kenakata-kit\CLAUDE.md পড়ো। তারপর <কাজ>।
-> আমার সাথে বাংলায় কথা বলো।"
-
-AI দুইভাবে কাজ করতে পারে, দুটোতেই শেষ ধাপ একই:
-- **AI সরাসরি এই ফোল্ডারে ফাইল বদলায়** (যেমন Claude Code / Claude Desktop এই কম্পিউটারে): কাজ ও টেস্ট শেষে AI
-  ভার্সন বাড়িয়ে ট্যাগ দেবে।
-- **AI ক্লাউডে কাজ করে** (যেমন claude.ai): AI একটা প্যাকেট (`kenakata-kit.bundle`) `inbox\` ফোল্ডারে রেখে দেবে।
-
-এরপর আপনি শুধু **`PUSH-TO-GITHUB.bat`-এ ডাবল-ক্লিক** করবেন। এটা:
-1. ফোল্ডারে কেউ কিছু বদলে থাকলে সেটা সেভ (commit) করে;
-2. `inbox\`-এ প্যাকেট থাকলে সেটা কোডে মিলিয়ে নেয়;
-3. GitHub-এ নতুন কিছু থাকলে সেটা নিয়ে আসে;
-4. সব GitHub-এ পাঠায়।
-
-শেষে "DONE" দেখালে AI-কে লিখুন: **"হয়েছে"**। নতুন ভার্সন হলে GitHub ~৩০ সেকেন্ডে zip বানিয়ে সই করে রিলিজ দেয়,
-আর সব সাইটে WordPress-এ "Update available" আসে (৬ ঘণ্টার মধ্যে, অথবা Dashboard → Updates → Check again)।
-
-## ৪. যা কখনো করবেন না
-- সাইটে হাতে zip আপলোড করবেন না। সাইট শুধু GitHub-এর সই করা রিলিজ থেকে আপডেট নেবে।
-- `secrets\` বা `kenakata-license-panel\` ফোল্ডারের কিছু কাউকে পাঠাবেন না, চ্যাটে পেস্ট করবেন না।
-- `kenakata-license-panel` রিপোটা কখনো public করবেন না।
+## ৫. যা কখনো করবেন না
+- দোকানে হাতে zip আপলোড করবেন না। দোকান শুধু GitHub-এর সই করা রিলিজ থেকে আপডেট নেবে।
+- `secrets\` বা `kenakata-license-panel\`-এর কিছু কাউকে পাঠাবেন না, চ্যাটে পেস্ট করবেন না।
+- `kenakata-license-panel` রিপো কখনো public করবেন না।
 - লাইসেন্স প্যানেলে নতুন চাবি (সিলমোহর) বানাবেন না, এতে আগের সব কাস্টমারের কী অকেজো হবে।
-- পাসওয়ার্ড বা Application Password চ্যাটে লিখবেন না।
+- কোনো দোকানের পাসওয়ার্ড বা Application Password চ্যাটে লিখবেন না।
 
-## ৫. কিছু ভুল হলে
-- বাটে লাল লেখা বা "Something went wrong" এলে উইন্ডোর স্ক্রিনশট AI-কে পাঠান।
-- সাইট ভেঙে গেলে: WordPress → Plugins → Kenakata Kit "Deactivate"। এতে দোকান আগের মতো চলবে। তারপর AI-কে জানান।
-- আগের ভার্সনে ফিরতে: GitHub → kenakata-kit → Releases থেকে আগের ভার্সনের নাম AI-কে বলুন; AI নতুন ভার্সন নম্বর দিয়ে
-  সেই কোড আবার রিলিজ করবে (ভার্সন নম্বর কখনো আগেরটা আবার ব্যবহার হয় না)।
+## ৬. কিছু ভুল হলে
+- বাটে লাল লেখা বা "Something went wrong": উইন্ডোর স্ক্রিনশট AI-কে পাঠান।
+- কোনো দোকান আপডেটের পর ভেঙে গেলে: WordPress → Plugins → Kenakata Kit → Deactivate। দোকান আগের মতো চলবে। তারপর AI-কে জানান।
+- আগের ভার্সনে ফিরতে: আগের ভার্সনের নম্বর AI-কে বলুন; AI সেই কোড নতুন ভার্সন নম্বর দিয়ে আবার রিলিজ করবে।
+- আরও: `kenakata-kit\docs\TROUBLESHOOTING.md`।

@@ -4,7 +4,7 @@ Plugin URI: https://digibhai.com/
 Requires at least: 6.3
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 3.27.0
+Stable tag: 3.28.0
 License: GPLv2 or later
 
 Everything a Bangladeshi WooCommerce store usually needs. Settings: left admin menu → Kenakata Kit.
@@ -30,6 +30,11 @@ Products Grid, Products Carousel, Brands, Categories, Buy Now Button, Live Searc
 Older [ss_…] shortcodes keep working. Options: see the guide or Kenakata Kit → Shortcodes.
 
 == Changelog ==
+= 3.28.0 =
+* New tab "SEO & Google" (all off until switched on):
+* Delivery and returns for Google: the delivery charge and time (inside Dhaka / rest of the country, or taken from WooCommerce shipping) and the return policy are added to the product data of Rank Math or WooCommerce, the fields Search Console asks for under Merchant listings. Categories that cannot be returned (e.g. medicine) can be marked. Fields already in the data are never changed.
+* "How much does it cost?" block under the product description with the live price, stock and delivery charges; question and answer text can be changed; also [kk_price_faq]. It is never taken into excerpts or meta descriptions.
+
 = 3.27.0 =
 * New: short intro for category, brand and tag pages. Write 2-3 sentences in the new "Short intro (above products)" field on the term's edit screen and show them above the products with [kk_term_intro] (for example in the Elementor product archive template). Nothing changes until a shop uses it.
 

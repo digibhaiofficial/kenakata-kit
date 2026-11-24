@@ -161,6 +161,7 @@ footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border
 				<li><a href="#s-cart">Side cart</a></li>
 				<li><a href="#s-bbar">Bottom Bar (মোবাইল)</a></li>
 				<li><a href="#s-security">Security</a></li>
+				<li><a href="#s-seo">SEO &amp; Google</a></li>
 				<li><a href="#s-tools">Tools (Export / Import)</a></li>
 			</ol>
 		</li>
@@ -788,6 +789,13 @@ footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border
 		<li>কারও সাথে শেয়ার করা Application Password কাজ শেষে বাতিল করা।</li>
 	</ul>
 </div>
+
+<h3 id="s-seo">SEO &amp; Google (এসইও ও গুগল)</h3>
+<p>সব সুইচ শুরুতে বন্ধ। Rank Math থাকলে তার প্রোডাক্ট-ডাটায়, না থাকলে WooCommerce-এর নিজের প্রোডাক্ট-ডাটায় তথ্য যোগ হয়। আগে থেকে থাকা কোনো তথ্য বদলায় না।</p>
+<ul>
+	<li><strong>ডেলিভারি ও রিটার্ন (গুগলের জন্য):</strong> ঢাকার ভেতরে আর বাইরের ডেলিভারি চার্জ, কত দিনে পৌঁছায়, আর রিটার্ন নীতি প্রোডাক্টের লুকানো ডাটায় যায়। এতে Search Console-এর "Missing field shippingDetails / hasMerchantReturnPolicy" সতর্কবার্তা চলে যায়। চার্জের ঘর খালি রাখলে WooCommerce শিপিং থেকে নেওয়া হয়। যেসব ক্যাটাগরি ফেরত নেন না (যেমন ওষুধ), তাদের slug লিখে দিন: ওই প্রোডাক্টে "ফেরত নেওয়া হয় না" যাবে। <em>রিটার্ন পাতায় যা লেখা, এখানে ঠিক তা-ই দিন।</em> চালু করার পর একটা প্রোডাক্টের লিংক <a href="https://search.google.com/test/rich-results" target="_blank" rel="noopener">Rich Results Test</a>-এ দিয়ে দেখুন।</li>
+	<li><strong>"দাম কত?" অংশ:</strong> প্রোডাক্টের বিবরণের নিচে একটা ছোট প্রশ্ন-উত্তর, যাতে এখনকার দাম, স্টক আর ডেলিভারি চার্জ থাকে। দাম বদলালে লেখাও বদলায়। প্রশ্ন আর উত্তরের লেখা নিজের ভাষায় বদলাতে পারেন: <code>{name}</code>, <code>{price}</code>, <code>{stock}</code>, <code>{site}</code>, <code>{delivery}</code>। Elementor-এর প্রোডাক্ট টেমপ্লেটে বিবরণ না থাকলে <code>[kk_price_faq]</code> শর্টকোড দিয়ে বসান।</li>
+</ul>
 
 <h3 id="s-speed">Speed &amp; health (স্পিড ও হেলথ)</h3>
 <p>সব সুইচ শুরুতে বন্ধ। একটা চালু করার পর হোম, একটা প্রোডাক্ট, কার্ট আর চেকআউট একবার খুলে দেখুন, ক্যাশ প্লাগইন থাকলে ক্যাশ মুছুন।</p>

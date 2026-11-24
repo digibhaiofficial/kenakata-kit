@@ -9219,3 +9219,211 @@ msgstr "ছোট ভূমিকা (প্রোডাক্টের উপ�
 #: includes/terms.php
 msgid "2-3 sentences shown above the products with the [kk_term_intro] shortcode (for example in the Elementor product archive template). The long description stays below. Leave empty to show nothing."
 msgstr "প্রোডাক্টের উপরে [kk_term_intro] শর্টকোড দিয়ে দেখানো ২–৩ বাক্য (যেমন Elementor-এর প্রোডাক্ট আর্কাইভ টেমপ্লেটে)। লম্বা বিবরণ নিচেই থাকে। কিছু দেখাতে না চাইলে খালি রাখুন।"
+
+#: includes/seo-extras.php
+msgid "SEO & Google"
+msgstr "SEO ও গুগল"
+
+#: includes/seo-extras.php
+msgid "Extra product information for Google and AI search: delivery charges and the return policy in the product data, and a short \"How much does it cost?\" answer on every product page. Works with Rank Math or WooCommerce's own product data. Every switch is off until you turn it on."
+msgstr "গুগল আর AI সার্চের জন্য প্রোডাক্টের বাড়তি তথ্য: প্রোডাক্ট-ডাটায় ডেলিভারি চার্জ ও রিটার্ন নীতি, আর প্রতিটি প্রোডাক্ট পাতায় \"দাম কত?\"-এর ছোট উত্তর। Rank Math বা WooCommerce-এর নিজের প্রোডাক্ট-ডাটা, দুটোর সাথেই কাজ করে। আপনি চালু না করা পর্যন্ত সব সুইচ বন্ধ থাকে।"
+
+#: includes/seo-extras.php
+msgid "Delivery and returns in the product data"
+msgstr "প্রোডাক্ট-ডাটায় ডেলিভারি ও রিটার্ন"
+
+#: includes/seo-extras.php
+msgid "Google Search Console (Merchant listings) asks for the delivery charge, the delivery time and the return policy of every product. Without them it shows \"Missing field shippingDetails / hasMerchantReturnPolicy\" and cannot show delivery or returns in the search results. Check one product afterwards with Google's Rich Results Test."
+msgstr "Google Search Console (Merchant listings) প্রতিটি প্রোডাক্টের ডেলিভারি চার্জ, ডেলিভারির সময় আর রিটার্ন নীতি চায়। এগুলো না থাকলে \"Missing field shippingDetails / hasMerchantReturnPolicy\" দেখায়, আর সার্চ রেজাল্টে ডেলিভারি বা রিটার্নের তথ্য দেখাতে পারে না। চালু করার পর একটা প্রোডাক্ট গুগলের Rich Results Test দিয়ে পরীক্ষা করুন।"
+
+#: includes/seo-extras.php
+msgid "Rich Results Test"
+msgstr "Rich Results Test"
+
+#: includes/seo-extras.php
+msgid "Add delivery and return details to products"
+msgstr "প্রোডাক্টে ডেলিভারি ও রিটার্নের তথ্য যোগ করুন"
+
+#: includes/seo-extras.php
+msgid "Nothing changes on the page itself: only the hidden product data that search engines read."
+msgstr "পাতায় দেখতে কিছু বদলায় না: শুধু সার্চ ইঞ্জিন যে লুকানো প্রোডাক্ট-ডাটা পড়ে, সেটা।"
+
+#: includes/seo-extras.php
+msgid "Area with its own charge"
+msgstr "যে এলাকার চার্জ আলাদা"
+
+#: includes/seo-extras.php
+msgid "Most shops charge less inside Dhaka. Choose \"None\" if the charge is the same everywhere."
+msgstr "বেশিরভাগ দোকানে ঢাকার ভেতরে চার্জ কম। সব জায়গায় একই চার্জ হলে \"নেই\" বাছুন।"
+
+#: includes/seo-extras.php
+msgid "None (one charge for the whole country)"
+msgstr "নেই (পুরো দেশে একই চার্জ)"
+
+#: includes/seo-extras.php
+msgid "Dhaka district"
+msgstr "ঢাকা জেলা"
+
+#: includes/seo-extras.php
+msgid "Dhaka division"
+msgstr "ঢাকা বিভাগ"
+
+#: includes/seo-extras.php
+msgid "Chattogram district"
+msgstr "চট্টগ্রাম জেলা"
+
+#: includes/seo-extras.php
+msgid "Delivery charge in that area"
+msgstr "ওই এলাকায় ডেলিভারি চার্জ"
+
+#: includes/seo-extras.php
+msgid "Only the number, e.g. 80. Empty = the lowest delivery charge in WooCommerce shipping."
+msgstr "শুধু সংখ্যা, যেমন 80। খালি রাখলে WooCommerce শিপিং-এর সবচেয়ে কম চার্জটা নেওয়া হবে।"
+
+#: includes/seo-extras.php
+msgid "Delivery time in that area (days)"
+msgstr "ওই এলাকায় ডেলিভারির সময় (দিন)"
+
+#: includes/seo-extras.php
+msgid "For example 1-2."
+msgstr "যেমন 1-2।"
+
+#: includes/seo-extras.php
+msgid "Delivery charge for the rest of the country"
+msgstr "দেশের বাকি এলাকায় ডেলিভারি চার্জ"
+
+#: includes/seo-extras.php
+msgid "Only the number, e.g. 150. Empty = the highest delivery charge in WooCommerce shipping."
+msgstr "শুধু সংখ্যা, যেমন 150। খালি রাখলে WooCommerce শিপিং-এর সবচেয়ে বেশি চার্জটা নেওয়া হবে।"
+
+#: includes/seo-extras.php
+msgid "Delivery time for the rest of the country (days)"
+msgstr "দেশের বাকি এলাকায় ডেলিভারির সময় (দিন)"
+
+#: includes/seo-extras.php
+msgid "For example 2-5."
+msgstr "যেমন 2-5।"
+
+#: includes/seo-extras.php
+msgid "Time to pack and hand over to the courier (days)"
+msgstr "প্যাক করে কুরিয়ারে দিতে সময় (দিন)"
+
+#: includes/seo-extras.php
+msgid "For example 0-1. Empty = not added."
+msgstr "যেমন 0-1। খালি রাখলে যোগ হবে না।"
+
+#: includes/seo-extras.php
+msgid "Return policy"
+msgstr "রিটার্ন নীতি"
+
+#: includes/seo-extras.php
+msgid "Write only what your return policy page really says: Google compares them."
+msgstr "আপনার রিটার্ন নীতির পাতায় আসলে যা লেখা, শুধু সেটাই দিন: গুগল দুটো মিলিয়ে দেখে।"
+
+#: includes/seo-extras.php
+msgid "Do not add"
+msgstr "যোগ করবেন না"
+
+#: includes/seo-extras.php
+msgid "Returns accepted within a number of days"
+msgstr "নির্দিষ্ট দিনের মধ্যে ফেরত নেওয়া হয়"
+
+#: includes/seo-extras.php
+msgid "No returns"
+msgstr "ফেরত নেওয়া হয় না"
+
+#: includes/seo-extras.php
+msgid "Days to return"
+msgstr "ফেরতের সময় (দিন)"
+
+#: includes/seo-extras.php
+msgid "days"
+msgstr "দিন"
+
+#: includes/seo-extras.php
+msgid "Who pays for the return delivery"
+msgstr "ফেরতের ডেলিভারি খরচ কে দেবে"
+
+#: includes/seo-extras.php
+msgid "The customer"
+msgstr "ক্রেতা"
+
+#: includes/seo-extras.php
+msgid "The shop (free return)"
+msgstr "দোকান (ফ্রি রিটার্ন)"
+
+#: includes/seo-extras.php
+msgid "Categories that cannot be returned"
+msgstr "যেসব ক্যাটাগরি ফেরত নেওয়া হয় না"
+
+#: includes/seo-extras.php
+msgid "Category slugs, separated by commas (e.g. medicine, innerwear). Products in them are marked \"no returns\". Empty = none."
+msgstr "ক্যাটাগরির slug, কমা দিয়ে আলাদা (যেমন medicine, innerwear)। এগুলোর প্রোডাক্টে \"ফেরত নেওয়া হয় না\" লেখা যাবে। খালি রাখলে কোনোটাই না।"
+
+#: includes/seo-extras.php
+msgid "Return policy page"
+msgstr "রিটার্ন নীতির পাতা"
+
+#: includes/seo-extras.php
+msgid "Linked in the product data. Empty = WooCommerce's \"Refund and Returns Policy\" page."
+msgstr "প্রোডাক্ট-ডাটায় এই পাতার লিংক যাবে। খালি রাখলে WooCommerce-এর \"Refund and Returns Policy\" পাতা।"
+
+#: includes/seo-extras.php
+msgid "— WooCommerce return policy page —"
+msgstr "— WooCommerce-এর রিটার্ন নীতির পাতা —"
+
+#: includes/seo-extras.php
+msgid "\"How much does it cost?\" on product pages"
+msgstr "প্রোডাক্ট পাতায় \"দাম কত?\""
+
+#: includes/seo-extras.php
+msgid "Many people search \"price of …\" on Google or ask ChatGPT. A short answer under the description with the current price, stock and delivery charges helps them find your shop. The price is always the current one."
+msgstr "অনেকে গুগলে \"… এর দাম\" লিখে খোঁজেন বা ChatGPT-কে জিজ্ঞেস করেন। বিবরণের নিচে এখনকার দাম, স্টক আর ডেলিভারি চার্জসহ ছোট একটা উত্তর থাকলে তাঁরা আপনার দোকান খুঁজে পান। দাম সবসময় এখনকারটাই দেখায়।"
+
+#: includes/seo-extras.php
+msgid "Show the price answer under the product description"
+msgstr "প্রোডাক্টের বিবরণের নিচে দামের উত্তর দেখান"
+
+#: includes/seo-extras.php
+msgid "Or place it yourself with [kk_price_faq] (then it is not added again)."
+msgstr "অথবা [kk_price_faq] দিয়ে নিজে বসান (তখন আর আলাদা করে যোগ হবে না)।"
+
+#: includes/seo-extras.php
+msgid "Question heading"
+msgstr "প্রশ্নের হেডিং"
+
+#: includes/seo-extras.php
+msgid "{name} = product name."
+msgstr "{name} = প্রোডাক্টের নাম।"
+
+#: includes/seo-extras.php
+msgid "One paragraph per line. {name} = product, {price} = current price, {stock} = in stock or not, {site} = shop name, {delivery} = delivery charges from WooCommerce shipping. Write only what is true for your shop."
+msgstr "প্রতি লাইনে একটি অনুচ্ছেদ। {name} = প্রোডাক্ট, {price} = এখনকার দাম, {stock} = স্টকে আছে কি না, {site} = দোকানের নাম, {delivery} = WooCommerce শিপিং-এর ডেলিভারি চার্জ। শুধু আপনার দোকানের জন্য যা সত্যি, তা-ই লিখুন।"
+
+#: includes/seo-extras.php
+msgid "Delivery & returns for Google"
+msgstr "গুগলের জন্য ডেলিভারি ও রিটার্ন"
+
+#: includes/seo-extras.php
+msgid "Delivery charge, time and return policy in the product data."
+msgstr "প্রোডাক্ট-ডাটায় ডেলিভারি চার্জ, সময় ও রিটার্ন নীতি।"
+
+#: includes/seo-extras.php
+msgid "Price answer"
+msgstr "দামের উত্তর"
+
+#: includes/seo-extras.php
+msgid "\"How much does it cost?\" with the live price on product pages."
+msgstr "প্রোডাক্ট পাতায় এখনকার দামসহ \"দাম কত?\"।"
+
+#: includes/seo-extras.php
+msgid "available on order"
+msgstr "অর্ডার দিলে পাওয়া যাবে"
+
+#: includes/seo-extras.php
+msgid "in stock"
+msgstr "স্টকে আছে"
+
+#: includes/seo-extras.php
+msgid "out of stock right now"
+msgstr "এখন স্টকে নেই"

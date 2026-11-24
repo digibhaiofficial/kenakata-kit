@@ -3,7 +3,7 @@
  * Plugin Name:       Kenakata Kit – WooCommerce Toolkit for Bangladesh
  * Plugin URI:        https://digibhai.com/
  * Description:       Everything a Bangladeshi WooCommerce store needs: Buy Now, simple checkout with delivery areas, fake-order protection, thank-you page, order tracking by phone, live search, login popup, product cards, brand/category carousels, WhatsApp, variation buttons, photo reviews, side cart, mobile bar and 15 Elementor widgets. English and Bengali (বাংলা). Settings: left menu → Kenakata Kit.
- * Version:           3.27.0
+ * Version:           3.28.0
  * Requires at least: 6.3
  * Requires PHP:      7.4
  * Requires Plugins:  woocommerce
@@ -21,7 +21,7 @@ defined( 'ABSPATH' ) || exit;
 
 $GLOBALS['kk_load_ms'] = -microtime( true ); // time spent loading this plugin (Speed & health shows it)
 
-define( 'KK_VERSION', '3.27.0' );
+define( 'KK_VERSION', '3.28.0' );
 define( 'KK_FILE', __FILE__ );
 define( 'KK_DIR', __DIR__ );
 define( 'KK_URL', plugin_dir_url( __FILE__ ) );
@@ -417,6 +417,23 @@ function kk_defaults() {
 		'speed_bot_block'       => 0,
 		'speed_ai_block'        => 0,
 		'speed_ai_search_block' => 0,
+		// SEO & Google (product schema delivery/returns, price question block).
+		'seo_schema_enable'     => 0,
+		'seo_ship_local_region' => 'BD-13',
+		'seo_ship_local_cost'   => '', // '' = lowest delivery charge in WooCommerce shipping
+		'seo_ship_local_days'   => '1-2',
+		'seo_ship_other_cost'   => '', // '' = highest delivery charge
+		'seo_ship_other_days'   => '2-5',
+		'seo_handling_days'     => '0-1',
+		'seo_return_mode'       => 'none',
+		'seo_return_days'       => 7,
+		'seo_return_fees'       => 'customer',
+		'seo_return_no_cats'    => '',
+		'seo_return_page'       => 0,
+		'seo_pricefaq_enable'   => 0,
+		'seo_pricefaq_tag'      => 'h3',
+		'seo_pricefaq_title'    => 'How much does {name} cost?',
+		'seo_pricefaq_text'     => "{name} costs {price} at {site} right now ({stock}).\nDelivery charge: {delivery}. Cash on delivery all over Bangladesh.\nPrices can change over time; the price shown at checkout is the one you pay.",
 		'turnstile_enable'      => 0,
 		'turnstile_site'        => '',
 		'turnstile_login'       => 1,
@@ -926,7 +943,7 @@ add_action( 'plugins_loaded', function () {
 		kk_load_admin();
 		require_once KK_DIR . '/includes/updater.php';
 	}
-	foreach ( array( 'rest', 'assets', 'product-card', 'products', 'buy-now', 'cart-guard', 'checkout', 'free-delivery', 'order-guard', 'shield', 'orders', 'courier', 'print', 'manual-pay', 'messaging', 'incomplete', 'search', 'account', 'my-account', 'wishlist', 'qa', 'terms', 'extras', 'variations', 'reviews', 'bottom-bar', 'security', 'speed', 'cron-health', 'store-dashboard', 'elementor' ) as $file ) {
+	foreach ( array( 'rest', 'assets', 'product-card', 'products', 'buy-now', 'cart-guard', 'checkout', 'free-delivery', 'order-guard', 'shield', 'orders', 'courier', 'print', 'manual-pay', 'messaging', 'incomplete', 'search', 'account', 'my-account', 'wishlist', 'qa', 'terms', 'extras', 'variations', 'reviews', 'bottom-bar', 'security', 'speed', 'seo-extras', 'cron-health', 'store-dashboard', 'elementor' ) as $file ) {
 		if ( ! $pro && in_array( $file, kk_pro_modules(), true ) ) {
 			continue;
 		}

@@ -387,6 +387,8 @@ body a.kk-el-account:hover { color: var(--kk-primary); }
 
 .kk-delivery { margin: 16px 0; padding: 16px; border: 1px solid var(--kk-border); border-radius: var(--kk-radius); background: var(--kk-di-bg, var(--kk-soft)); font-family: var(--kk-font); color: var(--kk-text); }
 .kk-delivery__title { margin: 0 0 10px; font-size: 15px; font-weight: 700; }
+.kk-price-faq { margin: 24px 0 0; }
+.kk-price-faq__title { margin: 0 0 8px; }
 .kk-delivery__list { display: grid; gap: 8px; list-style: none; margin: 0; padding: 0; }
 .kk-delivery__item { display: flex; align-items: flex-start; gap: 10px; margin: 0; font-size: 14px; line-height: 1.45; }
 .kk-delivery__item .kk-ico { width: 18px; height: 18px; margin-top: 1px; color: var(--kk-di-ico, var(--kk-primary)); }

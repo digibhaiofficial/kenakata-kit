@@ -1,8 +1,8 @@
 @echo off
 rem Kenakata Kit: one click to send everything to GitHub.
 rem Put this file in D:\kenakata-kit\ (next to the kenakata-kit and kenakata-license-panel folders).
-rem 1. takes a package from Claude in inbox\<repo>.bundle (if there is one)
-rem 2. saves changes made in the folder (by you or an AI agent on this computer)
+rem 1. saves changes made in the folder (by you or an AI agent on this computer)
+rem 2. takes a package from Claude in inbox\<repo>.bundle (if there is one)
 rem 3. takes newer changes from GitHub
 rem 4. sends everything (with version tags) to GitHub
 setlocal EnableDelayedExpansion
@@ -56,6 +56,12 @@ if not exist "%R%\.git" (
   )
 )
 "!GIT!" -C "%R%" remote set-url origin https://github.com/digibhaiofficial/%1.git
+"!GIT!" -C "%R%" add -A
+"!GIT!" -C "%R%" diff --cached --quiet
+if errorlevel 1 (
+  echo    saving the changes made in this folder ...
+  "!GIT!" %ID% -C "%R%" commit -q -m "Changes made on this computer"
+)
 if exist "%B%" (
   echo    taking the package from inbox ...
   "!GIT!" -C "%R%" fetch -q --tags "%B%" main || exit /b 1
@@ -66,12 +72,6 @@ if exist "%B%" (
     exit /b 1
   )
   move /y "%B%" "%~dp0inbox\done\%1.bundle" >nul
-)
-"!GIT!" -C "%R%" add -A
-"!GIT!" -C "%R%" diff --cached --quiet
-if errorlevel 1 (
-  echo    saving the changes made in this folder ...
-  "!GIT!" %ID% -C "%R%" commit -q -m "Changes made on this computer"
 )
 "!GIT!" %ID% -C "%R%" pull -q --no-rebase --no-edit origin main
 if errorlevel 1 (

@@ -30,7 +30,7 @@ D:\kenakata-kit\
 (পেনড্রাইভ বা নিজের Google Drive)।
 
 ## ২. নতুন কম্পিউটারে একবারের সেটআপ
-1. **GitHub Desktop** ইনস্টল করুন (https://desktop.github.com) আর আপনার GitHub অ্যাকাউন্টে লগইন করুন
+1. **GitHub Desktop** ইনস্টল করুন (https://github.com/apps/desktop — Windows-এর বোতামটা চাপুন) আর আপনার GitHub অ্যাকাউন্টে লগইন করুন
    (`digibhaiofficial`)। এর সাথে Git-ও চলে আসে।
 2. `D:\kenakata-kit` নামে একটা ফোল্ডার বানান।
 3. GitHub Desktop → File → Clone repository → `digibhaiofficial/kenakata-kit` → Local path: `D:\kenakata-kit\kenakata-kit`।
@@ -51,8 +51,8 @@ AI দুইভাবে কাজ করতে পারে, দুটোতে
 - **AI ক্লাউডে কাজ করে** (যেমন claude.ai): AI একটা প্যাকেট (`kenakata-kit.bundle`) `inbox\` ফোল্ডারে রেখে দেবে।
 
 এরপর আপনি শুধু **`PUSH-TO-GITHUB.bat`-এ ডাবল-ক্লিক** করবেন। এটা:
-1. `inbox\`-এ প্যাকেট থাকলে সেটা কোডে মিলিয়ে নেয়;
-2. ফোল্ডারে কেউ কিছু বদলে থাকলে সেটা সেভ (commit) করে;
+1. ফোল্ডারে কেউ কিছু বদলে থাকলে সেটা সেভ (commit) করে;
+2. `inbox\`-এ প্যাকেট থাকলে সেটা কোডে মিলিয়ে নেয়;
 3. GitHub-এ নতুন কিছু থাকলে সেটা নিয়ে আসে;
 4. সব GitHub-এ পাঠায়।
 

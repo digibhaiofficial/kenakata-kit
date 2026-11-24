@@ -34,6 +34,9 @@ jobs:
           php-version: ${{ matrix.php }}
           extensions: mysqli, sodium, gd, zip
           tools: wp-cli
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - name: Smoke test (PHP ${{ matrix.php }}, WP ${{ matrix.wp }}, WooCommerce ${{ matrix.wc }})
         env:
           WP_VERSION: ${{ matrix.wp }}

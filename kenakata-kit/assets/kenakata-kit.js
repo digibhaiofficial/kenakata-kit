@@ -3,6 +3,9 @@
 (function () {
 	'use strict';
 	var D = window.kkData || { i18n: {}, slider: {} };
+	// REST address with a query: with WordPress's plain permalinks the base is "…/?rest_route=/kenakata/v1/", so the
+	// query must start with "&" there (a second "?" made the wishlist page and "recently viewed" empty before 3.29).
+	function restUrl(path, query) { var u = (D.restUrl || '') + path; return query ? u + (u.indexOf('?') > -1 ? '&' : '?') + query : u; }
 	// wp_localize_script() turns numbers into strings ("0" would count as true): make the on/off flags real numbers.
 	['popup', 'drawer', 'drawerAuto', 'drawerTake', 'ajaxSingle', 'cartRedirect', 'minChars'].forEach(function (k) { D[k] = Number(D[k]) || 0; });
 	D.i18n = D.i18n || {};
@@ -779,7 +782,7 @@
 			var exclude = parseInt(box.getAttribute('data-kk-exclude'), 10) || 0;
 			var ids = recentIds().filter(function (n) { return n !== exclude; });
 			if (!ids.length || !window.fetch || !D.restUrl) return;
-			var url = D.restUrl + 'recent?ids=' + ids.join(',') + '&exclude=' + exclude + '&q=' + encodeURIComponent(box.getAttribute('data-kk-recent')) + '&sig=' + encodeURIComponent(box.getAttribute('data-kk-sig'));
+			var url = restUrl('recent', 'ids=' + ids.join(',')) + '&exclude=' + exclude + '&q=' + encodeURIComponent(box.getAttribute('data-kk-recent')) + '&sig=' + encodeURIComponent(box.getAttribute('data-kk-sig'));
 			fetch(url, { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (res) {
 				if (!res || !res.html) return;
 				var tmp = document.createElement('div');
@@ -920,7 +923,7 @@
 		};
 		if (!ids.length) { show(false); return; }
 		if (removed) { show(true); return; }
-		fetch(D.restUrl + 'wishlist/products?ids=' + ids.join(',') + '&cols=' + encodeURIComponent(page.getAttribute('data-cols') || '{}'), { credentials: 'same-origin' })
+		fetch(restUrl('wishlist/products', 'ids=' + ids.join(',')) + '&cols=' + encodeURIComponent(page.getAttribute('data-cols') || '{}'), { credentials: 'same-origin' })
 			.then(function (r) { return r.ok ? r.json() : null; })
 			.then(function (res) {
 				if (!res || !res.html) { show(false); return; }

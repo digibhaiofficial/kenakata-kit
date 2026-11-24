@@ -82,7 +82,8 @@ python dev/build-zip.py                       # local zip for testing; releases 
 Real WordPress test: `dev/ci/smoke.sh` installs WordPress + WooCommerce + the plugin and checks shop pages, instant
 add to cart / Buy Now, the bot guard, every settings tab, license save (wrong domain refused), courier tick list,
 incomplete order → order with delivery charge, tracking with order number, speed switches, Turnstile, uninstall and
-the PHP log (expect "0 failed"). GitHub runs it on every push (.github/workflows/wp-test.yml, PHP 7.4 + 8.3).
+the PHP log (expect "0 failed"). It also runs `dev/e2e-shop.js` (shop features in headless Chrome, needs Node 22+) and a size
+budget for the plugin's files. GitHub runs it on every push (.github/workflows/wp-test.yml, PHP 7.4 + 8.3).
 Without MySQL / wordpress.org it also runs on SQLite:
 `LOCAL_WP=<WordPress git checkout> LOCAL_WC_ZIP=<woocommerce.zip> LOCAL_SQLITE=<sqlite-database-integration/packages/plugin-sqlite-database-integration> bash dev/ci/smoke.sh`
 (WordPress: `git clone --depth 1 --branch <ver> https://github.com/WordPress/WordPress`; WooCommerce zip from its GitHub releases).

@@ -255,6 +255,27 @@ check "cart page loads the checkout styles" 'curl -sL "$URL/?page_id=$(wpc optio
 check "account page loads the account styles" 'curl -sL "$URL/?page_id=$(wpc option get woocommerce_myaccount_page_id)" | grep -q "kenakata-kit-account-css"'
 check "tracking page loads the order styles" 'curl -sL "$URL/?pagename=track" | grep -q "kenakata-kit-order-css"'
 check "WooCommerce form fields keep their style everywhere (core)" 'grep -q "\.woocommerce form \.form-row label" "$WP/wp-content/plugins/kenakata-kit/assets/kenakata-kit.min.css"'
+echo "== 3.29: feature styles only when switched on, speed budget"
+kkset() { printf '%s' "$1" > /tmp/kkset.json; wpc eval '$s = (array) get_option( "kk_settings", array() ); foreach ( json_decode( file_get_contents( "/tmp/kkset.json" ), true ) ?: array() as $k => $v ) { $s[ $k ] = $v; } kk_update_settings( $s );' >/dev/null; }
+wpc eval '$s = (array) get_option( "kk_settings", array() ); echo wp_json_encode( array_intersect_key( $s, array_flip( array( "wl_enable", "search_enable", "popup_enable", "mnav_enable", "sticky_enable", "rm_enable" ) ) ) );' > /tmp/kkfeat
+kkset '{"wl_enable":0,"search_enable":0,"popup_enable":0,"mnav_enable":0,"sticky_enable":0,"rm_enable":0}'
+curl -s "$URL/" > /tmp/home_off
+check "features off: none of their styles load" '! grep -qE "kenakata-kit-(wishlist|search|popup|bbar|sticky|readmore)-css" /tmp/home_off && grep -q "kenakata-kit-css" /tmp/home_off'
+kkset '{"wl_enable":1,"search_enable":1,"popup_enable":1,"mnav_enable":1,"sticky_enable":1,"rm_enable":1}'
+curl -s "$URL/" > /tmp/home_on
+check "features on: their styles load on the home page" 'for p in wishlist search popup bbar readmore; do grep -q "kenakata-kit-$p-css" /tmp/home_on || exit 1; done; ! grep -q "kenakata-kit-sticky-css" /tmp/home_on'
+check "sticky bar styles only on product pages" 'curl -sL "$URL/?p=$PID" | grep -q "kenakata-kit-sticky-css"'
+check "settings screen loads every feature style for its previews" 'curl -s -b "$JAR" "$URL/wp-admin/admin.php?page=kenakata-kit" | grep -q "kenakata-kit-wishlist-css"'
+# Speed budget: total size of the plugin's CSS + JS files a page loads (minified files on disk).
+kkbytes() { grep -oE "plugins/kenakata-kit/assets/[a-z0-9.-]+\.(css|js)" "$1" | sort -u | while read -r f; do wc -c < "$WP/wp-content/$f"; done | awk '{s+=$1} END {print s+0}'; }
+B_OFF=$(kkbytes /tmp/home_off); B_ON=$(kkbytes /tmp/home_on)
+echo "    home page plugin CSS+JS: $B_OFF bytes (features off), $B_ON bytes (all on)"
+check "speed budget: home page with default features <= 70 KB of plugin CSS+JS" '[ "$B_OFF" -gt 0 ] && [ "$B_OFF" -le 71680 ]'
+check "speed budget: home page with every feature on <= 110 KB of plugin CSS+JS" '[ "$B_ON" -le 112640 ]'
+check "speed budget: core stylesheet <= 48 KB minified" '[ "$(wc -c < "$WP/wp-content/plugins/kenakata-kit/assets/kenakata-kit.min.css")" -le 49152 ]'
+LMS=$(for i in 1 2 3; do curl -s -o /dev/null -w "%{time_total}\n" "$URL/"; done | sort -n | head -1)
+echo "    home page time (fastest of 3): ${LMS}s"
+wpc eval '$s = (array) get_option( "kk_settings", array() ); foreach ( json_decode( file_get_contents( "/tmp/kkfeat" ), true ) ?: array() as $k => $v ) { $s[ $k ] = $v; } kk_update_settings( $s );' >/dev/null
 check "tracking results are never cached" 'curl -s -D - -o /dev/null "$URL/?pagename=track&kk_phone=01712345678" | grep -qi "cache-control: no-cache"'
 mkdir -p "$WP/wp-content/mu-plugins"
 cat > "$WP/wp-content/mu-plugins/kk-fake-courier.php" <<'PHP'
@@ -530,6 +551,18 @@ code=$(get "$URL/wp-admin/admin.php?page=kenakata-kit&tab=seo")
 check "SEO & Google tab opens, no PHP errors" '[ "$code" = 200 ] && grep -q "seo_schema_enable" /tmp/body && clean /tmp/body'
 wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["seo_schema_enable"] = 0; $s["seo_pricefaq_enable"] = 0; kk_update_settings( $s );'
 
+echo "== Shop features in a real browser (dev/e2e-shop.js)"
+kkset '{"card_enable":1,"cart_drawer_enable":1,"cart_drawer_auto_open":1,"wl_enable":1,"search_enable":1,"popup_enable":1,"qa_enable":1,"rv_enable":1,"mnav_enable":1,"turnstile_enable":0}'
+UIP=$(wpc post create --post_type=page --post_status=publish --post_title="Shop UI" --post_content='[kk_live_search mode="bar"] [kk_account_link] [kk_wishlist_link] [kk_cart_icon] [kk_products source="latest" limit="4" columns="4"]' --porcelain)
+WLP=$(wpc post create --post_type=page --post_status=publish --post_title="Saved" --post_content='[kk_wishlist]' --porcelain)
+if command -v node >/dev/null 2>&1; then
+	node "$(dirname "$0")/../e2e-shop.js" "$URL" "$UIP" "$WLP" "$PID" /tmp/kk-shop-e2e > /tmp/e2e-shop.log 2>&1
+	sed 's/^/  /' /tmp/e2e-shop.log | grep -v "passed, " 
+	EP=$(grep -c "✓" /tmp/e2e-shop.log); EF=$(grep -c "✗" /tmp/e2e-shop.log)
+	PASSES=$((PASSES+EP)); FAILS=$((FAILS+EF))
+else
+	echo "  (node not found: browser test skipped)"
+fi
 echo "== Deactivate / activate / uninstall"
 wpc plugin deactivate kenakata-kit >/dev/null
 check "crons cleared on deactivation" '! wpc cron event list --fields=hook --format=csv | grep -q "^kk_"'

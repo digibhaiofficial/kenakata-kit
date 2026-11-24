@@ -13,7 +13,9 @@ kenakata-kit/                    the plugin (this folder is what goes into the z
 │  ├─ store-dashboard*.php       Pro dashboard (page, role, REST /sd/*)
 │  ├─ elementor/                 Elementor widgets (base.php = shared style controls)
 │  └─ data/bd-thanas.php         districts and thanas (English + Bengali)
-├─ assets/                       name.css / name.js (readable) + name.min.* (made by dev/minify.sh; served by default)
+├─ assets/                       name.css / name.js (readable) + name.min.* (made by dev/minify.sh; served by default).
+│                                kenakata-kit.css = core; -checkout/-account/-order/-product = per page type;
+│                                -wishlist/-search/-popup/-bbar/-sticky/-readmore = only when that feature is on
 ├─ templates/                    WooCommerce template overrides used by the kit
 ├─ languages/                    kenakata-kit-bn_BD.po / .mo (built from dev/i18n)
 ├─ docs/index.html               the shop owner's Bengali user guide (opened from the Help tab)
@@ -50,6 +52,8 @@ Uninstall keeps everything by default; with "Delete all data" on it removes sett
 ## Browser ↔ server
 - REST routes under `/wp-json/kenakata/v1/…` (search, wishlist, Q&A, products, courier, incomplete, store
   dashboard `/sd/*`, cron health). Every route has a `permission_callback` with a real capability or a nonce.
+- Which styles a page gets: `includes/assets.php` (`kk_need_css()` for page types, `kk_feature_css_parts()` for switched-on
+  features). REST addresses in JS are built with a helper that works with plain permalinks (`?rest_route=`).
 - Shop JS `assets/kenakata-kit.js` (side cart, Buy Now, search, wishlist…) works without WooCommerce cart fragments.
 - The store dashboard is a single-page app (`assets/store-dashboard.js`) that never puts server data into
   `innerHTML` (uses `h()`; editor HTML goes through `cleanHTML()`).

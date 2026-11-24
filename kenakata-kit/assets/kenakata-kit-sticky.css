@@ -1,0 +1,20 @@
+/* Kenakata Kit: sticky styles (loaded only when the feature is switched on). Split from kenakata-kit.css in 3.29.0. */
+.kk-sticky{ position: fixed; left: 0; right: 0; bottom: 0; z-index: 9995; display: flex; align-items: center; gap: 10px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); background: var(--kk-sticky-bg, #fff); border-top: 1px solid var(--kk-border); box-shadow: 0 -8px 24px -16px rgba(16, 23, 20, .4); font-family: var(--kk-font); transform: translateY(110%); transition: transform .25s ease; }
+.kk-sticky[hidden]{ display: none; }
+.kk-sticky.is-visible{ transform: none; }
+.kk-sticky__info{ display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+.kk-sticky__img{ width: 44px !important; height: 44px !important; object-fit: contain; border-radius: 6px; background: var(--kk-soft); }
+.kk-sticky__text{ display: flex; flex-direction: column; min-width: 0; }
+.kk-sticky__name{ font-size: 13px; font-weight: 600; color: var(--kk-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kk-sticky__price{ font-size: 14px; font-weight: 700; color: var(--kk-price, var(--kk-text)); }
+.kk-sticky__price del{ font-weight: 400; font-size: 12px; color: var(--kk-muted); }
+.kk-sticky__price ins{ text-decoration: none; }
+.kk-sticky__price .screen-reader-text{ display: none; }
+.kk-sticky__actions{ display: flex; gap: 8px; flex: none; }
+.kk-sticky .kk-sticky__btn{ display: inline-flex; align-items: center; justify-content: center; min-height: 46px !important; padding: 0 18px !important; border: 0 !important; border-radius: var(--kk-btn-radius, 6px) !important; background: var(--kk-accent) !important; color: var(--kk-btn-text, #fff) !important; font: 700 15px var(--kk-font) !important; cursor: pointer; }
+.kk-sticky .kk-sticky__btn--cart{ width: 46px; padding: 0 !important; background: var(--kk-primary) !important; }
+.kk-sticky .kk-sticky__btn .kk-ico{ width: 22px; height: 22px; }
+.kk-sticky .kk-sticky__btn:focus-visible{ outline: 3px solid var(--kk-text); outline-offset: 2px; }
+@media (min-width: 768px){
+.kk-sticky{ display: none !important; }
+}

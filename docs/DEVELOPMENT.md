@@ -28,7 +28,9 @@ The binding rules and exact commands are in [../CLAUDE.md](../CLAUDE.md). This p
 2. New setting: add the default in `kk_defaults()` (kenakata-kit.php), the field in `settings-schema.php`, the
    Bengali in `dev/i18n/i18n-vNN.js`; regenerate `docs/SETTINGS-REFERENCE.md`.
 3. New file in `includes/`: add it to the loader list in kenakata-kit.php (and to `kk_pro_modules()` if Pro).
-4. CSS/JS changed: `sh dev/minify.sh` (CI fails if the .min files do not match).
+4. CSS/JS changed: `sh dev/minify.sh` (CI fails if the .min files do not match). Styles of a feature that has its own
+   switch go in `assets/kenakata-kit-<part>.css`: add the part to `kk_feature_css_parts()` (assets.php) and to
+   `dev/minify.sh`. Inline CSS for such a part must be attached to its handle, not to `kenakata-kit` (order matters).
 5. Run the tests (below). Add a check to `dev/ci/smoke.sh` for new server behaviour.
 6. Update `kenakata-kit/docs/index.html` (user guide) and `readme.txt` (changelog) when users see a change.
 7. Release: RELEASE-AND-UPDATES.md.
@@ -40,7 +42,7 @@ The binding rules and exact commands are in [../CLAUDE.md](../CLAUDE.md). This p
 | `node dev/calls.js includes/<file>.php` | lists external functions used, to confirm they exist | review the list |
 | `node dev/e2e-dashboard.js - <outDir>` | clicks through the store dashboard in headless Chrome | 70 passed, 0 failed |
 | `node dev/shots-dashboard.js <outDir> bn` | screenshots of every dashboard screen (look at them) | — |
-| `bash dev/ci/smoke.sh` | installs WordPress + WooCommerce + the plugin and tests shop pages, checkout, guards, settings, license, courier list, uninstall, PHP log | 191 passed, 0 failed (3.28.0) |
+| `bash dev/ci/smoke.sh` | installs WordPress + WooCommerce + the plugin and tests shop pages, checkout, guards, settings, license, courier list, feature styles, size budget, uninstall, PHP log; runs `dev/e2e-shop.js` in headless Chrome (cards, wishlist, side cart, search, login popup, Q&A, reviews, phone layout) | 215 passed, 0 failed (3.29.0) |
 GitHub Actions: `check.yml` (lint, minified files), `wp-test.yml` (smoke test on PHP 7.4 and 8.3) on every push.
 
 ## Useful facts

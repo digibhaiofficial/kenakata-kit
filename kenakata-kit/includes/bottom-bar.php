@@ -227,7 +227,8 @@ function kk_bbar_css() {
 
 add_action( 'wp_enqueue_scripts', function () {
 	if ( kk_opt( 'mnav_enable' ) ) {
-		wp_add_inline_style( 'kenakata-kit', kk_bbar_css() );
+		// After the bar's own stylesheet (3.29), so the breakpoint rule wins over its default "hidden".
+		wp_add_inline_style( wp_style_is( 'kenakata-kit-bbar', 'enqueued' ) ? 'kenakata-kit-bbar' : 'kenakata-kit', kk_bbar_css() );
 	}
 }, 30 );
 

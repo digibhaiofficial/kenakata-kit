@@ -76,7 +76,7 @@
 		current = id;
 		body.textContent = ''; body.appendChild(el('p', 'kk-cc-muted', T.loading));
 		panel.hidden = false;
-		fetch(C.url + id + (refresh ? '?refresh=1' : ''), { credentials: 'same-origin', headers: { 'X-WP-Nonce': C.nonce } })
+		fetch(C.url + id + (refresh ? (C.url.indexOf('?') > -1 ? '&' : '?') + 'refresh=1' : ''), { credentials: 'same-origin', headers: { 'X-WP-Nonce': C.nonce } })
 			.then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
 			.then(function (res) {
 				if (current !== id) { return; }

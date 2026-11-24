@@ -4,7 +4,7 @@ Plugin URI: https://digibhai.com/
 Requires at least: 6.3
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 3.28.1
+Stable tag: 3.29.0
 License: GPLv2 or later
 
 Everything a Bangladeshi WooCommerce store usually needs. Settings: left admin menu → Kenakata Kit.
@@ -30,6 +30,12 @@ Products Grid, Products Carousel, Brands, Categories, Buy Now Button, Live Searc
 Older [ss_…] shortcodes keep working. Options: see the guide or Kenakata Kit → Shortcodes.
 
 == Changelog ==
+= 3.29.0 =
+* Faster pages: the main shop stylesheet is about 30% smaller (61 KB → 44 KB, minified). The styles of the wishlist, live search, login popup, bottom bar, sticky Buy Now bar and "Read more" now load only when that feature is switched on (the sticky bar only on product pages). Nothing changes in how the shop looks.
+* Fix: with WordPress's plain web addresses (Settings → Permalinks → Plain) the wishlist page stayed empty and "Recently viewed" showed nothing; the store dashboard's and order screen's courier check could not refresh. The request address had two "?" in it.
+* Updates box (License tab): one line explaining what to do when WordPress says the plugin "could not be reactivated" after an update.
+* Quality: the automatic tests now also click through the shop in a real browser (product cards, wishlist and its page, instant add to cart and side cart, live search, login popup, product questions, reviews, phone layout without sideways scrolling, no JavaScript errors) and check a size limit for the plugin's files on the home page.
+
 = 3.28.1 =
 * The WhatsApp number setting showed a real phone number as its example; it now shows 01XXXXXXXXX (English and Bengali).
 * New developer and owner documentation in the repository (docs/): status, features, settings reference, architecture, development, releases and updates, license system, troubleshooting.

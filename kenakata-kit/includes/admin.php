@@ -268,7 +268,11 @@ add_action( 'admin_enqueue_scripts', function ( $hook ) {
 	}
 	wp_enqueue_style( 'wp-color-picker' );
 	wp_enqueue_style( 'kenakata-kit', kk_asset( 'kenakata-kit.css' ), array(), KK_VERSION );
-	wp_add_inline_style( 'kenakata-kit', kk_css_vars( '.kk-preview' ) . kk_bbar_css() );
+	wp_add_inline_style( 'kenakata-kit', kk_css_vars( '.kk-preview' ) );
+	foreach ( array_keys( kk_feature_css_parts( true ) ) as $part ) { // previews of every feature
+		wp_enqueue_style( 'kenakata-kit-' . $part, kk_asset( 'kenakata-kit-' . $part . '.css' ), array( 'kenakata-kit' ), KK_VERSION );
+	}
+	wp_add_inline_style( 'kenakata-kit-bbar', kk_bbar_css() ); // after the bar's stylesheet, as on the shop
 	wp_enqueue_style( 'kenakata-kit-admin', kk_asset( 'admin.css' ), array( 'kenakata-kit' ), KK_VERSION );
 	wp_enqueue_script( 'kenakata-kit-admin', kk_asset( 'admin.js' ), array( 'jquery', 'jquery-ui-sortable', 'wp-color-picker' ), KK_VERSION, true );
 	wp_localize_script( 'kenakata-kit-admin', 'kkAdmin', array(

@@ -1,0 +1,45 @@
+/* Kenakata Kit: search styles (loaded only when the feature is switched on). Split from kenakata-kit.css in 3.29.0. */
+.kk-search{ display: flex; }
+.kk-search__toggle{ width: 40px !important; height: 40px !important; min-height: 0 !important; padding: 0 !important; border: 0 !important; border-radius: var(--kk-radius) !important; background: var(--kk-soft) !important; color: var(--kk-text) !important; display: inline-flex !important; align-items: center; justify-content: center; cursor: pointer; box-shadow: none; }
+.kk-search__toggle:hover{ background: var(--kk-soft-primary) !important; color: var(--kk-primary) !important; }
+.kk-search__toggle:focus-visible{ outline: 3px solid var(--kk-primary); outline-offset: 2px; }
+.kk-search__panel{ position: fixed; inset: 0; z-index: 99999; background: rgba(16, 23, 20, .55); padding: 24px 16px; overflow-y: auto; }
+.kk-search__panel[hidden]{ display: none; }
+.kk-search__inner{ max-width: 760px; margin: 0 auto; background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 24px 60px -20px rgba(16, 23, 20, .5); font-family: var(--kk-font); }
+.kk-search__form{ position: relative; display: flex; align-items: center; gap: 8px; margin: 0; }
+.kk-search__icon{ position: absolute; left: 16px; color: var(--kk-muted); pointer-events: none; }
+.kk-search__panel .kk-search__input{ flex: 1; height: 56px !important; padding: 0 16px 0 48px !important; border: 2px solid var(--kk-border) !important; border-radius: var(--kk-radius) !important; font: 400 17px var(--kk-font) !important; color: var(--kk-text) !important; background: #fff !important; }
+.kk-search__input:focus{ border-color: var(--kk-primary) !important; outline: none; box-shadow: 0 0 0 3px var(--kk-soft-primary) !important; }
+.kk-search__close{ width: 48px !important; height: 48px !important; min-height: 0 !important; padding: 0 !important; border: 0 !important; border-radius: var(--kk-radius) !important; background: var(--kk-soft) !important; color: var(--kk-text) !important; font-size: 28px !important; line-height: 1 !important; cursor: pointer; box-shadow: none; }
+.kk-search__close:hover{ background: var(--kk-soft-primary) !important; }
+.kk-search__status{ margin: 12px 4px 4px; font-size: 14px; color: var(--kk-muted); min-height: 1em; }
+.kk-search__results{ list-style: none; margin: 0; padding: 0; max-height: 60vh; overflow-y: auto; }
+.kk-search__results li{ margin: 0; }
+.kk-search__results a{ display: grid; grid-template-columns: 56px 1fr auto; gap: 14px; align-items: center; padding: 10px; border-radius: var(--kk-radius); text-decoration: none; color: var(--kk-text) !important; }
+.kk-search__results li[aria-selected="true"] a, .kk-search__results a:hover{ background: var(--kk-soft-primary); }
+.kk-search__results img{ width: 56px; height: 56px; object-fit: contain; border-radius: var(--kk-radius); background: var(--kk-soft); }
+.kk-search__name{ font-size: 15px; font-weight: 500; line-height: 1.35; }
+.kk-search__name em{ color: var(--kk-muted); font-style: normal; font-size: 13px; }
+.kk-search__price{ font-weight: 700; white-space: nowrap; text-align: right; }
+.kk-search__price del{ display: block; font-weight: 400; font-size: 13px; color: var(--kk-muted); }
+.kk-search__all{ display: block; margin-top: 8px; padding: 12px; text-align: center; border-radius: var(--kk-radius); background: var(--kk-soft); color: var(--kk-primary) !important; font-weight: 600; text-decoration: none; }
+.kk-search__all:hover{ background: var(--kk-soft-primary); }
+@media (max-width: 600px){
+.kk-search__panel{ padding: 0; background: #fff; }
+.kk-search__inner{ border-radius: 0; box-shadow: none; min-height: 100%; }
+.kk-search__results{ max-height: none; }
+.kk-search__results a{ grid-template-columns: 48px 1fr; }
+.kk-search__price{ grid-column: 2; text-align: left; }
+}
+.kk-search--bar{ --kk-bar-h: 46px; --kk-bar-r: var(--kk-input-radius, 8px); position: relative; width: 100%; max-width: 640px; font-family: var(--kk-font); }
+.kk-search--bar .kk-search__form{ width: 100%; gap: 0; }
+.kk-search--bar .kk-search__input{ flex: 1; min-width: 0; height: var(--kk-bar-h) !important; min-height: 0 !important; margin: 0 !important; padding: 0 16px !important; border: 1.5px solid var(--kk-border) !important; border-right: 0 !important; border-radius: var(--kk-bar-r) 0 0 var(--kk-bar-r) !important; background: #fff !important; color: var(--kk-text) !important; font: 400 15px var(--kk-font); box-shadow: none !important; }
+.kk-search--bar .kk-search__submit{ display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex: none; min-width: calc(var(--kk-bar-h) + 6px); height: var(--kk-bar-h) !important; min-height: 0 !important; margin: 0 !important; padding: 0 16px !important; border: 0 !important; border-radius: 0 var(--kk-bar-r) var(--kk-bar-r) 0 !important; background: var(--kk-primary) !important; color: #fff !important; font: 600 15px var(--kk-font) !important; cursor: pointer; box-shadow: none !important; }
+.kk-search--bar .kk-search__submit:hover{ background: var(--kk-primary-hover) !important; }
+.kk-search--bar .kk-search__submit:focus-visible{ outline: 3px solid var(--kk-text); outline-offset: 2px; }
+.kk-search__drop{ position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 9999; padding: 8px; background: #fff; border: 1px solid var(--kk-border); border-radius: var(--kk-radius); box-shadow: 0 20px 40px -18px rgba(16, 23, 20, .45); min-width: 280px; }
+.kk-search__drop[hidden]{ display: none; }
+.kk-search__drop .kk-search__status{ margin: 4px 6px 6px; }
+.kk-search__drop .kk-search__results{ max-height: 420px; }
+.kk-search__drop .kk-search__results a{ grid-template-columns: 44px 1fr auto; gap: 10px; padding: 8px; }
+.kk-search__drop .kk-search__results img{ width: 44px; height: 44px; }

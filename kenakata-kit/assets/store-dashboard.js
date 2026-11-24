@@ -108,9 +108,9 @@
 	}
 
 	/* ------------------------------------------------------------------ API */
-	function apiUrl(path) {
+	function apiUrl(path, root) {
 		var parts = String(path).split('?');
-		var u = C.rest + parts[0];
+		var u = (root || C.rest) + parts[0];
 		if (parts[1]) { u += (u.indexOf('?') === -1 ? '?' : '&') + parts[1]; }
 		return u;
 	}
@@ -120,7 +120,7 @@
 		if (opts.form) { init.body = opts.form; }
 		else if (opts.body !== undefined) { init.headers['Content-Type'] = 'application/json'; init.body = JSON.stringify(opts.body); }
 		if (!navigator.onLine) { return Promise.reject(new Error(t('offline'))); }
-		return fetch(opts.root ? opts.root + path : apiUrl(path), init).then(function (r) {
+		return fetch(apiUrl(path, opts.root), init).then(function (r) {
 			return r.text().then(function (txt) {
 				var data = null;
 				try { data = txt ? JSON.parse(txt) : null; } catch (e) { data = null; }

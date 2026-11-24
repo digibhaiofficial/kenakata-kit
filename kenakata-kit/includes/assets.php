@@ -97,6 +97,24 @@ function kk_body_classes( $classes ) {
 }
 
 /**
+ * Feature styles split out of kenakata-kit.css in 3.29: part name => whether this page needs it.
+ * The settings screen loads all of them for its previews.
+ *
+ * @param bool $all True for every part (admin previews).
+ * @return array
+ */
+function kk_feature_css_parts( $all = false ) {
+	return array(
+		'wishlist' => $all || kk_opt( 'wl_enable' ),
+		'search'   => $all || kk_opt( 'search_enable' ),
+		'popup'    => $all || kk_opt( 'popup_enable' ),
+		'bbar'     => $all || kk_opt( 'mnav_enable' ),
+		'sticky'   => $all || ( kk_opt( 'sticky_enable' ) && is_singular( 'product' ) ),
+		'readmore' => $all || kk_opt( 'rm_enable' ),
+	);
+}
+
+/**
  * Styles that only some pages need (3.13): 'checkout', 'account', 'order' (thank-you + tracking), 'product' (Q&A + reviews).
  * Pages known in advance get the file in <head>. A shortcode or widget shown somewhere else calls this while it is
  * being drawn and puts the returned <link> in front of its own HTML, so the style is there before the content
@@ -156,6 +174,13 @@ add_action( 'wp_enqueue_scripts', function () {
 	if ( function_exists( 'is_product' ) && is_product() ) {
 		kk_need_css( 'product' );
 	}
+	// Styles of features that are switched off are not loaded at all (3.29). Each of these features prints nothing
+	// while its switch is off, so its styles are needed only when it is on.
+	foreach ( kk_feature_css_parts() as $part => $on ) {
+		if ( $on ) {
+			wp_enqueue_style( 'kenakata-kit-' . $part, kk_asset( 'kenakata-kit-' . $part . '.css' ), array( 'kenakata-kit' ), KK_VERSION );
+		}
+	}
 	if ( is_singular() ) {
 		$post = get_post();
 		$text = $post ? (string) $post->post_content : '';
@@ -168,7 +193,7 @@ add_action( 'wp_enqueue_scripts', function () {
 	// "Strong styles" come last, as before 3.13 (after the page-only styles too).
 	if ( kk_opt( 'compat_strong' ) ) {
 		$deps = array( 'kenakata-kit' );
-		foreach ( array( 'checkout', 'account', 'order', 'product' ) as $part ) {
+		foreach ( array_merge( array( 'checkout', 'account', 'order', 'product' ), array_keys( kk_feature_css_parts( true ) ) ) as $part ) {
 			if ( wp_style_is( 'kenakata-kit-' . $part, 'enqueued' ) ) {
 				$deps[] = 'kenakata-kit-' . $part;
 			}

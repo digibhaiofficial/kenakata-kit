@@ -306,6 +306,7 @@ function kk_render_license_page() {
 	if ( current_user_can( 'update_plugins' ) && function_exists( 'kk_update_check_url' ) ) {
 		echo '<p><a class="button" href="' . esc_url( kk_update_check_url() ) . '">' . esc_html__( 'Check for updates now', 'kenakata-kit' ) . '</a></p>';
 	}
+	echo '<p class="kk-card__desc">' . esc_html__( 'If WordPress says after an update that the plugin "could not be reactivated", open Plugins and click Activate under Kenakata Kit. Your settings and license stay as they were.', 'kenakata-kit' ) . '</p>';
 	echo '</div>';
 
 	echo '<div class="kk-card"><h3>' . esc_html__( 'Free and Pro', 'kenakata-kit' ) . '</h3>';

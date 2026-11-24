@@ -87,16 +87,18 @@ The owner's Windows PC has no PHP: there PHP is checked by syntax lint + careful
 After the release, update the plugin on the live site from Dashboard → Updates and test there with real data.
 
 ## Release (how code reaches GitHub — this cloud session cannot push itself)
-The owner's PC has `D:\kenakata-kit\github-push\push-to-github.bat`, which pushes with the owner's own GitHub login.
-1. Commit here. Make a bundle: `git bundle create kenakata-kit.bundle main --tags`.
-2. Copy it to the PC: `D:\kenakata-kit\github-push\kenakata-kit.bundle` (device_commit_files, overwrite).
-3. Ask the owner to double-click `push-to-github.bat` and reply "hoyeche". It pushes `main` and all tags
-   (it merges GitHub-only commits such as revoked.json from the license panel first).
-4. Two steps for a new version: first a bundle WITHOUT the new tag (push main → GitHub runs check.yml and
-   wp-test.yml on PHP 7.4 + 8.3; the repo is public, check github.com/digibhaiofficial/kenakata-kit/actions).
-   When green: `git tag vX.Y.Z`, new bundle, owner clicks again → release.yml builds, signs and publishes.
-5. After a merge on GitHub, the next bundle must contain those commits too: before bundling, ask the owner to run the
-   .bat once without changes or fetch the public repo (`git fetch https://github.com/digibhaiofficial/kenakata-kit main`).
+Shops update ONLY from a tagged, signed GitHub release (Dashboard → Updates). Pushing main alone changes nothing on
+the sites. Never hand the owner a zip to upload. One click for the owner per version:
+1. Before tagging, run every test (lint, e2e, and the full SQLite smoke test `dev/ci/smoke.sh` — same script GitHub
+   runs on PHP 7.4 + 8.3). All must pass.
+2. Commit, then tag: `git tag vX.Y.Z` (must equal KK_VERSION), then `git bundle create kenakata-kit.bundle main --tags`.
+   Before bundling, merge GitHub-only commits: `git fetch https://github.com/digibhaiofficial/kenakata-kit main` and
+   merge FETCH_HEAD if it is not already in main (the repo is public, fetch works here).
+3. Copy it to the owner's PC: `D:\kenakata-kit\github-push\kenakata-kit.bundle` (device_commit_files, overwrite).
+4. Owner double-clicks `D:\kenakata-kit\github-push\push-to-github.bat` → pushes main + tags → release.yml builds,
+   signs and publishes the release (~30 s). Check https://github.com/digibhaiofficial/kenakata-kit/actions (public).
+5. Sites check for updates every 6 h; Dashboard → Updates → "Check again" checks at once. Then update the plugin there
+   and test the live site.
 
 ## Live site used for testing
 purpleflorabd.com (Hello theme + Elementor Pro + WooCommerce + LiteSpeed Cache). It is a demo shop, not a live

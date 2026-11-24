@@ -517,6 +517,19 @@ code=$(curl -s -o /dev/null -w "%{http_code}" -A "Mozilla/5.0 (compatible; Ahref
 check "blocked bots can still read robots.txt ($code)" '[ "$code" = 200 ]'
 wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["speed_bot_block"] = 0; $s["speed_ai_block"] = 0; kk_update_settings( $s );'
 
+echo "== SEO & Google (product schema delivery/returns, price answer)"
+curl -sL -o /tmp/body "$URL/?p=$PID"
+check "SEO extras off by default: no price block, no shipping data" '! grep -q "kk-price-faq" /tmp/body && ! grep -q "shippingDetails" /tmp/body'
+wpc eval '$z = new WC_Shipping_Zone(); $z->set_zone_name( "CI Bangladesh" ); $z->add_location( "BD", "country" ); $z->save(); foreach ( array( array( "Inside Dhaka", 80 ), array( "Outside Dhaka", 150 ) ) as $r ) { $i = $z->add_shipping_method( "flat_rate" ); update_option( "woocommerce_flat_rate_" . $i . "_settings", array( "title" => $r[0], "cost" => $r[1], "tax_status" => "none", "enabled" => "yes" ) ); } $s = (array) get_option( "kk_settings", array() ); $s["seo_schema_enable"] = 1; $s["seo_return_mode"] = "days"; $s["seo_pricefaq_enable"] = 1; kk_update_settings( $s );'
+wpc post update "$PID" --post_content='<p>A cotton saree for daily wear.</p>' >/dev/null
+curl -sL -o /tmp/body "$URL/?p=$PID"
+check "product page: price block shown exactly once, no PHP errors" '[ "$(grep -o "class=\"kk-price-faq\"" /tmp/body | wc -l)" = 1 ] && clean /tmp/body'
+check "product schema has shipping details (80 + 150) and the return policy" 'grep -q "\"shippingDetails\"" /tmp/body && grep -q "\"value\":80" /tmp/body && grep -q "\"value\":150" /tmp/body && grep -q "MerchantReturnFiniteReturnWindow" /tmp/body'
+check "price block shows the live price and the delivery charges" 'grep -o "<div class=\"kk-price-faq\">.*" /tmp/body | grep -q "1,500" && grep -o "<div class=\"kk-price-faq\">.*" /tmp/body | grep -q "Inside Dhaka"'
+code=$(get "$URL/wp-admin/admin.php?page=kenakata-kit&tab=seo")
+check "SEO & Google tab opens, no PHP errors" '[ "$code" = 200 ] && grep -q "seo_schema_enable" /tmp/body && clean /tmp/body'
+wpc eval '$s = (array) get_option( "kk_settings", array() ); $s["seo_schema_enable"] = 0; $s["seo_pricefaq_enable"] = 0; kk_update_settings( $s );'
+
 echo "== Deactivate / activate / uninstall"
 wpc plugin deactivate kenakata-kit >/dev/null
 check "crons cleared on deactivation" '! wpc cron event list --fields=hook --format=csv | grep -q "^kk_"'

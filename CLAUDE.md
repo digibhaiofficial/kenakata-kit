@@ -61,8 +61,8 @@ customer ledger and handoff notes live in the private repo `digibhaiofficial/ken
 - Dashboard texts used by the script are listed in `kk_sd_strings()` (store-dashboard.php); the mock server reports
   `MISSING STRINGS` (key used in JS but not defined) and `NO BENGALI FOR` (no translation).
 - Bump the version in **both** places in kenakata-kit.php (header `Version:` and `KK_VERSION`), add a changelog
-  entry in readme.txt, commit, push, then push the tag `vX.Y.Z` (GitHub Actions builds and publishes the release).
-  Never reuse a version number.
+  entry in readme.txt, commit, then release (see "Release" below). Never reuse a version number.
+- Never hand the owner a zip to upload: shops update from the signed GitHub release (Dashboard → Updates).
 
 ## Test before every delivery (all must pass)
 On a fresh clone run `cd dev && npm install` once (php-parser for calls.js and i18n-build.js; dev/node_modules is not in git).
@@ -71,7 +71,7 @@ Without npm: lint falls back to `php -l`; translations can be added straight to 
 ```
 node dev/lint.js
 node dev/calls.js includes/store-dashboard.php includes/store-dashboard-api.php   # review the list
-node dev/e2e-dashboard.js - <outDir>          # starts its own mock server; expect "70 passed, 0 failed"
+node dev/e2e-dashboard.js - <outDir>          # starts its own mock server; expect "70 passed, 0 failed" (rarely 1–4 timing failures: run again)
 node dev/shots-dashboard.js <outDir> bn       # look at the screenshots (phone + desktop, Bengali)
 sh dev/minify.sh                              # after any CSS/JS change: regenerates assets/*.min.* (CI checks they match)
 python dev/build-zip.py                       # local zip for testing; releases come from the tag
@@ -84,7 +84,19 @@ Without MySQL / wordpress.org it also runs on SQLite:
 `LOCAL_WP=<WordPress git checkout> LOCAL_WC_ZIP=<woocommerce.zip> LOCAL_SQLITE=<sqlite-database-integration/packages/plugin-sqlite-database-integration> bash dev/ci/smoke.sh`
 (WordPress: `git clone --depth 1 --branch <ver> https://github.com/WordPress/WordPress`; WooCommerce zip from its GitHub releases).
 The owner's Windows PC has no PHP: there PHP is checked by syntax lint + careful review + the live test site.
-After the owner uploads a zip, test on the live site with real data (see HANDOFF.md → Live test).
+After the release, update the plugin on the live site from Dashboard → Updates and test there with real data.
+
+## Release (how code reaches GitHub — this cloud session cannot push itself)
+The owner's PC has `D:\kenakata-kit\github-push\push-to-github.bat`, which pushes with the owner's own GitHub login.
+1. Commit here. Make a bundle: `git bundle create kenakata-kit.bundle main --tags`.
+2. Copy it to the PC: `D:\kenakata-kit\github-push\kenakata-kit.bundle` (device_commit_files, overwrite).
+3. Ask the owner to double-click `push-to-github.bat` and reply "hoyeche". It pushes `main` and all tags
+   (it merges GitHub-only commits such as revoked.json from the license panel first).
+4. Two steps for a new version: first a bundle WITHOUT the new tag (push main → GitHub runs check.yml and
+   wp-test.yml on PHP 7.4 + 8.3; the repo is public, check github.com/digibhaiofficial/kenakata-kit/actions).
+   When green: `git tag vX.Y.Z`, new bundle, owner clicks again → release.yml builds, signs and publishes.
+5. After a merge on GitHub, the next bundle must contain those commits too: before bundling, ask the owner to run the
+   .bat once without changes or fetch the public repo (`git fetch https://github.com/digibhaiofficial/kenakata-kit main`).
 
 ## Live site used for testing
 purpleflorabd.com (Hello theme + Elementor Pro + WooCommerce + LiteSpeed Cache). It is a demo shop, not a live
